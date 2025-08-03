@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-900 text-white;
+  }
+}
+
+@layer components {
+  .stats-card {
+    @apply bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:shadow-xl hover:scale-[1.01];
+  }
+  
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #4B5563 #1F2937;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1F2937;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #4B5563;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #6B7280;
+  }
+  
+  /* Form styles for dark theme */
+  .card {
+    @apply bg-gray-700 rounded-xl shadow-lg border border-gray-600;
+  }
+  
+  .form-input {
+    @apply block w-full rounded-lg border border-gray-600 bg-gray-700 text-white shadow-sm 
+    focus:border-splitty focus:ring-2 focus:ring-splitty focus:ring-opacity-50
+    px-3 py-2 text-sm placeholder-gray-400
+    transition-all duration-200 hover:border-gray-500;
+  }
+  
+  .form-select {
+    @apply block w-full rounded-lg border border-gray-600 bg-gray-700 text-white shadow-sm 
+    focus:border-splitty focus:ring-2 focus:ring-splitty focus:ring-opacity-50
+    px-3 py-2 text-sm appearance-none cursor-pointer
+    transition-all duration-200 hover:border-gray-500;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-gray-300 mb-2;
+  }
+  
+  .form-checkbox {
+    @apply h-4 w-4 rounded border border-gray-600 bg-gray-700 text-splitty 
+    focus:ring-2 focus:ring-splitty focus:ring-opacity-50
+    transition-all duration-200;
+  }
+}
