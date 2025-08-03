@@ -16,6 +16,7 @@ import {
   CheckIcon,
   CloudArrowUpIcon,
   PhotoIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline'
 
 export default function Settings() {
@@ -97,7 +98,7 @@ export default function Settings() {
         email: profileFormData.email,
         phone: profileFormData.phone,
         bio: profileFormData.bio,
-        avatar: avatarPreview || currentUser.avatar
+        avatar: avatarPreview
       }
       
       db.updateUser(currentUser.id, updatedUser)
@@ -109,6 +110,9 @@ export default function Settings() {
       
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
+      
+      // Trigger storage event to update Layout component
+      window.dispatchEvent(new Event('storage'))
     } else if (activeTab === 'security' && currentUser) {
       // Handle password change
       if (passwordData.currentPassword && passwordData.newPassword) {
@@ -201,6 +205,11 @@ export default function Settings() {
     reader.readAsDataURL(file)
   }
 
+  const handleDeleteAvatar = () => {
+    setAvatarPreview(null)
+    setAvatar(null)
+  }
+
   const renderProfileSettings = () => (
     <div className="space-y-8">
       <div>
@@ -220,11 +229,20 @@ export default function Settings() {
             {/* Current Avatar */}
             <div className="relative">
               {avatarPreview ? (
-                <img 
-                  src={avatarPreview} 
-                  alt="Avatar preview" 
-                  className="h-24 w-24 rounded-full object-cover border-2 border-[#2a2d3a]"
-                />
+                <div className="relative">
+                  <img 
+                    src={avatarPreview} 
+                    alt="Avatar preview" 
+                    className="h-24 w-24 rounded-full object-cover border-2 border-[#2a2d3a]"
+                  />
+                  <button
+                    onClick={handleDeleteAvatar}
+                    className="absolute -bottom-1 -right-1 p-2 bg-red-500 hover:bg-red-600 rounded-full transition-colors duration-200 shadow-lg"
+                    title="Verwijder profielfoto"
+                  >
+                    <TrashIcon className="h-4 w-4 text-white" />
+                  </button>
+                </div>
               ) : (
                 <div className="h-24 w-24 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-bold text-2xl">
                   {currentUser?.name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}

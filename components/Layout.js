@@ -22,6 +22,7 @@ import {
   MoonIcon,
   ChevronDownIcon,
   ArrowRightOnRectangleIcon,
+  ChevronRightIcon,
 } from '@heroicons/react/24/outline'
 
 const allNavigation = [
@@ -44,6 +45,7 @@ export default function Layout({ children }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState('en')
+  const [expandedMenus, setExpandedMenus] = useState({})
   const router = useRouter()
   
   // Initialize user data with default values
@@ -55,21 +57,33 @@ export default function Layout({ children }) {
   
   // Load user data from localStorage after mount
   useEffect(() => {
-    const storedUserName = localStorage.getItem('userName') || 'User'
-    const storedUserRole = localStorage.getItem('userRole') || 'staff'
-    const storedUserEmail = localStorage.getItem('userEmail') || ''
-    const storedUserAvatar = localStorage.getItem('userAvatar') || ''
+    const loadUserData = () => {
+      const storedUserName = localStorage.getItem('userName') || 'User'
+      const storedUserRole = localStorage.getItem('userRole') || 'staff'
+      const storedUserEmail = localStorage.getItem('userEmail') || ''
+      const storedUserAvatar = localStorage.getItem('userAvatar') || ''
+      
+      setUserName(storedUserName)
+      setUserRole(storedUserRole)
+      setUserEmail(storedUserEmail)
+      setUserAvatar(storedUserAvatar)
+      
+      // Filter navigation based on user role
+      const filteredNavigation = allNavigation.filter(item => 
+        item.roles.includes(storedUserRole)
+      )
+      setNavigation(filteredNavigation)
+    }
     
-    setUserName(storedUserName)
-    setUserRole(storedUserRole)
-    setUserEmail(storedUserEmail)
-    setUserAvatar(storedUserAvatar)
+    // Initial load
+    loadUserData()
     
-    // Filter navigation based on user role
-    const filteredNavigation = allNavigation.filter(item => 
-      item.roles.includes(storedUserRole)
-    )
-    setNavigation(filteredNavigation)
+    // Listen for storage events to update user data
+    window.addEventListener('storage', loadUserData)
+    
+    return () => {
+      window.removeEventListener('storage', loadUserData)
+    }
   }, [])
   
   // Format role display
@@ -129,6 +143,13 @@ export default function Layout({ children }) {
       document.documentElement.classList.remove('dark')
       localStorage.setItem('splitty-theme', 'light')
     }
+  }
+
+  const toggleSubmenu = (itemName) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [itemName]: !prev[itemName]
+    }))
   }
 
   const handleLogout = () => {
@@ -191,33 +212,96 @@ export default function Layout({ children }) {
         {/* Navigation */}
         <nav className="flex-1 px-4 py-3 overflow-y-auto">
           {navigation.map((item) => {
-            const isActive = router.pathname === item.href
+            const isActive = router.pathname === item.href || 
+                           (item.submenu && item.submenu.some(sub => router.pathname === sub.href))
+            const isExpanded = expandedMenus[item.name]
+            const hasSubmenu = item.submenu && item.submenu.length > 0
+
             return (
               <div key={item.name} className="relative mb-1">
-                <Link
-                  href={item.href}
-                  className={`
-                  group flex items-center px-5 py-3 text-sm font-medium rounded-lg transition-all duration-200
-                  ${
-                    isActive
-                      ? 'bg-gradient-to-r from-[#2BE89A]/10 to-[#4FFFB0]/10 text-[#2BE89A]'
-                      : 'text-[#BBBECC] hover:text-white hover:bg-[#1c1e27]'
-                  }
-                `}
-                >
-                  <div className="mr-3">
-                    <item.icon
-                      className={`h-5 w-5 transition-all duration-200 ${
-                        isActive ? 'text-[#2BE89A]' : ''
-                      }`}
-                    />
+                {hasSubmenu ? (
+                  <button
+                    onClick={() => toggleSubmenu(item.name)}
+                    className={`
+                    w-full group flex items-center px-5 py-3 text-sm font-medium rounded-lg transition-all duration-200
+                    ${
+                      isActive
+                        ? 'bg-gradient-to-r from-[#2BE89A]/10 to-[#4FFFB0]/10 text-[#2BE89A]'
+                        : 'text-[#BBBECC] hover:text-white hover:bg-[#1c1e27]'
+                    }
+                  `}
+                  >
+                    <div className="mr-3">
+                      <item.icon
+                        className={`h-5 w-5 transition-all duration-200 ${
+                          isActive ? 'text-[#2BE89A]' : ''
+                        }`}
+                      />
+                    </div>
+                    {!sidebarCollapsed && (
+                      <>
+                        <span className="flex-1 text-left transition-all duration-200">
+                          {item.name}
+                        </span>
+                        <ChevronRightIcon 
+                          className={`h-4 w-4 transition-transform duration-200 ${
+                            isExpanded ? 'rotate-90' : ''
+                          }`}
+                        />
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className={`
+                    group flex items-center px-5 py-3 text-sm font-medium rounded-lg transition-all duration-200
+                    ${
+                      isActive
+                        ? 'bg-gradient-to-r from-[#2BE89A]/10 to-[#4FFFB0]/10 text-[#2BE89A]'
+                        : 'text-[#BBBECC] hover:text-white hover:bg-[#1c1e27]'
+                    }
+                  `}
+                  >
+                    <div className="mr-3">
+                      <item.icon
+                        className={`h-5 w-5 transition-all duration-200 ${
+                          isActive ? 'text-[#2BE89A]' : ''
+                        }`}
+                      />
+                    </div>
+                    {!sidebarCollapsed && (
+                      <span className="flex-1 transition-all duration-200">
+                        {item.name}
+                      </span>
+                    )}
+                  </Link>
+                )}
+
+                {/* Submenu */}
+                {hasSubmenu && isExpanded && !sidebarCollapsed && (
+                  <div className="mt-1 ml-10">
+                    {item.submenu.map((subItem) => {
+                      const isSubActive = router.pathname === subItem.href
+                      return (
+                        <Link
+                          key={subItem.href}
+                          href={subItem.href}
+                          className={`
+                          block px-4 py-2 text-sm rounded-lg transition-all duration-200
+                          ${
+                            isSubActive
+                              ? 'text-[#2BE89A] bg-[#2BE89A]/5'
+                              : 'text-[#BBBECC] hover:text-white hover:bg-[#1c1e27]'
+                          }
+                        `}
+                        >
+                          {subItem.name}
+                        </Link>
+                      )
+                    })}
                   </div>
-                  {!sidebarCollapsed && (
-                    <span className="flex-1 transition-all duration-200">
-                      {item.name}
-                    </span>
-                  )}
-                </Link>
+                )}
               </div>
             )
           })}
@@ -282,9 +366,17 @@ export default function Layout({ children }) {
                 onClick={handleLogout}
                 className="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-[#BBBECC] hover:text-white hover:bg-[#1c1e27] group"
               >
-                <div className="w-10 h-10 bg-gradient-to-br from-[#2BE89A] to-[#4FFFB0] rounded-full flex items-center justify-center text-[#0F1117] text-sm font-medium mr-3">
-                  MA
-                </div>
+                {userAvatar ? (
+                  <img 
+                    src={userAvatar} 
+                    alt={userName} 
+                    className="w-10 h-10 rounded-full object-cover mr-3 border-2 border-[#2a2d3a]"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#2BE89A] to-[#4FFFB0] rounded-full flex items-center justify-center text-[#0F1117] text-sm font-medium mr-3">
+                    {userName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                  </div>
+                )}
                 {!sidebarCollapsed && (
                   <>
                     <div className="flex-1 text-left">

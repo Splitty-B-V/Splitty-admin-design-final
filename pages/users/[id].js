@@ -102,6 +102,13 @@ export default function EditUser() {
   }
 
   const handleDelete = () => {
+    // Check if user is trying to delete themselves
+    const currentUserId = localStorage.getItem('userId')
+    if (currentUserId && parseInt(currentUserId) === parseInt(id)) {
+      alert('Je kunt jezelf niet verwijderen!')
+      return
+    }
+    
     const expectedName = `${formData.first_name} ${formData.last_name}`.toLowerCase()
     if (deleteConfirmation.toLowerCase() === expectedName) {
       deleteCompanyUser(id)

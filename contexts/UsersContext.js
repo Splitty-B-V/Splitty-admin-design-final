@@ -44,7 +44,7 @@ export function UsersProvider({ children }) {
     })))
   }
 
-  // Sync with database on mount and when window gets focus
+  // Sync with database on mount and when window gets focus or storage changes
   useEffect(() => {
     refreshUsers()
     
@@ -52,8 +52,19 @@ export function UsersProvider({ children }) {
       refreshUsers()
     }
     
+    const handleStorageChange = (e) => {
+      if (e.key === 'splitty_users') {
+        refreshUsers()
+      }
+    }
+    
     window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
+    window.addEventListener('storage', handleStorageChange)
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener('storage', handleStorageChange)
+    }
   }, [])
 
   const deleteCompanyUser = (userId) => {

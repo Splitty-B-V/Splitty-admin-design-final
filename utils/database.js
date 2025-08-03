@@ -141,11 +141,12 @@ class Database {
 
   deleteUser(userId) {
     const users = this.getUsers() || []
-    const index = users.findIndex(u => u.id === userId)
-    if (index !== -1) {
-      // Mark as inactive instead of deleting
-      users[index].status = 'inactive'
-      this.setUsers(users)
+    // Filter out the user to delete (actually remove from array)
+    const updatedUsers = users.filter(u => u.id !== userId)
+    
+    // Check if user was actually deleted
+    if (users.length !== updatedUsers.length) {
+      this.setUsers(updatedUsers)
       return true
     }
     return false
