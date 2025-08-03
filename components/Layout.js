@@ -23,6 +23,7 @@ import {
   ChevronDownIcon,
   ArrowRightOnRectangleIcon,
   ChevronRightIcon,
+  ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline'
 
 const allNavigation = [
@@ -35,6 +36,7 @@ const allNavigation = [
   { name: 'Uitbetalingen', href: '/payments/payouts', icon: CurrencyDollarIcon, roles: ['ceo', 'admin'] },
   { name: 'Users', href: '/users', icon: UsersIcon, roles: ['ceo', 'admin'] },
   { name: 'POS Integration', href: '/pos', icon: DevicePhoneMobileIcon, roles: ['ceo', 'admin', 'developer'] },
+  { name: 'Support', href: '/support', icon: ChatBubbleLeftRightIcon, roles: ['ceo', 'admin', 'support'] },
   { name: 'Settings', href: '/settings', icon: Cog6ToothIcon, roles: ['ceo', 'admin', 'account_manager', 'support', 'developer'] },
 ]
 
