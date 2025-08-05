@@ -255,7 +255,7 @@ export default function Settings() {
               className={`relative flex flex-col items-center justify-center w-64 h-32 border-2 border-dashed rounded-lg transition-all ${
                 dragActive 
                   ? 'border-[#2BE89A] bg-[#2BE89A]/10' 
-                  : 'border-[#2a2d3a] bg-[#0F1117] hover:border-[#2BE89A]/50'
+                  : 'border-[#2a2d3a] bg-[#0A0B0F] hover:border-[#2BE89A]/50'
               }`}
               onDragEnter={handleDragIn}
               onDragLeave={handleDragOut}
@@ -298,7 +298,7 @@ export default function Settings() {
             id="profile-first-name"
             value={profileFormData.first_name}
             onChange={(e) => setProfileFormData(prev => ({ ...prev, first_name: e.target.value }))}
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
 
@@ -312,7 +312,7 @@ export default function Settings() {
             id="profile-last-name"
             value={profileFormData.last_name}
             onChange={(e) => setProfileFormData(prev => ({ ...prev, last_name: e.target.value }))}
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
 
@@ -326,7 +326,7 @@ export default function Settings() {
             id="profile-email"
             value={profileFormData.email}
             onChange={(e) => setProfileFormData(prev => ({ ...prev, email: e.target.value }))}
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
 
@@ -340,7 +340,7 @@ export default function Settings() {
             id="profile-phone"
             value={profileFormData.phone}
             onChange={(e) => setProfileFormData(prev => ({ ...prev, phone: e.target.value }))}
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
 
@@ -354,7 +354,7 @@ export default function Settings() {
             id="profile-role"
             value={getRoleDisplay(currentUser?.role || '')}
             disabled
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-[#BBBECC] cursor-not-allowed opacity-75"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-[#BBBECC] cursor-not-allowed opacity-75"
           />
         </div>
 
@@ -368,7 +368,7 @@ export default function Settings() {
             id="profile-department"
             value={currentUser?.department || ''}
             disabled
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-[#BBBECC] cursor-not-allowed opacity-75"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-[#BBBECC] cursor-not-allowed opacity-75"
           />
         </div>
       </div>
@@ -384,7 +384,7 @@ export default function Settings() {
           value={profileFormData.bio}
           onChange={(e) => setProfileFormData(prev => ({ ...prev, bio: e.target.value }))}
           placeholder="Vertel iets over jezelf..."
-          className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent resize-none"
+          className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent resize-none"
         />
       </div>
     </div>
@@ -409,7 +409,7 @@ export default function Settings() {
             name="company-name"
             id="company-name"
             defaultValue="Splitty B.V."
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
 
@@ -422,7 +422,7 @@ export default function Settings() {
             name="email"
             id="email"
             defaultValue="contact@splitty.com"
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
 
@@ -435,7 +435,7 @@ export default function Settings() {
             name="phone"
             id="phone"
             defaultValue="+31 20 123 4567"
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
 
@@ -448,7 +448,7 @@ export default function Settings() {
             name="website"
             id="website"
             defaultValue="https://splitty.com"
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
       </div>
@@ -462,7 +462,7 @@ export default function Settings() {
           name="address"
           rows={3}
           defaultValue="Herengracht 182\n1016 BR Amsterdam\nNetherlands"
-          className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent resize-none"
+          className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent resize-none"
         />
       </div>
 
@@ -473,7 +473,7 @@ export default function Settings() {
         <select
           id="timezone"
           name="timezone"
-          className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+          className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
           defaultValue="Europe/Amsterdam"
         >
           <option value="Europe/Amsterdam">Europe/Amsterdam (CET)</option>
@@ -503,14 +503,14 @@ export default function Settings() {
           { id: 'new-reviews', label: 'Nieuwe Reviews', description: 'Klantbeoordelingen en ratings', checked: false },
           { id: 'marketing', label: 'Marketing Updates', description: 'Product updates en aankondigingen', checked: false },
         ].map((item) => (
-          <div key={item.id} className="flex items-start p-4 rounded-lg hover:bg-[#0F1117] transition-colors duration-200">
+          <div key={item.id} className="flex items-start p-4 rounded-lg hover:bg-[#0A0B0F] transition-colors duration-200">
             <div className="flex h-6 items-center">
               <input
                 id={item.id}
                 name={item.id}
                 type="checkbox"
                 defaultChecked={item.checked}
-                className="h-5 w-5 rounded border-2 border-[#2a2d3a] bg-[#0F1117] text-[#2BE89A] focus:ring-2 focus:ring-[#2BE89A] focus:ring-opacity-20 transition-all duration-200"
+                className="h-5 w-5 rounded border-2 border-[#2a2d3a] bg-[#0A0B0F] text-[#2BE89A] focus:ring-2 focus:ring-[#2BE89A] focus:ring-opacity-20 transition-all duration-200"
               />
             </div>
             <div className="ml-4">
@@ -566,7 +566,7 @@ export default function Settings() {
         </p>
       </div>
 
-      <div className="bg-[#0F1117] rounded-xl p-8 border border-[#2a2d3a]">
+      <div className="bg-[#0A0B0F] rounded-xl p-8 border border-[#2a2d3a]">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <div className="bg-blue-500/20 p-4 rounded-xl">
@@ -666,7 +666,7 @@ export default function Settings() {
             placeholder="••••••••"
             value={passwordData.currentPassword}
             onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
 
@@ -681,7 +681,7 @@ export default function Settings() {
             placeholder="••••••••"
             value={passwordData.newPassword}
             onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
 
@@ -696,7 +696,7 @@ export default function Settings() {
             placeholder="••••••••"
             value={passwordData.confirmPassword}
             onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
           />
         </div>
       </div>
@@ -708,7 +708,7 @@ export default function Settings() {
         </p>
       </div>
 
-      <div className="bg-[#0F1117] rounded-lg p-6 border border-[#2a2d3a]">
+      <div className="bg-[#0A0B0F] rounded-lg p-6 border border-[#2a2d3a]">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <ShieldCheckIcon className="h-8 w-8 text-[#2BE89A]" />
@@ -736,7 +736,7 @@ export default function Settings() {
           { device: 'iPhone 13 - App', location: 'Amsterdam, NL', current: false },
           { device: 'iPad Pro - Safari', location: 'Rotterdam, NL', current: false },
         ].map((session, index) => (
-          <div key={index} className="bg-[#0F1117] rounded-lg p-4 flex items-center justify-between border border-[#2a2d3a]">
+          <div key={index} className="bg-[#0A0B0F] rounded-lg p-4 flex items-center justify-between border border-[#2a2d3a]">
             <div>
               <p className="text-white font-medium">{session.device}</p>
               <p className="text-sm text-[#BBBECC]">{session.location}</p>
@@ -952,7 +952,7 @@ export default function Settings() {
                       className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 mb-1 ${
                         activeTab === tab.id
                           ? 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black shadow-lg'
-                          : 'text-[#BBBECC] hover:bg-[#0F1117] hover:text-white'
+                          : 'text-[#BBBECC] hover:bg-[#0A0B0F] hover:text-white'
                       }`}
                     >
                       <tab.icon className="mr-3 h-5 w-5" />
@@ -968,8 +968,8 @@ export default function Settings() {
                   <div className="p-8">
                     {renderContent()}
                   </div>
-                  <div className="bg-[#0F1117] px-6 py-4 flex justify-end space-x-3 border-t border-[#2a2d3a]">
-                    <button className="px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition">
+                  <div className="bg-[#0A0B0F] px-6 py-4 flex justify-end space-x-3 border-t border-[#2a2d3a]">
+                    <button className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition">
                       Annuleren
                     </button>
                     <button

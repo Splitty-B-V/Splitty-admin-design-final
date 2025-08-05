@@ -150,7 +150,7 @@ export default function NewUser() {
                         name="first_name"
                         id="first_name"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         placeholder="John"
                         value={formData.first_name}
                         onChange={handleInputChange}
@@ -166,7 +166,7 @@ export default function NewUser() {
                         name="last_name"
                         id="last_name"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         placeholder="Doe"
                         value={formData.last_name}
                         onChange={handleInputChange}
@@ -182,7 +182,7 @@ export default function NewUser() {
                         name="email"
                         id="email"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         placeholder="john.doe@example.com"
                         value={formData.email}
                         onChange={handleInputChange}
@@ -196,7 +196,7 @@ export default function NewUser() {
                         type="tel"
                         name="phone"
                         id="phone"
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         placeholder="+31 6 12345678"
                         value={formData.phone}
                         onChange={handleInputChange}
@@ -222,7 +222,7 @@ export default function NewUser() {
                         id="password"
                         required
                         minLength="8"
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={handleInputChange}
@@ -235,7 +235,7 @@ export default function NewUser() {
                               {getPasswordStrengthText().text}
                             </span>
                           </div>
-                          <div className="w-full bg-[#0F1117] rounded-full h-2">
+                          <div className="w-full bg-[#0A0B0F] rounded-full h-2">
                             <div 
                               className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrengthText().color}`}
                               style={{ width: `${(passwordStrength / 4) * 100}%` }}
@@ -253,7 +253,7 @@ export default function NewUser() {
                         type="password"
                         id="confirm_password"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         placeholder="••••••••"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
@@ -293,8 +293,8 @@ export default function NewUser() {
                           key={role.value}
                           className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none transition-all ${
                             formData.role === role.value
-                              ? 'bg-[#0F1117] border-[#2BE89A]'
-                              : 'bg-[#0F1117] border-[#2a2d3a] hover:border-[#2BE89A]/50'
+                              ? 'bg-[#0A0B0F] border-[#2BE89A]'
+                              : 'bg-[#0A0B0F] border-[#2a2d3a] hover:border-[#2BE89A]/50'
                           }`}
                         >
                           <input
@@ -330,7 +330,7 @@ export default function NewUser() {
                     <select
                       id="department"
                       name="department"
-                      className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                       value={formData.department}
                       onChange={handleInputChange}
                       required
@@ -345,13 +345,13 @@ export default function NewUser() {
                   </div>
 
                   {/* Active Status */}
-                  <div className="bg-[#0F1117] rounded-lg p-4">
+                  <div className="bg-[#0A0B0F] rounded-lg p-4">
                     <div className="flex items-center">
                       <input
                         id="is_active"
                         name="is_active"
                         type="checkbox"
-                        className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0F1117]"
+                        className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0A0B0F]"
                         checked={formData.is_active}
                         onChange={handleInputChange}
                       />
@@ -367,7 +367,7 @@ export default function NewUser() {
                 <div className="flex justify-between pt-6 border-t border-[#2a2d3a]">
                   <Link
                     href="/users"
-                    className="px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                    className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
                   >
                     Annuleren
                   </Link>

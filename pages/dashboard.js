@@ -100,20 +100,6 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="min-h-screen bg-[#0A0B0F]">
-        {/* Marquee Announcement */}
-        <div className="bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black py-2 overflow-hidden">
-          <div className="animate-marquee whitespace-nowrap flex items-center">
-            <span className="mx-4">🚀 Nieuwe feature: Automatische tip verdeling nu beschikbaar!</span>
-            <span className="mx-4">•</span>
-            <span className="mx-4">📊 Q3 2024: Record omzet van €2.5M bereikt</span>
-            <span className="mx-4">•</span>
-            <span className="mx-4">🎉 Welkom aan 25 nieuwe restaurants deze maand</span>
-            <span className="mx-4">•</span>
-            <span className="mx-4">🚀 Nieuwe feature: Automatische tip verdeling nu beschikbaar!</span>
-            <span className="mx-4">•</span>
-            <span className="mx-4">📊 Q3 2024: Record omzet van €2.5M bereikt</span>
-          </div>
-        </div>
 
         <div className="px-4 sm:px-6 lg:px-8 py-6">
           {/* Header */}
@@ -183,7 +169,7 @@ export default function Dashboard() {
               </div>
               <div className="space-y-3">
                 {openQuotations.map((quote) => (
-                  <div key={quote.id} className="bg-[#0F1117] rounded-lg p-4 hover:bg-[#1a1c25] transition-colors">
+                  <div key={quote.id} className="bg-[#0A0B0F] rounded-lg p-4 hover:bg-[#1a1c25] transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-medium text-white">{quote.restaurant}</h3>
                       {quote.status === 'urgent' && (
@@ -249,7 +235,7 @@ export default function Dashboard() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {partners.map((partner, index) => (
-                <div key={index} className="bg-[#0F1117] rounded-lg p-4 hover:bg-[#1a1c25] transition-colors">
+                <div key={index} className="bg-[#0A0B0F] rounded-lg p-4 hover:bg-[#1a1c25] transition-colors">
                   <div className="flex items-center mb-3">
                     <span className="text-2xl mr-3">{partner.icon}</span>
                     <div>
@@ -272,19 +258,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes marquee {
-          0% {
-            transform: translateX(0%);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        .animate-marquee {
-          animation: marquee 30s linear infinite;
-        }
-      `}</style>
     </Layout>
   )
 }

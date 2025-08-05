@@ -153,7 +153,7 @@ export default function EditRestaurantUser() {
                         name="first_name"
                         id="first_name"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         value={formData.first_name}
                         onChange={handleInputChange}
                       />
@@ -168,7 +168,7 @@ export default function EditRestaurantUser() {
                         name="last_name"
                         id="last_name"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         value={formData.last_name}
                         onChange={handleInputChange}
                       />
@@ -187,7 +187,7 @@ export default function EditRestaurantUser() {
                           name="email"
                           id="email"
                           required
-                          className="w-full pl-10 pr-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                          className="w-full pl-10 pr-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                           value={formData.email}
                           onChange={handleInputChange}
                         />
@@ -206,7 +206,7 @@ export default function EditRestaurantUser() {
                           type="tel"
                           name="phone"
                           id="phone"
-                          className="w-full pl-10 pr-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                          className="w-full pl-10 pr-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                           value={formData.phone}
                           onChange={handleInputChange}
                         />
@@ -224,7 +224,7 @@ export default function EditRestaurantUser() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {[
                         { 
-                          value: 'restaurant_admin', 
+                          value: 'admin', 
                           label: 'Restaurant Admin', 
                           desc: 'Volledige toegang tot restaurant functies', 
                           icon: BuildingOfficeIcon, 
@@ -242,8 +242,8 @@ export default function EditRestaurantUser() {
                           key={role.value}
                           className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none transition-all ${
                             formData.role === role.value
-                              ? 'bg-[#0F1117] border-[#2BE89A]'
-                              : 'bg-[#0F1117] border-[#2a2d3a] hover:border-[#2BE89A]/50'
+                              ? 'bg-[#0A0B0F] border-[#2BE89A]'
+                              : 'bg-[#0A0B0F] border-[#2a2d3a] hover:border-[#2BE89A]/50'
                           }`}
                         >
                           <input
@@ -272,13 +272,13 @@ export default function EditRestaurantUser() {
                   </div>
 
                   {/* Active Status */}
-                  <div className="bg-[#0F1117] rounded-lg p-4">
+                  <div className="bg-[#0A0B0F] rounded-lg p-4">
                     <div className="flex items-center">
                       <input
                         id="is_active"
                         name="is_active"
                         type="checkbox"
-                        className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0F1117]"
+                        className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0A0B0F]"
                         checked={formData.is_active}
                         onChange={handleInputChange}
                       />
@@ -295,14 +295,14 @@ export default function EditRestaurantUser() {
                   <div className="flex space-x-3">
                     <Link
                       href={`/restaurants/${restaurantId}/users`}
-                      className="px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                      className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
                     >
                       Annuleren
                     </Link>
                     <button
                       type="button"
                       onClick={() => setShowPasswordModal(true)}
-                      className="inline-flex items-center px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                      className="inline-flex items-center px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
                     >
                       <KeyIcon className="h-5 w-5 mr-2" />
                       Wachtwoord Wijzigen
@@ -342,7 +342,7 @@ export default function EditRestaurantUser() {
                   id="new_password"
                   required
                   minLength="8"
-                  className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                   placeholder="••••••••"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -357,7 +357,7 @@ export default function EditRestaurantUser() {
                   type="password"
                   id="confirm_new_password"
                   required
-                  className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -372,7 +372,7 @@ export default function EditRestaurantUser() {
                     setNewPassword('')
                     setConfirmPassword('')
                   }}
-                  className="px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                  className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
                 >
                   Annuleren
                 </button>
@@ -414,7 +414,7 @@ export default function EditRestaurantUser() {
               <input
                 type="text"
                 id="delete_confirmation"
-                className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 placeholder={`${formData.first_name} ${formData.last_name}`}
                 value={deleteConfirmation}
                 onChange={(e) => setDeleteConfirmation(e.target.value)}
@@ -431,7 +431,7 @@ export default function EditRestaurantUser() {
                   setShowDeleteModal(false)
                   setDeleteConfirmation('')
                 }}
-                className="px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
               >
                 Annuleren
               </button>

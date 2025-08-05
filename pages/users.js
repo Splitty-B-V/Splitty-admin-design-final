@@ -198,7 +198,7 @@ export default function Users() {
                       id="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="block w-full pl-10 pr-3 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className="block w-full pl-10 pr-3 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                       placeholder="Zoek op naam, email of afdeling..."
                     />
                   </div>
@@ -211,7 +211,7 @@ export default function Users() {
                       name="role"
                       value={roleFilter}
                       onChange={(e) => setRoleFilter(e.target.value)}
-                      className="bg-[#0F1117] border border-[#2a2d3a] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2BE89A]"
+                      className="bg-[#0A0B0F] border border-[#2a2d3a] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2BE89A]"
                     >
                       <option value="all">Alle Rollen</option>
                       <option value="ceo">CEO</option>
@@ -225,7 +225,7 @@ export default function Users() {
                       name="status"
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
-                      className="bg-[#0F1117] border border-[#2a2d3a] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2BE89A]"
+                      className="bg-[#0A0B0F] border border-[#2a2d3a] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2BE89A]"
                     >
                       <option value="all">Alle Status</option>
                       <option value="active">Actief</option>
@@ -240,7 +240,7 @@ export default function Users() {
             <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full">
-                  <thead className="bg-[#0F1117] border-b border-[#2a2d3a]">
+                  <thead className="bg-[#0A0B0F] border-b border-[#2a2d3a]">
                     <tr>
                       <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
                         Gebruiker
@@ -264,7 +264,7 @@ export default function Users() {
                   </thead>
                   <tbody className="divide-y divide-[#2a2d3a]">
                     {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-[#0F1117] transition-colors">
+                      <tr key={user.id} className="hover:bg-[#0A0B0F] transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-semibold">
@@ -320,14 +320,14 @@ export default function Users() {
                           <div className="flex items-center justify-end space-x-3">
                             <Link
                               href={`/users/${user.id}`}
-                              className="inline-flex items-center px-3 py-1.5 bg-[#0F1117] text-[#2BE89A] border border-[#2BE89A]/30 rounded-lg hover:bg-[#2BE89A]/10 transition text-sm"
+                              className="inline-flex items-center px-3 py-1.5 bg-[#0A0B0F] text-[#2BE89A] border border-[#2BE89A]/30 rounded-lg hover:bg-[#2BE89A]/10 transition text-sm"
                             >
                               Bewerk
                             </Link>
                             {canDelete && user.role !== 'ceo' && ( // Don't allow deleting CEO
                               <Link
                                 href={`/users/${user.id}?delete=true`}
-                                className="inline-flex items-center px-3 py-1.5 bg-[#0F1117] text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition text-sm"
+                                className="inline-flex items-center px-3 py-1.5 bg-[#0A0B0F] text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition text-sm"
                               >
                                 Verwijder
                               </Link>
@@ -342,7 +342,7 @@ export default function Users() {
               
               {/* Table Footer */}
               {filteredUsers.length > 0 && (
-                <div className="bg-[#0F1117] px-6 py-4 border-t border-[#2a2d3a]">
+                <div className="bg-[#0A0B0F] px-6 py-4 border-t border-[#2a2d3a]">
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-[#BBBECC]">
                       <span className="font-medium text-white">{filteredUsers.length}</span> gebruikers gevonden

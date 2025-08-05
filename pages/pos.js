@@ -1,192 +1,113 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Layout from '../components/Layout'
 import Breadcrumb from '../components/Breadcrumb'
+import { useRestaurants } from '../contexts/RestaurantsContext'
 import {
-  DevicePhoneMobileIcon,
-  ComputerDesktopIcon,
+  BuildingStorefrontIcon,
   CheckCircleIcon,
   XCircleIcon,
   ClockIcon,
   WifiIcon,
   ArrowPathIcon,
   CpuChipIcon,
-  CloudIcon,
-  PlusIcon,
+  ExclamationTriangleIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/outline'
 
 export default function POSIntegration() {
-  const [selectedRestaurant, setSelectedRestaurant] = useState('all')
+  const { restaurants } = useRestaurants()
+  const [posStatuses, setPosStatuses] = useState({})
+  const [refreshing, setRefreshing] = useState(false)
 
-  const posDevices = [
-    {
-      id: 'pos_001',
-      name: 'Hoofd Terminal',
-      restaurant: 'Limon B.V.',
-      type: 'terminal',
-      model: 'Verifone V400m',
-      status: 'online',
-      lastSeen: new Date('2025-08-02T10:45:00'),
-      version: '2.3.1',
-      transactions: 156,
-    },
-    {
-      id: 'pos_002',
-      name: 'Mobiel POS 1',
-      restaurant: 'Limon B.V.',
-      type: 'mobile',
-      model: 'iPad Pro 12.9',
-      status: 'online',
-      lastSeen: new Date('2025-08-02T10:43:00'),
-      version: '2.3.1',
-      transactions: 89,
-    },
-    {
-      id: 'pos_003',
-      name: 'Bar Terminal',
-      restaurant: 'Limon B.V.',
-      type: 'terminal',
-      model: 'Verifone V400m',
-      status: 'offline',
-      lastSeen: new Date('2025-08-01T23:15:00'),
-      version: '2.3.0',
-      transactions: 234,
-    },
-    {
-      id: 'pos_004',
-      name: 'Restaurant Terminal',
-      restaurant: 'Anatolii Restaurant',
-      type: 'terminal',
-      model: 'Ingenico Move 5000',
-      status: 'online',
-      lastSeen: new Date('2025-08-02T10:42:00'),
-      version: '2.3.1',
-      transactions: 67,
-    },
-    {
-      id: 'pos_005',
-      name: 'Mobiel POS',
-      restaurant: 'Viresh Kewalbansing',
-      type: 'mobile',
-      model: 'Samsung Galaxy Tab S8',
-      status: 'online',
-      lastSeen: new Date('2025-08-02T10:40:00'),
-      version: '2.3.1',
-      transactions: 45,
-    },
-    {
-      id: 'pos_006',
-      name: 'Hoofd Terminal',
-      restaurant: 'Loetje',
-      type: 'terminal',
-      model: 'Verifone V400m',
-      status: 'online',
-      lastSeen: new Date('2025-08-02T10:44:00'),
-      version: '2.3.1',
-      transactions: 198,
-    },
-    {
-      id: 'pos_007',
-      name: 'Keuken Display',
-      restaurant: 'Restaurant Stefan',
-      type: 'display',
-      model: 'Kitchen Display System',
-      status: 'maintenance',
-      lastSeen: new Date('2025-07-30T14:00:00'),
-      version: '2.2.5',
-      transactions: 0,
-    },
-  ]
+  // Load POS data from localStorage for each restaurant
+  useEffect(() => {
+    const loadPosStatuses = () => {
+      const statuses = {}
+      
+      restaurants.forEach(restaurant => {
+        if (!restaurant.deleted) {
+          // Try to load onboarding data
+          const onboardingData = localStorage.getItem(`onboarding_${restaurant.id}`)
+          if (onboardingData) {
+            try {
+              const parsed = JSON.parse(onboardingData)
+              if (parsed.posData && parsed.posData.posType) {
+                statuses[restaurant.id] = {
+                  connected: true,
+                  posType: parsed.posData.posType,
+                  username: parsed.posData.username,
+                  environment: parsed.posData.environment || 'production',
+                  isActive: parsed.posData.isActive !== false,
+                  lastSync: new Date().toISOString(), // In real app, this would come from server
+                }
+              } else {
+                statuses[restaurant.id] = { connected: false }
+              }
+            } catch (e) {
+              statuses[restaurant.id] = { connected: false }
+            }
+          } else {
+            statuses[restaurant.id] = { connected: false }
+          }
+        }
+      })
+      
+      setPosStatuses(statuses)
+    }
 
-  const integrations = [
-    {
-      name: 'Verifone Integratie',
-      status: 'active',
-      description: 'Verbind met Verifone betaalterminals',
-      features: ['Kaartbetalingen', 'NFC/Contactloos', 'Bonnen printen'],
-      connectedDevices: 4,
-    },
-    {
-      name: 'Ingenico Connect',
-      status: 'active',
-      description: 'Ondersteuning voor Ingenico betaalapparaten',
-      features: ['Multi-valuta', 'Chip & PIN', 'Mobiele betalingen'],
-      connectedDevices: 1,
-    },
-    {
-      name: 'Keuken Display Systeem',
-      status: 'beta',
-      description: 'Real-time bestellingen weergave voor keukenpersoneel',
-      features: ['Order tracking', 'Tijdsbeheer', 'Status updates'],
-      connectedDevices: 1,
-    },
-    {
-      name: 'Tablet POS',
-      status: 'active',
-      description: 'Mobiele kassa voor tablets',
-      features: ['Tafel-side bestellen', 'Rekening splitsen', 'Offline modus'],
-      connectedDevices: 2,
-    },
-  ]
+    loadPosStatuses()
+    
+    // Set up interval to refresh every 5 seconds (simulating real-time updates)
+    const interval = setInterval(loadPosStatuses, 5000)
+    
+    return () => clearInterval(interval)
+  }, [restaurants])
 
-  const restaurants = ['all', 'Limon B.V.', 'Anatolii Restaurant', 'Viresh Kewalbansing', 'Loetje', 'Restaurant Stefan']
-
-  const filteredDevices = posDevices.filter((device) => {
-    return selectedRestaurant === 'all' || device.restaurant === selectedRestaurant
-  })
+  const handleRefresh = () => {
+    setRefreshing(true)
+    // Simulate refresh
+    setTimeout(() => {
+      setRefreshing(false)
+      // Reload POS statuses
+      const event = new Event('storage')
+      window.dispatchEvent(event)
+    }, 1000)
+  }
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case 'online':
-        return <CheckCircleIcon className="h-5 w-5 text-[#2BE89A]" />
-      case 'offline':
-        return <XCircleIcon className="h-5 w-5 text-red-400" />
-      case 'maintenance':
-        return <ClockIcon className="h-5 w-5 text-yellow-400" />
-      default:
-        return null
+    if (!status || !status.connected) {
+      return <XCircleIcon className="h-5 w-5 text-red-400" />
     }
+    if (!status.isActive) {
+      return <ClockIcon className="h-5 w-5 text-yellow-400" />
+    }
+    return <CheckCircleIcon className="h-5 w-5 text-[#2BE89A]" />
+  }
+
+  const getStatusText = (status) => {
+    if (!status || !status.connected) {
+      return 'Niet Verbonden'
+    }
+    if (!status.isActive) {
+      return 'Inactief'
+    }
+    return 'Actief'
   }
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'online':
-        return 'bg-[#2BE89A]/20 text-[#2BE89A]'
-      case 'offline':
-        return 'bg-red-500/20 text-red-400'
-      case 'maintenance':
-        return 'bg-yellow-500/20 text-yellow-400'
-      default:
-        return 'bg-gray-500/20 text-gray-400'
+    if (!status || !status.connected) {
+      return 'bg-red-500/20 text-red-400 border-red-500/30'
     }
-  }
-
-  const getDeviceIcon = (type) => {
-    switch (type) {
-      case 'terminal':
-        return <ComputerDesktopIcon className="h-8 w-8 text-[#BBBECC]" />
-      case 'mobile':
-        return <DevicePhoneMobileIcon className="h-8 w-8 text-[#BBBECC]" />
-      case 'display':
-        return <ComputerDesktopIcon className="h-8 w-8 text-[#BBBECC]" />
-      default:
-        return <CpuChipIcon className="h-8 w-8 text-[#BBBECC]" />
+    if (!status.isActive) {
+      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
     }
+    return 'bg-[#2BE89A]/20 text-[#2BE89A] border-[#2BE89A]/30'
   }
 
-  const formatDate = (date) => {
-    const diff = new Date() - date
-    const minutes = Math.floor(diff / 60000)
-    
-    if (minutes < 1) return 'Zojuist'
-    if (minutes < 60) return `${minutes}m geleden`
-    if (minutes < 1440) return `${Math.floor(minutes / 60)}u geleden`
-    return `${Math.floor(minutes / 1440)}d geleden`
-  }
-
-  const handleRefresh = () => {
-    console.log('Refreshing POS devices...')
-  }
+  const activeRestaurants = restaurants.filter(r => !r.deleted)
+  const connectedCount = Object.values(posStatuses).filter(s => s.connected).length
+  const activeCount = Object.values(posStatuses).filter(s => s.connected && s.isActive).length
 
   return (
     <Layout>
@@ -199,26 +120,20 @@ export default function POSIntegration() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-white">POS Integratie</h1>
-                <p className="text-[#BBBECC] mt-1">Beheer je kassa systemen en betaalterminals</p>
+                <h1 className="text-3xl font-bold text-white">POS Integratie Overzicht</h1>
+                <p className="text-[#BBBECC] mt-1">Real-time status van alle restaurant POS integraties</p>
               </div>
-              <div className="flex space-x-3">
-                <button
-                  type="button"
-                  onClick={handleRefresh}
-                  className="inline-flex items-center px-4 py-3 border border-[#2a2d3a] rounded-lg text-white bg-[#1c1e27] hover:bg-[#252833] transition-all duration-200"
-                >
-                  <ArrowPathIcon className="-ml-1 mr-2 h-5 w-5 text-[#BBBECC]" />
-                  Ververs Status
-                </button>
-                <Link
-                  href="/pos/new"
-                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition-opacity shadow-lg"
-                >
-                  <PlusIcon className="-ml-1 mr-2 h-5 w-5" />
-                  Nieuwe POS Toevoegen
-                </Link>
-              </div>
+              <button
+                type="button"
+                onClick={handleRefresh}
+                className={`inline-flex items-center px-4 py-3 border border-[#2a2d3a] rounded-lg text-white bg-[#1c1e27] hover:bg-[#252833] transition-all duration-200 ${
+                  refreshing ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                disabled={refreshing}
+              >
+                <ArrowPathIcon className={`-ml-1 mr-2 h-5 w-5 text-[#BBBECC] ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? 'Vernieuwen...' : 'Ververs Status'}
+              </button>
             </div>
 
             {/* Stats Cards */}
@@ -226,11 +141,22 @@ export default function POSIntegration() {
               <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
                 <div className="flex items-center">
                   <div className="p-3 rounded-lg bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]">
-                    <CpuChipIcon className="h-6 w-6 text-black" />
+                    <BuildingStorefrontIcon className="h-6 w-6 text-black" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Totaal Apparaten</p>
-                    <p className="text-2xl font-bold text-white">{filteredDevices.length}</p>
+                    <p className="text-[#BBBECC] text-sm">Totaal Restaurants</p>
+                    <p className="text-2xl font-bold text-white">{activeRestaurants.length}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
+                <div className="flex items-center">
+                  <div className="p-3 rounded-lg bg-blue-500/20">
+                    <CpuChipIcon className="h-6 w-6 text-blue-400" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-[#BBBECC] text-sm">POS Verbonden</p>
+                    <p className="text-2xl font-bold text-white">{connectedCount}</p>
                   </div>
                 </div>
               </div>
@@ -240,172 +166,112 @@ export default function POSIntegration() {
                     <WifiIcon className="h-6 w-6 text-[#2BE89A]" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Online</p>
-                    <p className="text-2xl font-bold text-white">
-                      {filteredDevices.filter(d => d.status === 'online').length}
-                    </p>
+                    <p className="text-[#BBBECC] text-sm">Actief</p>
+                    <p className="text-2xl font-bold text-white">{activeCount}</p>
                   </div>
                 </div>
               </div>
               <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
                 <div className="flex items-center">
-                  <div className="p-3 rounded-lg bg-blue-500/20">
-                    <CloudIcon className="h-6 w-6 text-blue-400" />
+                  <div className="p-3 rounded-lg bg-red-500/20">
+                    <ExclamationTriangleIcon className="h-6 w-6 text-red-400" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Integraties</p>
-                    <p className="text-2xl font-bold text-white">{integrations.length}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
-                <div className="flex items-center">
-                  <div className="p-3 rounded-lg bg-purple-500/20">
-                    <CheckCircleIcon className="h-6 w-6 text-purple-400" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Transacties Vandaag</p>
+                    <p className="text-[#BBBECC] text-sm">Niet Verbonden</p>
                     <p className="text-2xl font-bold text-white">
-                      {filteredDevices.reduce((sum, d) => sum + d.transactions, 0)}
+                      {activeRestaurants.length - connectedCount}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Integrations */}
+            {/* Restaurants POS Status */}
             <div>
-              <h2 className="text-xl font-semibold text-white mb-4">Beschikbare Integraties</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {integrations.map((integration) => (
-                  <div key={integration.name} className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a] hover:border-[#2BE89A]/30 transition-all duration-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-medium text-white">{integration.name}</h3>
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          integration.status === 'active'
-                            ? 'bg-[#2BE89A]/20 text-[#2BE89A]'
-                            : 'bg-yellow-500/20 text-yellow-400'
-                        }`}
-                      >
-                        {integration.status === 'active' ? 'Actief' : 'Beta'}
-                      </span>
-                    </div>
-                    <p className="text-sm text-[#BBBECC] mb-4">{integration.description}</p>
-                    <div className="space-y-3">
-                      <div className="text-sm text-[#BBBECC]">Functies:</div>
-                      <div className="flex flex-wrap gap-2">
-                        {integration.features.map((feature) => (
-                          <span
-                            key={feature}
-                            className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-[#0F1117] border border-[#2a2d3a] text-[#BBBECC]"
-                          >
-                            {feature}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-[#2a2d3a]">
-                      <p className="text-sm text-[#BBBECC]">
-                        Verbonden apparaten: <span className="text-white font-medium">{integration.connectedDevices}</span>
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Filter */}
-            <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
-              <div className="max-w-xs">
-                <label htmlFor="restaurant" className="block text-sm font-medium text-[#BBBECC] mb-2">
-                  Filter op Restaurant
-                </label>
-                <select
-                  id="restaurant"
-                  name="restaurant"
-                  value={selectedRestaurant}
-                  onChange={(e) => setSelectedRestaurant(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
-                >
-                  {restaurants.map((restaurant) => (
-                    <option key={restaurant} value={restaurant}>
-                      {restaurant === 'all' ? 'Alle Restaurants' : restaurant}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Devices Grid */}
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-4">Verbonden Apparaten</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredDevices.map((device) => (
-                  <div
-                    key={device.id}
-                    className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden hover:border-[#2BE89A]/30 transition-all duration-200 group"
-                  >
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        {getDeviceIcon(device.type)}
-                        <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                            device.status
-                          )}`}
-                        >
-                          {getStatusIcon(device.status)}
-                          <span className="ml-1 capitalize">{device.status}</span>
-                        </span>
-                      </div>
-                      
-                      <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#2BE89A] transition-colors">{device.name}</h3>
-                      <p className="text-sm text-[#BBBECC] mb-4">{device.restaurant}</p>
-                      
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-[#BBBECC]">Model</span>
-                          <span className="text-white">{device.model}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#BBBECC]">Versie</span>
-                          <span className="text-white">{device.version}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#BBBECC]">Laatst Gezien</span>
-                          <span className="text-white">{formatDate(device.lastSeen)}</span>
-                        </div>
-                        {device.type !== 'display' && (
-                          <div className="flex justify-between">
-                            <span className="text-[#BBBECC]">Transacties Vandaag</span>
-                            <span className="text-[#2BE89A] font-medium">{device.transactions}</span>
+              <h2 className="text-xl font-semibold text-white mb-4">Restaurant POS Status</h2>
+              <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden">
+                <div className="divide-y divide-[#2a2d3a]">
+                  {activeRestaurants.map((restaurant) => {
+                    const posStatus = posStatuses[restaurant.id]
+                    return (
+                      <div key={restaurant.id} className="p-6 hover:bg-[#0A0B0F] transition">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className="h-12 w-12 rounded-lg overflow-hidden bg-white flex items-center justify-center">
+                              {restaurant.logo ? (
+                                <img
+                                  src={restaurant.logo}
+                                  alt={restaurant.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <div className="h-full w-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-bold text-lg">
+                                  {restaurant.name.charAt(0)}
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-semibold text-white">{restaurant.name}</h3>
+                              <p className="text-sm text-[#BBBECC]">{restaurant.location}</p>
+                            </div>
                           </div>
-                        )}
-                      </div>
-                      
-                      <div className="mt-4 pt-4 border-t border-[#2a2d3a]">
-                        <div className="flex justify-between">
-                          <button className="text-[#2BE89A] hover:text-[#4FFFB0] text-sm font-medium transition-colors">
-                            Configureren
-                          </button>
-                          <button className="text-[#BBBECC] hover:text-white text-sm transition-colors">
-                            Logs
-                          </button>
+                          
+                          <div className="flex items-center space-x-6">
+                            {posStatus && posStatus.connected ? (
+                              <>
+                                <div className="text-right">
+                                  <p className="text-sm font-medium text-white">{posStatus.posType}</p>
+                                  <p className="text-xs text-[#BBBECC]">
+                                    {posStatus.environment === 'production' ? 'Productie' : posStatus.environment}
+                                  </p>
+                                </div>
+                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(posStatus)}`}>
+                                  {getStatusIcon(posStatus)}
+                                  <span className="ml-1.5">{getStatusText(posStatus)}</span>
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(posStatus)}`}>
+                                  {getStatusIcon(posStatus)}
+                                  <span className="ml-1.5">{getStatusText(posStatus)}</span>
+                                </span>
+                              </>
+                            )}
+                            
+                            <Link
+                              href={posStatus && posStatus.connected 
+                                ? `/restaurants/${restaurant.id}` 
+                                : `/restaurants/${restaurant.id}/onboarding?step=3`
+                              }
+                              className="inline-flex items-center px-4 py-2 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white hover:bg-[#1a1c25] transition"
+                            >
+                              {posStatus && posStatus.connected ? 'Bekijk Details' : 'Configureer POS'}
+                              <ArrowRightIcon className="ml-2 h-4 w-4" />
+                            </Link>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    )
+                  })}
+                </div>
               </div>
             </div>
 
             {/* Empty State */}
-            {filteredDevices.length === 0 && (
+            {activeRestaurants.length === 0 && (
               <div className="text-center py-16 bg-[#1c1e27] rounded-xl border border-[#2a2d3a]">
-                <CpuChipIcon className="mx-auto h-12 w-12 text-[#BBBECC]" />
+                <BuildingStorefrontIcon className="mx-auto h-12 w-12 text-[#BBBECC]" />
                 <p className="mt-4 text-[#BBBECC]">
-                  Geen POS apparaten gevonden voor het geselecteerde restaurant.
+                  Geen actieve restaurants gevonden.
                 </p>
+                <Link
+                  href="/restaurants/new"
+                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition mt-4"
+                >
+                  Voeg Restaurant Toe
+                  <ArrowRightIcon className="ml-2 h-4 w-4" />
+                </Link>
               </div>
             )}
           </div>

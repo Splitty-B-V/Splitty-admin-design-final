@@ -22,16 +22,83 @@ export function UsersProvider({ children }) {
     }))
   })
 
+  // Load restaurant users from localStorage
+  const loadRestaurantUsersFromStorage = () => {
+    // Check if we're on the client side
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return {}
+    }
+    
+    // First, check if we have directly saved restaurant users
+    const savedRestaurantUsers = localStorage.getItem('restaurantUsers')
+    if (savedRestaurantUsers) {
+      try {
+        return JSON.parse(savedRestaurantUsers)
+      } catch (e) {
+        console.error('Error parsing saved restaurant users:', e)
+      }
+    }
+    
+    // Fallback: Load from onboarding data
+    const restaurantUsersData = {}
+    
+    // Get all restaurants to check their onboarding data
+    // const restaurants = db.getRestaurants() || []
+    
+    // Also check all localStorage keys for any onboarding data
+    if (typeof window !== 'undefined') {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith('onboarding_')) {
+          const restaurantId = key.replace('onboarding_', '')
+          const onboardingData = localStorage.getItem(key)
+          
+          if (onboardingData) {
+            try {
+              const parsed = JSON.parse(onboardingData)
+              // Check for personnelData (not staff)
+              if (parsed.personnelData && parsed.personnelData.length > 0) {
+                restaurantUsersData[restaurantId] = parsed.personnelData.map((staffMember, index) => ({
+                  id: index + 1,
+                  name: `${staffMember.firstName} ${staffMember.lastName}`,
+                  email: staffMember.email,
+                  phone: staffMember.phone || '',
+                  role: staffMember.role === 'manager' ? 'admin' : 'staff',
+                  lastActive: 'Recent',
+                  status: 'active'
+                }))
+              }
+            } catch (e) {
+              console.error(`Error parsing onboarding data for restaurant ${restaurantId}:`, e)
+            }
+          }
+        }
+      }
+    }
+    
+    // Add default data for restaurants without onboarding data
+    if (!restaurantUsersData[6]) {
+      restaurantUsersData[6] = [
+        { id: 1, name: 'Sarah Johnson', email: 'sarah@limon.nl', phone: '+31 6 34567890', role: 'staff', lastActive: '5 minuten geleden', status: 'active' },
+        { id: 2, name: 'Tom Bakker', email: 'tom@limon.nl', phone: '+31 6 01234567', role: 'staff', lastActive: '2 uur geleden', status: 'active' },
+      ]
+    }
+    if (!restaurantUsersData[16]) {
+      restaurantUsersData[16] = [
+        { id: 1, name: 'John Doe', email: 'john@splitty.com', role: 'admin', lastActive: '2 uur geleden', status: 'active' },
+        { id: 2, name: 'Jane Smith', email: 'jane@splitty.com', role: 'staff', lastActive: '5 minuten geleden', status: 'active' },
+      ]
+    }
+    
+    return restaurantUsersData
+  }
+
   // Restaurant users by restaurant ID
-  const [restaurantUsers, setRestaurantUsers] = useState({
-    6: [
-      { id: 1, name: 'Sarah Johnson', email: 'sarah@limon.nl', phone: '+31 6 34567890', role: 'staff', lastActive: '5 minuten geleden', status: 'active' },
-      { id: 2, name: 'Tom Bakker', email: 'tom@limon.nl', phone: '+31 6 01234567', role: 'staff', lastActive: '2 uur geleden', status: 'active' },
-    ],
-    16: [
-      { id: 1, name: 'John Doe', email: 'john@splitty.com', role: 'admin', lastActive: '2 uur geleden', status: 'active' },
-      { id: 2, name: 'Jane Smith', email: 'jane@splitty.com', role: 'staff', lastActive: '5 minuten geleden', status: 'active' },
-    ],
+  const [restaurantUsers, setRestaurantUsers] = useState(() => {
+    if (typeof window === 'undefined') {
+      return {}
+    }
+    return loadRestaurantUsersFromStorage()
   })
 
   // Refresh users from database
@@ -44,26 +111,48 @@ export function UsersProvider({ children }) {
     })))
   }
 
+  // Refresh restaurant users from localStorage
+  const refreshRestaurantUsers = () => {
+    const newData = loadRestaurantUsersFromStorage()
+    setRestaurantUsers(newData)
+  }
+
   // Sync with database on mount and when window gets focus or storage changes
   useEffect(() => {
     refreshUsers()
+    refreshRestaurantUsers()
     
     const handleFocus = () => {
       refreshUsers()
+      refreshRestaurantUsers()
     }
     
     const handleStorageChange = (e) => {
       if (e.key === 'splitty_users') {
         refreshUsers()
       }
+      // Check for restaurant users changes
+      if (e.key === 'restaurantUsers') {
+        refreshRestaurantUsers()
+      }
+      // Check for onboarding data changes
+      if (e.key && e.key.startsWith('onboarding_')) {
+        refreshRestaurantUsers()
+      }
     }
     
     window.addEventListener('focus', handleFocus)
     window.addEventListener('storage', handleStorageChange)
     
+    // Also refresh restaurant users on mount and periodically
+    const interval = setInterval(() => {
+      refreshRestaurantUsers()
+    }, 1000) // Check every second for updates
+    
     return () => {
       window.removeEventListener('focus', handleFocus)
       window.removeEventListener('storage', handleStorageChange)
+      clearInterval(interval)
     }
   }, [])
 
@@ -86,10 +175,19 @@ export function UsersProvider({ children }) {
   }
 
   const deleteRestaurantUser = (restaurantId, userId) => {
-    setRestaurantUsers(prev => ({
-      ...prev,
-      [restaurantId]: (prev[restaurantId] || []).filter(user => user.id !== parseInt(userId))
-    }))
+    setRestaurantUsers(prev => {
+      const updatedUsers = {
+        ...prev,
+        [restaurantId]: (prev[restaurantId] || []).filter(user => user.id !== parseInt(userId))
+      }
+      
+      // Persist to localStorage
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        localStorage.setItem('restaurantUsers', JSON.stringify(updatedUsers))
+      }
+      
+      return updatedUsers
+    })
   }
 
   const getCompanyUser = (userId) => {
@@ -99,6 +197,54 @@ export function UsersProvider({ children }) {
   const getRestaurantUser = (restaurantId, userId) => {
     const users = restaurantUsers[restaurantId] || []
     return users.find(user => user.id === parseInt(userId))
+  }
+
+  const addRestaurantUser = (restaurantId, userData) => {
+    setRestaurantUsers(prev => {
+      const currentUsers = prev[restaurantId] || []
+      const newUser = {
+        ...userData,
+        id: currentUsers.length > 0 ? Math.max(...currentUsers.map(u => u.id)) + 1 : 1,
+        lastActive: 'Recent',
+        status: 'active'
+      }
+      const updatedUsers = {
+        ...prev,
+        [restaurantId]: [...currentUsers, newUser]
+      }
+      
+      // Persist to localStorage
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        localStorage.setItem('restaurantUsers', JSON.stringify(updatedUsers))
+      }
+      
+      return updatedUsers
+    })
+  }
+
+  const updateRestaurantUsersFromOnboarding = (restaurantId, personnelData) => {
+    if (personnelData && personnelData.length > 0) {
+      const updatedUsers = personnelData.map((staffMember, index) => ({
+        id: index + 1,
+        name: `${staffMember.firstName} ${staffMember.lastName}`,
+        email: staffMember.email,
+        phone: staffMember.phone || '',
+        role: staffMember.role === 'manager' ? 'admin' : 'staff',
+        lastActive: 'Recent',
+        status: 'active'
+      }))
+      
+      setRestaurantUsers(prev => ({
+        ...prev,
+        [restaurantId]: updatedUsers
+      }))
+    } else {
+      // Clear users if no personnel data
+      setRestaurantUsers(prev => ({
+        ...prev,
+        [restaurantId]: []
+      }))
+    }
   }
 
   return (
@@ -111,6 +257,9 @@ export function UsersProvider({ children }) {
       deleteRestaurantUser,
       getCompanyUser,
       getRestaurantUser,
+      addRestaurantUser,
+      updateRestaurantUsersFromOnboarding,
+      refreshRestaurantUsers,
     }}>
       {children}
     </UsersContext.Provider>

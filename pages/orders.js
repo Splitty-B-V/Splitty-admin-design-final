@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Layout from '../components/Layout'
 import Breadcrumb from '../components/Breadcrumb'
+import { useRestaurants } from '../contexts/RestaurantsContext'
 import {
   ArrowPathIcon,
   ArrowDownTrayIcon,
@@ -13,34 +14,60 @@ import {
   HashtagIcon,
   CalendarIcon,
   FunnelIcon,
+  UserGroupIcon,
+  ArrowsRightLeftIcon,
 } from '@heroicons/react/24/outline'
 
 export default function Orders() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('active')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [restaurantFilter, setRestaurantFilter] = useState('all')
+  const { restaurants } = useRestaurants()
 
-  const orders = [
-    { id: 257, restaurant: 'Limon B.V.', table: 'Table 1004', total: 21.8, remaining: 9.0, status: 'in_progress', created: new Date('2025-07-01T17:51:00') },
-    { id: 317, restaurant: 'Limon B.V.', table: 'Table 435', total: 43.2, remaining: 43.2, status: 'in_progress', created: new Date('2025-07-10T12:58:00') },
-    { id: 233, restaurant: 'Viresh Kewalbansing', table: 'Table 5', total: 35.75, remaining: 34.25, status: 'in_progress', created: new Date('2025-06-25T13:41:00') },
-    { id: 295, restaurant: 'Limon B.V.', table: 'Table 1002', total: 63.6, remaining: 63.6, status: 'in_progress', created: new Date('2025-07-04T09:32:00') },
-    { id: 296, restaurant: 'Limon B.V.', table: 'Table 806', total: 480.10, remaining: 480.10, status: 'in_progress', created: new Date('2025-07-04T09:45:00') },
-    { id: 176, restaurant: 'Limon B.V.', table: 'Table 808', total: 141.5, remaining: 119.0, status: 'in_progress', created: new Date('2025-05-25T23:21:00') },
-    { id: 341, restaurant: 'Anatolii Restaurant', table: 'Table 6', total: 48.8, remaining: 48.8, status: 'in_progress', created: new Date('2025-07-31T00:42:00') },
-    { id: 231, restaurant: 'Limon B.V.', table: 'Table 811', total: 67.8, remaining: 67.8, status: 'in_progress', created: new Date('2025-06-24T13:45:00') },
-    { id: 334, restaurant: 'Limon B.V.', table: 'Table 324', total: 439.50, remaining: 439.50, status: 'in_progress', created: new Date('2025-07-30T16:29:00') },
-    { id: 340, restaurant: 'Limon B.V.', table: 'Table 222', total: 30.0, remaining: 30.0, status: 'in_progress', created: new Date('2025-07-30T21:49:00') },
-    { id: 345, restaurant: 'Anatolii Restaurant', table: 'Table 8', total: 48.8, remaining: 48.8, status: 'in_progress', created: new Date('2025-07-31T15:45:00') },
-    { id: 337, restaurant: 'Anatolii Restaurant', table: 'Table 5', total: 123.4, remaining: 123.4, status: 'in_progress', created: new Date('2025-07-30T18:33:00') },
-    { id: 339, restaurant: 'Limon B.V.', table: 'Table 412', total: 176.20, remaining: 151.50, status: 'in_progress', created: new Date('2025-07-30T20:17:00') },
-    { id: 330, restaurant: 'Limon B.V.', table: 'Table 1001', total: 147.15, remaining: 136.85, status: 'in_progress', created: new Date('2025-07-15T13:38:00') },
-    { id: 343, restaurant: 'Anatolii Restaurant', table: 'Table 8', total: 48.8, remaining: 0, status: 'completed', created: new Date('2025-07-31T11:16:00') },
-    { id: 344, restaurant: 'Anatolii Restaurant', table: 'Table 8', total: 48.8, remaining: 0, status: 'completed', created: new Date('2025-07-31T15:17:00') },
-  ]
+  // Generate splitty transactions dynamically from all restaurants
+  const generateSplittyTransactions = () => {
+    const transactions = []
+    const activeRestaurants = restaurants.filter(r => !r.deleted)
+    const now = new Date()
+    
+    // Generate recent transactions for each restaurant
+    activeRestaurants.forEach((restaurant) => {
+      const numTransactions = Math.floor(Math.random() * 8) + 2 // 2-10 transactions per restaurant
+      
+      for (let i = 0; i < numTransactions; i++) {
+        const hoursAgo = Math.random() * 48 // Within last 48 hours
+        const created = new Date(now - hoursAgo * 60 * 60 * 1000)
+        const total = Math.floor(Math.random() * 200 + 20) + Math.random()
+        const paidPercentage = Math.random()
+        const paid = total * paidPercentage
+        const remaining = total - paid
+        const numGuests = Math.floor(Math.random() * 6) + 2
+        
+        transactions.push({
+          id: `SP${restaurant.id}${i}${Math.floor(Math.random() * 1000)}`,
+          restaurant: restaurant.name,
+          restaurantId: restaurant.id,
+          table: `Tafel ${Math.floor(Math.random() * 20) + 1}`,
+          total: total,
+          paid: paid,
+          remaining: remaining,
+          guests: numGuests,
+          paidGuests: Math.floor(numGuests * paidPercentage),
+          status: remaining < 0.01 ? 'completed' : 'in_progress',
+          created: created,
+          paymentMethod: Math.random() > 0.5 ? 'iDEAL' : 'Creditcard',
+        })
+      }
+    })
+    
+    return transactions.sort((a, b) => b.created - a.created)
+  }
+  
+  const orders = generateSplittyTransactions()
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
-      order.id.toString().includes(searchQuery) ||
+      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.restaurant.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.table.toLowerCase().includes(searchQuery.toLowerCase())
     
@@ -49,7 +76,10 @@ export default function Orders() {
       (statusFilter === 'active' && order.status === 'in_progress') ||
       (statusFilter === 'completed' && order.status === 'completed')
     
-    return matchesSearch && matchesStatus
+    const matchesRestaurant =
+      restaurantFilter === 'all' || order.restaurantId === parseInt(restaurantFilter)
+    
+    return matchesSearch && matchesStatus && matchesRestaurant
   })
 
   const formatCurrency = (amount) => {
@@ -92,7 +122,7 @@ export default function Orders() {
           <ClockIcon className="h-4 w-4 mr-1.5" />
           Actief
         </span>
-        <div className="w-20 bg-[#0F1117] rounded-full h-2">
+        <div className="w-20 bg-[#0A0B0F] rounded-full h-2">
           <div 
             className="bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] h-2 rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
@@ -104,7 +134,15 @@ export default function Orders() {
   }
 
   const handleRefresh = () => {
-    console.log('Refreshing orders...')
+    // Force re-render by updating state
+    setSearchQuery('')
+    setStatusFilter('all')
+    setRestaurantFilter('all')
+    
+    // Simulate data refresh
+    setTimeout(() => {
+      window.location.reload()
+    }, 100)
   }
 
   const handleExport = () => {
@@ -113,7 +151,13 @@ export default function Orders() {
 
   const activeCount = orders.filter(o => o.status === 'in_progress').length
   const completedCount = orders.filter(o => o.status === 'completed').length
-  const totalRevenue = orders.reduce((sum, order) => sum + (order.total - order.remaining), 0)
+  const totalRevenue = orders.reduce((sum, order) => sum + order.paid, 0)
+  const todayTransactions = orders.filter(o => {
+    const today = new Date()
+    return o.created.toDateString() === today.toDateString()
+  }).length
+  // Calculate transaction revenue (€0.70 per split payment)
+  const todayTransactionRevenue = todayTransactions * 0.70
 
   return (
     <Layout>
@@ -121,13 +165,13 @@ export default function Orders() {
         <div className="px-4 sm:px-6 lg:px-8 py-6">
           <div className="space-y-6">
             {/* Breadcrumb */}
-            <Breadcrumb items={[{ name: 'Bestellingen' }]} />
+            <Breadcrumb items={[{ name: "Alle Splitty's" }]} />
 
             {/* Header */}
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-3xl font-bold text-white">Bestellingen</h1>
-                <p className="text-[#BBBECC] mt-1">Beheer alle restaurant bestellingen</p>
+                <h1 className="text-3xl font-bold text-white">Alle Splitty Transacties</h1>
+                <p className="text-[#BBBECC] mt-1">Real-time overzicht van alle Splitty betalingen</p>
               </div>
               <div className="flex gap-3">
                 <button
@@ -154,7 +198,7 @@ export default function Orders() {
               <div className="bg-[#1c1e27] rounded-xl p-5 border border-[#2a2d3a]">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[#BBBECC] text-sm">Actieve Bestellingen</p>
+                    <p className="text-[#BBBECC] text-sm">Restaurant Bestellingen</p>
                     <p className="text-2xl font-bold text-white mt-1">{activeCount}</p>
                   </div>
                   <div className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg">
@@ -165,30 +209,30 @@ export default function Orders() {
               <div className="bg-[#1c1e27] rounded-xl p-5 border border-[#2a2d3a]">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[#BBBECC] text-sm">Voltooid Vandaag</p>
-                    <p className="text-2xl font-bold text-white mt-1">{completedCount}</p>
+                    <p className="text-[#BBBECC] text-sm">Transacties Vandaag</p>
+                    <p className="text-2xl font-bold text-white mt-1">{todayTransactions}</p>
                   </div>
                   <div className="p-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-lg">
-                    <CheckCircleIcon className="h-6 w-6 text-white" />
+                    <ArrowsRightLeftIcon className="h-6 w-6 text-white" />
                   </div>
                 </div>
               </div>
               <div className="bg-[#1c1e27] rounded-xl p-5 border border-[#2a2d3a]">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[#BBBECC] text-sm">Totaal Bestellingen</p>
-                    <p className="text-2xl font-bold text-white mt-1">{orders.length}</p>
+                    <p className="text-[#BBBECC] text-sm">Totaal via Splitty</p>
+                    <p className="text-2xl font-bold text-white mt-1">{formatCurrency(totalRevenue)}</p>
                   </div>
                   <div className="p-3 bg-gradient-to-r from-[#667EEA] to-[#764BA2] rounded-lg">
-                    <HashtagIcon className="h-6 w-6 text-white" />
+                    <UserGroupIcon className="h-6 w-6 text-white" />
                   </div>
                 </div>
               </div>
               <div className="bg-[#1c1e27] rounded-xl p-5 border border-[#2a2d3a]">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[#BBBECC] text-sm">Omzet Vandaag</p>
-                    <p className="text-2xl font-bold text-white mt-1">{formatCurrency(totalRevenue)}</p>
+                    <p className="text-[#BBBECC] text-sm">Transactie Omzet</p>
+                    <p className="text-2xl font-bold text-white mt-1">{formatCurrency(todayTransactionRevenue)}</p>
                   </div>
                   <div className="p-3 bg-gradient-to-r from-[#FF6B6B] to-[#FF8E53] rounded-lg">
                     <CurrencyEuroIcon className="h-6 w-6 text-white" />
@@ -211,14 +255,25 @@ export default function Orders() {
                       id="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="block w-full pl-10 pr-3 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
-                      placeholder="Zoek op bestelnummer, restaurant of tafel..."
+                      className="block w-full pl-10 pr-3 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      placeholder="Zoek op Splitty ID, restaurant of tafel..."
                     />
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <FunnelIcon className="h-5 w-5 text-[#BBBECC]" />
-                  <div className="flex bg-[#0F1117] rounded-lg p-1">
+                <div className="flex items-center gap-4">
+                  <select
+                    value={restaurantFilter}
+                    onChange={(e) => setRestaurantFilter(e.target.value)}
+                    className="px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+                  >
+                    <option value="all">Alle Restaurants</option>
+                    {restaurants.filter(r => !r.deleted).map(restaurant => (
+                      <option key={restaurant.id} value={restaurant.id}>
+                        {restaurant.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex bg-[#0A0B0F] rounded-lg p-1">
                     {[
                       { value: 'active', label: 'Actief' },
                       { value: 'completed', label: 'Voltooid' },
@@ -245,10 +300,10 @@ export default function Orders() {
             <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full">
-                  <thead className="bg-[#0F1117] border-b border-[#2a2d3a]">
+                  <thead className="bg-[#0A0B0F] border-b border-[#2a2d3a]">
                     <tr>
                       <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
-                        Bestelnr
+                        Splitty ID
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
                         Restaurant
@@ -257,10 +312,13 @@ export default function Orders() {
                         Tafel
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                        Gasten
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
                         Totaal
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
-                        Openstaand
+                        Betaald
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
                         Status
@@ -275,11 +333,11 @@ export default function Orders() {
                   </thead>
                   <tbody className="divide-y divide-[#2a2d3a]">
                     {filteredOrders.map((order) => (
-                      <tr key={order.id} className="hover:bg-[#0F1117] transition-colors">
+                      <tr key={order.id} className="hover:bg-[#0A0B0F] transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="p-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-lg">
-                              <HashtagIcon className="h-4 w-4 text-white" />
+                              <ArrowsRightLeftIcon className="h-4 w-4 text-black" />
                             </div>
                             <span className="ml-3 text-sm font-medium text-white">{order.id}</span>
                           </div>
@@ -294,11 +352,17 @@ export default function Orders() {
                           {order.table}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <UserGroupIcon className="h-4 w-4 text-[#BBBECC] mr-2" />
+                            <span className="text-sm text-white">{order.paidGuests}/{order.guests}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm font-semibold text-white">{formatCurrency(order.total)}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`text-sm font-semibold ${order.remaining > 0 ? 'text-orange-400' : 'text-[#2BE89A]'}`}>
-                            {formatCurrency(order.remaining)}
+                          <span className={`text-sm font-semibold ${order.paid >= order.total ? 'text-[#2BE89A]' : 'text-yellow-400'}`}>
+                            {formatCurrency(order.paid)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -313,7 +377,7 @@ export default function Orders() {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                           <Link
                             href={`/orders/${order.id}`}
-                            className="inline-flex items-center px-3 py-1.5 bg-[#0F1117] text-[#2BE89A] border border-[#2BE89A]/30 rounded-lg hover:bg-[#2BE89A]/10 transition"
+                            className="inline-flex items-center px-3 py-1.5 bg-[#0A0B0F] text-[#2BE89A] border border-[#2BE89A]/30 rounded-lg hover:bg-[#2BE89A]/10 transition"
                           >
                             Bekijk
                             <svg className="ml-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -329,10 +393,10 @@ export default function Orders() {
               
               {/* Table Footer */}
               {filteredOrders.length > 0 && (
-                <div className="bg-[#0F1117] px-6 py-4 border-t border-[#2a2d3a]">
+                <div className="bg-[#0A0B0F] px-6 py-4 border-t border-[#2a2d3a]">
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-[#BBBECC]">
-                      <span className="font-medium text-white">{filteredOrders.length}</span> bestellingen gevonden
+                      <span className="font-medium text-white">{filteredOrders.length}</span> Splitty transacties gevonden
                     </div>
                   </div>
                 </div>
@@ -343,8 +407,8 @@ export default function Orders() {
             {filteredOrders.length === 0 && (
               <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] p-12 text-center">
                 <MagnifyingGlassIcon className="mx-auto h-12 w-12 text-[#BBBECC] mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">Geen bestellingen gevonden</h3>
-                <p className="text-[#BBBECC]">Probeer je zoekfilters aan te passen</p>
+                <h3 className="text-lg font-medium text-white mb-2">Geen Splitty transacties gevonden</h3>
+                <p className="text-[#BBBECC]">Probeer je filters aan te passen of selecteer een ander restaurant</p>
               </div>
             )}
           </div>

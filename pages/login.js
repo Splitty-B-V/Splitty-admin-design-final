@@ -138,7 +138,7 @@ export default function Login() {
         {/* Bottom Logo */}
         <div className="relative z-10">
           <Image 
-            src="/splitty.png" 
+            src="/favicon-1.png" 
             alt="Splitty" 
             width={150} 
             height={50}
@@ -198,7 +198,7 @@ export default function Login() {
             {/* Logo for Desktop */}
             <div className="text-center mb-8 hidden lg:block">
               <Image 
-                src="/splitty.png" 
+                src="/favicon-1.png" 
                 alt="Splitty" 
                 width={180} 
                 height={60}
@@ -235,7 +235,7 @@ export default function Login() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                     placeholder="je@email.nl"
                     required
                   />
@@ -256,7 +256,7 @@ export default function Login() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                    className="w-full pl-10 pr-12 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                     placeholder="••••••••"
                     required
                   />
@@ -281,7 +281,7 @@ export default function Login() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0F1117]"
+                    className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0A0B0F]"
                   />
                   <span className="ml-2 text-sm text-[#BBBECC]">Onthoud mij</span>
                 </label>

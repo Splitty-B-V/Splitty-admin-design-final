@@ -145,7 +145,7 @@ export default function Support() {
     <Layout>
       <div className="flex" style={{ height: 'calc(100vh - 197px)' }}>
           {/* Sidebar - Channels and Conversations */}
-          <div className="w-96 bg-[#0F1117] border-r border-[#1c1e27] flex flex-col">
+          <div className="w-96 bg-[#0A0B0F] border-r border-[#1c1e27] flex flex-col">
             {/* Header */}
             <div className="px-6 py-4 border-b border-[#1c1e27]">
               <h1 className="text-2xl font-bold text-white mb-4">Support Center</h1>
@@ -248,11 +248,11 @@ export default function Support() {
           </div>
 
           {/* Main Content - Conversation View */}
-          <div className="flex-1 flex flex-col bg-[#0F1117]">
+          <div className="flex-1 flex flex-col bg-[#0A0B0F]">
             {selectedConversation ? (
               <>
                 {/* Conversation Header */}
-                <div className="px-6 py-4 border-b border-[#1c1e27] bg-[#0F1117]">
+                <div className="px-6 py-4 border-b border-[#1c1e27] bg-[#0A0B0F]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       {selectedConversation.customer.avatar ? (
@@ -311,7 +311,7 @@ export default function Support() {
                 </div>
 
                 {/* Message Input */}
-                <div className="px-6 py-4 border-t border-[#1c1e27] bg-[#0F1117]">
+                <div className="px-6 py-4 border-t border-[#1c1e27] bg-[#0A0B0F]">
                   <div className="flex items-center space-x-3">
                     <input
                       type="text"
@@ -345,7 +345,7 @@ export default function Support() {
 
           {/* Right Sidebar - Customer Info (Future Enhancement) */}
           {selectedConversation && (
-            <div className="w-80 bg-[#0F1117] border-l border-[#1c1e27] p-6">
+            <div className="w-80 bg-[#0A0B0F] border-l border-[#1c1e27] p-6">
               <h3 className="text-lg font-semibold text-white mb-6">Customer Information</h3>
               
               <div className="space-y-6">

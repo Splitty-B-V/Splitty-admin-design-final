@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Layout from '../../../../components/Layout'
+import { useUsers } from '../../../../contexts/UsersContext'
 import {
   ArrowLeftIcon,
   UserPlusIcon,
@@ -16,6 +17,9 @@ import {
 export default function NewRestaurantUser() {
   const router = useRouter()
   const { id: restaurantId } = router.query
+  const { addRestaurantUser, restaurantUsers, companyUsers } = useUsers()
+  const [emailError, setEmailError] = useState('')
+  const [phoneError, setPhoneError] = useState('')
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -68,6 +72,41 @@ export default function NewRestaurantUser() {
     }
   }
 
+  const validateUniqueFields = () => {
+    let isValid = true
+    setEmailError('')
+    setPhoneError('')
+    
+    // Check email uniqueness across all users
+    const allUsers = [
+      ...companyUsers,
+      ...Object.values(restaurantUsers).flat()
+    ]
+    
+    const emailExists = allUsers.some(user => 
+      user.email && user.email.toLowerCase() === formData.email.toLowerCase()
+    )
+    
+    if (emailExists) {
+      setEmailError('Dit e-mailadres is al in gebruik')
+      isValid = false
+    }
+    
+    // Check phone uniqueness if provided
+    if (formData.phone) {
+      const phoneExists = allUsers.some(user => 
+        user.phone && user.phone.replace(/\s+/g, '') === formData.phone.replace(/\s+/g, '')
+      )
+      
+      if (phoneExists) {
+        setPhoneError('Dit telefoonnummer is al in gebruik')
+        isValid = false
+      }
+    }
+    
+    return isValid
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     
@@ -76,8 +115,25 @@ export default function NewRestaurantUser() {
       return
     }
     
-    // Handle form submission
-    console.log('Creating restaurant user:', { ...formData, restaurant_id: restaurantId })
+    // Validate unique fields
+    if (!validateUniqueFields()) {
+      return
+    }
+    
+    // Create new user data
+    const newUser = {
+      name: `${formData.first_name} ${formData.last_name}`,
+      email: formData.email,
+      phone: formData.phone,
+      role: formData.role === 'restaurant_admin' ? 'admin' : 'staff',
+      isActive: formData.is_active,
+      password: formData.password // In real app, this would be hashed
+    }
+    
+    // Add user to restaurant
+    addRestaurantUser(restaurantId, newUser)
+    
+    // Navigate back to users page
     router.push(`/restaurants/${restaurantId}/users`)
   }
 
@@ -125,7 +181,7 @@ export default function NewRestaurantUser() {
                         name="first_name"
                         id="first_name"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         placeholder="John"
                         value={formData.first_name}
                         onChange={handleInputChange}
@@ -141,7 +197,7 @@ export default function NewRestaurantUser() {
                         name="last_name"
                         id="last_name"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         placeholder="Doe"
                         value={formData.last_name}
                         onChange={handleInputChange}
@@ -161,12 +217,20 @@ export default function NewRestaurantUser() {
                           name="email"
                           id="email"
                           required
-                          className="w-full pl-10 pr-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                          className={`w-full pl-10 pr-4 py-3 bg-[#0A0B0F] border rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent ${
+                            emailError ? 'border-red-500' : 'border-[#2a2d3a]'
+                          }`}
                           placeholder="john.doe@restaurant.nl"
                           value={formData.email}
-                          onChange={handleInputChange}
+                          onChange={(e) => {
+                            handleInputChange(e)
+                            setEmailError('') // Clear error on change
+                          }}
                         />
                       </div>
+                      {emailError && (
+                        <p className="mt-2 text-sm text-red-400">{emailError}</p>
+                      )}
                     </div>
 
                     <div>
@@ -182,12 +246,20 @@ export default function NewRestaurantUser() {
                           name="phone"
                           id="phone"
                           required
-                          className="w-full pl-10 pr-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                          className={`w-full pl-10 pr-4 py-3 bg-[#0A0B0F] border rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent ${
+                            phoneError ? 'border-red-500' : 'border-[#2a2d3a]'
+                          }`}
                           placeholder="+31 6 12345678"
                           value={formData.phone}
-                          onChange={handleInputChange}
+                          onChange={(e) => {
+                            handleInputChange(e)
+                            setPhoneError('') // Clear error on change
+                          }}
                         />
                       </div>
+                      {phoneError && (
+                        <p className="mt-2 text-sm text-red-400">{phoneError}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -209,7 +281,7 @@ export default function NewRestaurantUser() {
                         id="password"
                         required
                         minLength="8"
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={handleInputChange}
@@ -222,7 +294,7 @@ export default function NewRestaurantUser() {
                               {getPasswordStrengthText().text}
                             </span>
                           </div>
-                          <div className="w-full bg-[#0F1117] rounded-full h-2">
+                          <div className="w-full bg-[#0A0B0F] rounded-full h-2">
                             <div 
                               className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrengthText().color}`}
                               style={{ width: `${(passwordStrength / 4) * 100}%` }}
@@ -240,7 +312,7 @@ export default function NewRestaurantUser() {
                         type="password"
                         id="confirm_password"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         placeholder="••••••••"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
@@ -288,8 +360,8 @@ export default function NewRestaurantUser() {
                           key={role.value}
                           className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none transition-all ${
                             formData.role === role.value
-                              ? 'bg-[#0F1117] border-[#2BE89A]'
-                              : 'bg-[#0F1117] border-[#2a2d3a] hover:border-[#2BE89A]/50'
+                              ? 'bg-[#0A0B0F] border-[#2BE89A]'
+                              : 'bg-[#0A0B0F] border-[#2a2d3a] hover:border-[#2BE89A]/50'
                           }`}
                         >
                           <input
@@ -318,13 +390,13 @@ export default function NewRestaurantUser() {
                   </div>
 
                   {/* Active Status */}
-                  <div className="bg-[#0F1117] rounded-lg p-4">
+                  <div className="bg-[#0A0B0F] rounded-lg p-4">
                     <div className="flex items-center">
                       <input
                         id="is_active"
                         name="is_active"
                         type="checkbox"
-                        className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0F1117]"
+                        className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0A0B0F]"
                         checked={formData.is_active}
                         onChange={handleInputChange}
                       />
@@ -340,7 +412,7 @@ export default function NewRestaurantUser() {
                 <div className="flex justify-between pt-6 border-t border-[#2a2d3a]">
                   <Link
                     href={`/restaurants/${restaurantId}/users`}
-                    className="px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                    className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
                   >
                     Annuleren
                   </Link>

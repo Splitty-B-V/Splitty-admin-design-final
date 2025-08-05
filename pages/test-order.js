@@ -146,7 +146,7 @@ export default function TestOrder() {
                         name="restaurant"
                         value={selectedRestaurant}
                         onChange={(e) => setSelectedRestaurant(e.target.value)}
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
                       >
                         <option value="">Selecteer een restaurant</option>
                         {restaurants.map((restaurant) => (
@@ -167,7 +167,7 @@ export default function TestOrder() {
                         value={tableNumber}
                         onChange={(e) => setTableNumber(e.target.value)}
                         placeholder="bijv. 101"
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -184,7 +184,7 @@ export default function TestOrder() {
                           className={`py-4 px-6 text-sm font-medium border-b-2 transition-all duration-200 ${
                             activeCategory === key
                               ? 'border-[#2BE89A] text-[#2BE89A] bg-[#2BE89A]/10'
-                              : 'border-transparent text-[#BBBECC] hover:text-white hover:bg-[#0F1117]'
+                              : 'border-transparent text-[#BBBECC] hover:text-white hover:bg-[#0A0B0F]'
                           }`}
                         >
                           {label}
@@ -198,7 +198,7 @@ export default function TestOrder() {
                       {menuItems[activeCategory].map((item) => (
                         <div
                           key={item.id}
-                          className="bg-[#0F1117] rounded-lg p-5 hover:bg-[#0F1117]/80 border border-[#2a2d3a] hover:border-[#2BE89A]/30 transition-all duration-200 group"
+                          className="bg-[#0A0B0F] rounded-lg p-5 hover:bg-[#0A0B0F]/80 border border-[#2a2d3a] hover:border-[#2BE89A]/30 transition-all duration-200 group"
                         >
                           <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
@@ -237,7 +237,7 @@ export default function TestOrder() {
                     ) : (
                       <div className="space-y-4">
                         {cart.map((item) => (
-                          <div key={item.id} className="bg-[#0F1117] rounded-lg p-4 border border-[#2a2d3a]">
+                          <div key={item.id} className="bg-[#0A0B0F] rounded-lg p-4 border border-[#2a2d3a]">
                             <div className="flex justify-between items-start mb-3">
                               <div className="flex-1">
                                 <h4 className="text-white font-medium">{item.name}</h4>

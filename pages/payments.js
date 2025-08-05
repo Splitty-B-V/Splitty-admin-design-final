@@ -361,7 +361,7 @@ export default function Payments() {
                       id="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className="block w-full pl-12 pr-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                       placeholder="Zoek op betaling ID, bestelling ID, of restaurant..."
                     />
                   </div>
@@ -372,7 +372,7 @@ export default function Payments() {
                     name="status"
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="block w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+                    className="block w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
                   >
                     <option value="all">Alle Statussen</option>
                     <option value="succeeded">Geslaagd</option>
@@ -384,7 +384,7 @@ export default function Payments() {
                     name="dateRange"
                     value={dateRange}
                     onChange={(e) => setDateRange(e.target.value)}
-                    className="block w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+                    className="block w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
                   >
                     <option value="today">Vandaag</option>
                     <option value="last7days">Afgelopen 7 Dagen</option>
@@ -398,7 +398,7 @@ export default function Payments() {
             {/* Payments Table */}
             <div className="overflow-x-auto bg-[#1c1e27] rounded-xl border border-[#2a2d3a]">
               <table className="min-w-full divide-y divide-[#2a2d3a]">
-                <thead className="bg-[#0F1117]">
+                <thead className="bg-[#0A0B0F]">
                   <tr>
                     <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
                       Betaling ID
@@ -428,7 +428,7 @@ export default function Payments() {
                 </thead>
                 <tbody className="bg-[#1c1e27] divide-y divide-[#2a2d3a]">
                   {filteredPayments.map((payment) => (
-                    <tr key={payment.id} className="hover:bg-[#0F1117] transition-colors">
+                    <tr key={payment.id} className="hover:bg-[#0A0B0F] transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                         {payment.id}
                       </td>
@@ -478,7 +478,7 @@ export default function Payments() {
               </table>
               
               {/* Table Footer */}
-              <div className="bg-[#0F1117] px-6 py-4 border-t border-[#2a2d3a]">
+              <div className="bg-[#0A0B0F] px-6 py-4 border-t border-[#2a2d3a]">
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-[#BBBECC]">
                     Toont <span className="font-medium text-white">{filteredPayments.length}</span> betalingen

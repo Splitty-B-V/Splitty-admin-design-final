@@ -24,19 +24,31 @@ import {
   ArrowRightOnRectangleIcon,
   ChevronRightIcon,
   ChatBubbleLeftRightIcon,
+  BookOpenIcon,
+  GlobeAltIcon,
+  ArrowsRightLeftIcon,
 } from '@heroicons/react/24/outline'
 
 const allNavigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, roles: ['ceo', 'admin', 'account_manager', 'support', 'developer'] },
-  { name: 'Restaurants', href: '/restaurants', icon: BuildingStorefrontIcon, roles: ['ceo', 'admin', 'account_manager'] },
-  { name: 'Orders', href: '/orders', icon: ShoppingBagIcon, roles: ['ceo', 'admin', 'account_manager', 'support'] },
+  { 
+    name: 'Restaurants', 
+    href: '/restaurants', 
+    icon: BuildingStorefrontIcon, 
+    roles: ['ceo', 'admin', 'account_manager'],
+    submenu: [
+      { name: 'Alle Restaurants', href: '/restaurants', roles: ['ceo', 'admin', 'account_manager'] },
+      { name: 'POS Connecties', href: '/pos', roles: ['ceo', 'admin', 'developer'] },
+      { name: 'Uitbetalingen', href: '/payments/payouts', roles: ['ceo', 'admin'] },
+    ]
+  },
+  { name: "Alle Splitty's", href: '/orders', icon: ArrowsRightLeftIcon, roles: ['ceo', 'admin', 'account_manager', 'support'] },
   { name: 'Active Tables', href: '/tables', icon: TableCellsIcon, roles: ['ceo', 'admin', 'account_manager', 'support'] },
   { name: 'Test Order', href: '/test-order', icon: BeakerIcon, roles: ['ceo', 'admin', 'developer'] },
   { name: 'Payments', href: '/payments', icon: CreditCardIcon, roles: ['ceo', 'admin'] },
-  { name: 'Uitbetalingen', href: '/payments/payouts', icon: CurrencyDollarIcon, roles: ['ceo', 'admin'] },
   { name: 'Users', href: '/users', icon: UsersIcon, roles: ['ceo', 'admin'] },
-  { name: 'POS Integration', href: '/pos', icon: DevicePhoneMobileIcon, roles: ['ceo', 'admin', 'developer'] },
   { name: 'Support', href: '/support', icon: ChatBubbleLeftRightIcon, roles: ['ceo', 'admin', 'support'] },
+  { name: 'Knowledge Base', href: '/knowledge-base', icon: BookOpenIcon, roles: ['ceo', 'admin', 'account_manager', 'support', 'developer'] },
   { name: 'Settings', href: '/settings', icon: Cog6ToothIcon, roles: ['ceo', 'admin', 'account_manager', 'support', 'developer'] },
 ]
 
@@ -73,7 +85,18 @@ export default function Layout({ children }) {
       // Filter navigation based on user role
       const filteredNavigation = allNavigation.filter(item => 
         item.roles.includes(storedUserRole)
-      )
+      ).map(item => {
+        // Filter submenu items based on user role
+        if (item.submenu) {
+          return {
+            ...item,
+            submenu: item.submenu.filter(subItem => 
+              subItem.roles.includes(storedUserRole)
+            )
+          }
+        }
+        return item
+      })
       setNavigation(filteredNavigation)
     }
     
@@ -111,7 +134,21 @@ export default function Layout({ children }) {
     if (savedCollapsed === 'true') {
       setSidebarCollapsed(true)
     }
-  }, [])
+
+    // Auto-expand menu if on a submenu page OR if clicking on main item with submenu
+    if (navigation && navigation.length > 0) {
+      navigation.forEach(item => {
+        // Auto-expand if on any submenu page
+        if (item.submenu && item.submenu.some(sub => router.pathname === sub.href)) {
+          setExpandedMenus(prev => ({ ...prev, [item.name]: true }))
+        }
+        // Auto-expand Restaurants menu when on main restaurants page
+        if (item.name === 'Restaurants' && router.pathname === '/restaurants') {
+          setExpandedMenus(prev => ({ ...prev, [item.name]: true }))
+        }
+      })
+    }
+  }, [router.pathname, navigation])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -214,7 +251,7 @@ export default function Layout({ children }) {
         {/* Navigation */}
         <nav className="flex-1 px-4 py-3 overflow-y-auto">
           {navigation.map((item) => {
-            const isActive = router.pathname === item.href || 
+            const isActive = (router.pathname === item.href && !item.submenu) || 
                            (item.submenu && item.submenu.some(sub => router.pathname === sub.href))
             const isExpanded = expandedMenus[item.name]
             const hasSubmenu = item.submenu && item.submenu.length > 0
@@ -223,7 +260,15 @@ export default function Layout({ children }) {
               <div key={item.name} className="relative mb-1">
                 {hasSubmenu ? (
                   <button
-                    onClick={() => toggleSubmenu(item.name)}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      // Navigate to the main page if available
+                      if (item.href) {
+                        router.push(item.href)
+                      }
+                      // Always toggle the submenu
+                      toggleSubmenu(item.name)
+                    }}
                     className={`
                     w-full group flex items-center px-5 py-3 text-sm font-medium rounded-lg transition-all duration-200
                     ${
@@ -246,8 +291,8 @@ export default function Layout({ children }) {
                           {item.name}
                         </span>
                         <ChevronRightIcon 
-                          className={`h-4 w-4 transition-transform duration-200 ${
-                            isExpanded ? 'rotate-90' : ''
+                          className={`h-4 w-4 transition-transform duration-150 ease-in-out transform-gpu ${
+                            isExpanded ? 'rotate-90' : 'rotate-0'
                           }`}
                         />
                       </>
@@ -281,27 +326,33 @@ export default function Layout({ children }) {
                 )}
 
                 {/* Submenu */}
-                {hasSubmenu && isExpanded && !sidebarCollapsed && (
-                  <div className="mt-1 ml-10">
-                    {item.submenu.map((subItem) => {
-                      const isSubActive = router.pathname === subItem.href
-                      return (
-                        <Link
-                          key={subItem.href}
-                          href={subItem.href}
-                          className={`
-                          block px-4 py-2 text-sm rounded-lg transition-all duration-200
-                          ${
-                            isSubActive
-                              ? 'text-[#2BE89A] bg-[#2BE89A]/5'
-                              : 'text-[#BBBECC] hover:text-white hover:bg-[#1c1e27]'
-                          }
-                        `}
-                        >
-                          {subItem.name}
-                        </Link>
-                      )
-                    })}
+                {hasSubmenu && !sidebarCollapsed && (
+                  <div className={`transition-all duration-150 ease-in-out transform-gpu ${
+                    isExpanded ? 'mt-1' : ''
+                  }`}>
+                    <div className={`ml-10 overflow-hidden transition-all duration-150 ease-in-out ${
+                      isExpanded ? 'max-h-40' : 'max-h-0'
+                    }`}>
+                      {item.submenu.map((subItem) => {
+                        const isSubActive = router.pathname === subItem.href
+                        return (
+                          <Link
+                            key={subItem.href}
+                            href={subItem.href}
+                            className={`
+                            block px-4 py-2 text-sm rounded-lg transition-colors duration-150
+                            ${
+                              isSubActive
+                                ? 'text-[#2BE89A] bg-[#2BE89A]/5'
+                                : 'text-[#BBBECC] hover:text-white hover:bg-[#1c1e27]'
+                            }
+                          `}
+                          >
+                            {subItem.name}
+                          </Link>
+                        )
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -401,8 +452,10 @@ export default function Layout({ children }) {
         }`}
       >
         {/* Header */}
-        <header className="bg-[#0F1117] border-b border-[#1c1e27] transition-all duration-300">
-          <div className="px-6">
+        <header className="fixed top-0 left-0 right-0 bg-[#0F1117] border-b border-[#1c1e27] transition-all duration-300 z-40">
+          <div className={`px-6 transition-all duration-300 ${
+            sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'
+          }`}>
             <div className="flex justify-between items-center h-[72px]">
               <div className="flex items-center gap-4">
                 {/* Mobile menu button */}
@@ -432,7 +485,7 @@ export default function Layout({ children }) {
                   <button
                     onClick={() => setDarkMode(false)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                      !darkMode ? 'bg-[#0F1117] text-white' : 'text-[#BBBECC]'
+                      !darkMode ? 'bg-[#0A0B0F] text-white' : 'text-[#BBBECC]'
                     }`}
                   >
                     <SunIcon className="h-4 w-4 inline mr-1" />
@@ -441,7 +494,7 @@ export default function Layout({ children }) {
                   <button
                     onClick={() => setDarkMode(true)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                      darkMode ? 'bg-[#0F1117] text-white' : 'text-[#BBBECC]'
+                      darkMode ? 'bg-[#0A0B0F] text-white' : 'text-[#BBBECC]'
                     }`}
                   >
                     <MoonIcon className="h-4 w-4 inline mr-1" />
@@ -461,7 +514,7 @@ export default function Layout({ children }) {
                   </button>
                   
                   {languageMenuOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-40 bg-[#0F1117] border border-[#1c1e27] rounded-lg shadow-lg py-1 z-10">
+                    <div className="absolute top-full left-0 mt-1 w-40 bg-[#0A0B0F] border border-[#1c1e27] rounded-lg shadow-lg py-1 z-10">
                       <button
                         onClick={() => {
                           setSelectedLanguage('en')
@@ -496,21 +549,6 @@ export default function Layout({ children }) {
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Info dropdown */}
-                <button className="p-2 rounded-lg transition-colors duration-200 text-[#BBBECC] hover:text-white hover:bg-[#1c1e27]">
-                  <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.5 0C7.62108 0 5.78435 0.557165 4.22209 1.60104C2.65982 2.64491 1.44218 4.12861 0.723149 5.86451C0.00411622 7.6004 -0.184015 9.51054 0.182544 11.3534C0.549104 13.1962 1.45389 14.8889 2.78249 16.2175C4.11109 17.5461 5.80383 18.4509 7.64664 18.8175C9.48946 19.184 11.3996 18.9959 13.1355 18.2769C14.8714 17.5578 16.3551 16.3402 17.399 14.7779C18.4428 13.2156 19 11.3789 19 9.5C18.9973 6.98128 17.9955 4.5665 16.2145 2.78549C14.4335 1.00449 12.0187 0.00272419 9.5 0ZM9.5 17.4167C7.93423 17.4167 6.40363 16.9524 5.10174 16.0825C3.79985 15.2126 2.78515 13.9762 2.18596 12.5296C1.58676 11.083 1.42999 9.49122 1.73545 7.95553C2.04092 6.41985 2.79491 5.00924 3.90207 3.90207C5.00924 2.79491 6.41986 2.04092 7.95554 1.73545C9.49122 1.42998 11.083 1.58676 12.5296 2.18595C13.9762 2.78515 15.2126 3.79985 16.0825 5.10174C16.9524 6.40362 17.4167 7.93423 17.4167 9.5C17.4144 11.5989 16.5795 13.6112 15.0954 15.0954C13.6112 16.5795 11.5989 17.4144 9.5 17.4167Z" fill="currentColor"/>
-                    <path d="M9.50081 7.91686H8.70914C8.49918 7.91686 8.29782 8.00027 8.14935 8.14874C8.00089 8.2972 7.91748 8.49857 7.91748 8.70853C7.91748 8.91849 8.00089 9.11985 8.14935 9.26832C8.29782 9.41679 8.49918 9.50019 8.70914 9.50019H9.50081V14.2502C9.50081 14.4602 9.58422 14.6615 9.73269 14.81C9.88115 14.9585 10.0825 15.0419 10.2925 15.0419C10.5024 15.0419 10.7038 14.9585 10.8523 14.81C11.0007 14.6615 11.0841 14.4602 11.0841 14.2502V9.50019C11.0841 9.08027 10.9173 8.67754 10.6204 8.38061C10.3235 8.08368 9.92074 7.91686 9.50081 7.91686Z" fill="currentColor"/>
-                    <path d="M9.50049 6.33332C10.1563 6.33332 10.688 5.80166 10.688 5.14582C10.688 4.48999 10.1563 3.95832 9.50049 3.95832C8.84465 3.95832 8.31299 4.48999 8.31299 5.14582C8.31299 5.80166 8.84465 6.33332 9.50049 6.33332Z" fill="currentColor"/>
-                  </svg>
-                </button>
-
-                {/* Download */}
-                <button className="p-2 rounded-lg transition-colors duration-200 text-[#BBBECC] hover:text-white hover:bg-[#1c1e27]">
-                  <svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17 12.3333V16.1111C17 16.6121 16.8127 17.0925 16.4793 17.4468C16.1459 17.801 15.6937 18 15.2222 18H2.77778C2.30628 18 1.8541 17.801 1.5207 17.4468C1.1873 17.0925 1 16.6121 1 16.1111V12.3333M4.55556 7.61111L9 12.3333M9 12.3333L13.4444 7.61111M9 12.3333V1" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
 
                 {/* Notifications */}
                 <button className="p-2 rounded-lg transition-colors duration-200 relative text-[#BBBECC] hover:text-white hover:bg-[#1c1e27]">
@@ -548,7 +586,7 @@ export default function Layout({ children }) {
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-[#0F1117] border border-[#1c1e27] rounded-lg shadow-lg py-2 z-10">
+                    <div className="absolute right-0 mt-2 w-56 bg-[#0A0B0F] border border-[#1c1e27] rounded-lg shadow-lg py-2 z-10">
                       <div className="px-4 py-2 border-b border-[#1c1e27]">
                         <p className="text-sm font-medium text-white">{userName}</p>
                         <p className="text-xs text-[#BBBECC]">{getRoleDisplay(userRole)}</p>
@@ -576,14 +614,9 @@ export default function Layout({ children }) {
         </header>
 
         {/* Page content */}
-        <main className="bg-[#0F1117] min-h-screen transition-colors duration-300">
+        <main className="bg-[#0F1117] min-h-screen transition-colors duration-300 pt-[72px]">
           {children}
         </main>
-
-        {/* Footer */}
-        <footer className="bg-[#0F1117] text-[#BBBECC] border-[#1c1e27] border-t p-4 text-center text-sm transition-all duration-300">
-          <p>© 2025 Splitty B.V. All rights reserved.</p>
-        </footer>
       </div>
     </div>
   )

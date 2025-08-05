@@ -127,7 +127,7 @@ export default function NewPOSIntegration() {
                         <select
                           id="restaurant"
                           name="restaurant"
-                          className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+                          className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
                           required
                           value={formData.restaurant}
                           onChange={handleInputChange}
@@ -150,7 +150,7 @@ export default function NewPOSIntegration() {
                         <select
                           id="posType"
                           name="posType"
-                          className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+                          className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
                           required
                           value={formData.posType}
                           onChange={handleInputChange}
@@ -173,7 +173,7 @@ export default function NewPOSIntegration() {
                             type="text"
                             name="username"
                             id="username"
-                            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                             required
                             value={formData.username}
                             onChange={handleInputChange}
@@ -190,7 +190,7 @@ export default function NewPOSIntegration() {
                             type="password"
                             name="password"
                             id="password"
-                            className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                            className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                             required
                             value={formData.password}
                             onChange={handleInputChange}
@@ -210,7 +210,7 @@ export default function NewPOSIntegration() {
                           name="baseUrl"
                           id="baseUrl"
                           placeholder="https://jouw-untill-server.com"
-                          className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                          className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                           required
                           value={formData.baseUrl}
                           onChange={handleInputChange}
@@ -226,7 +226,7 @@ export default function NewPOSIntegration() {
                         <select
                           id="environment"
                           name="environment"
-                          className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+                          className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
                           value={formData.environment}
                           onChange={handleInputChange}
                         >
@@ -238,14 +238,14 @@ export default function NewPOSIntegration() {
                       </div>
 
                       {/* Active Checkbox */}
-                      <div className="bg-[#0F1117] rounded-lg p-4 border border-[#2a2d3a]">
+                      <div className="bg-[#0A0B0F] rounded-lg p-4 border border-[#2a2d3a]">
                         <div className="flex items-start">
                           <div className="flex items-center h-5">
                             <input
                               id="isActive"
                               name="isActive"
                               type="checkbox"
-                              className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0F1117]"
+                              className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0A0B0F]"
                               checked={formData.isActive}
                               onChange={handleInputChange}
                             />
@@ -261,7 +261,7 @@ export default function NewPOSIntegration() {
                     </div>
 
                     {/* Form Actions */}
-                    <div className="px-6 py-4 bg-[#0F1117] border-t border-[#2a2d3a] flex justify-end space-x-3">
+                    <div className="px-6 py-4 bg-[#0A0B0F] border-t border-[#2a2d3a] flex justify-end space-x-3">
                       <Link
                         href="/pos"
                         className="px-6 py-3 border border-[#2a2d3a] rounded-lg text-white bg-[#1c1e27] hover:bg-[#252833] transition-all duration-200"

@@ -9,8 +9,10 @@ class Database {
       PAYOUTS: 'splitty_payouts',
     }
     
-    // Initialize with default data if empty
-    this.initializeData()
+    // Initialize with default data if empty (only on client side)
+    if (typeof window !== 'undefined') {
+      this.initializeData()
+    }
   }
 
   initializeData() {
@@ -95,6 +97,7 @@ class Database {
   // User methods
   getUsers() {
     try {
+      if (typeof window === 'undefined') return null
       const data = localStorage.getItem(this.KEYS.USERS)
       return data ? JSON.parse(data) : null
     } catch (error) {
@@ -105,6 +108,7 @@ class Database {
 
   setUsers(users) {
     try {
+      if (typeof window === 'undefined') return false
       localStorage.setItem(this.KEYS.USERS, JSON.stringify(users))
       return true
     } catch (error) {
@@ -172,6 +176,7 @@ class Database {
   // Restaurant methods
   getRestaurants() {
     try {
+      if (typeof window === 'undefined') return []
       const data = localStorage.getItem(this.KEYS.RESTAURANTS)
       return data ? JSON.parse(data) : []
     } catch (error) {
@@ -182,6 +187,7 @@ class Database {
 
   setRestaurants(restaurants) {
     try {
+      if (typeof window === 'undefined') return false
       localStorage.setItem(this.KEYS.RESTAURANTS, JSON.stringify(restaurants))
       return true
     } catch (error) {
@@ -193,6 +199,7 @@ class Database {
   // Clear all data
   clearAll() {
     try {
+      if (typeof window === 'undefined') return false
       Object.values(this.KEYS).forEach(key => {
         localStorage.removeItem(key)
       })

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Layout from '../../../components/Layout'
@@ -23,13 +23,20 @@ export default function RestaurantStaffManagement() {
   const { id } = router.query
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedRole, setSelectedRole] = useState('all')
-  const { restaurantUsers } = useUsers()
+  const { restaurantUsers, refreshRestaurantUsers } = useUsers()
 
   // Mock data - in real app this would come from API
   const restaurantName = id === '15' ? 'Loetje' : id === '16' ? 'Splitty' : id === '6' ? 'Limon B.V.' : 'Restaurant'
   
   // Get staff members for this restaurant
   const staffMembers = restaurantUsers[id] || []
+  
+  // Refresh on mount and when ID changes
+  useEffect(() => {
+    if (id) {
+      refreshRestaurantUsers()
+    }
+  }, [id])
 
   const filteredStaff = staffMembers.filter((member) => {
     const matchesSearch = 
@@ -82,6 +89,40 @@ export default function RestaurantStaffManagement() {
               </Link>
             </div>
 
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-lg">
+                    <UserGroupIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <span className="text-xs text-[#BBBECC]">Totaal</span>
+                </div>
+                <p className="text-2xl font-bold text-white">{staffMembers.length}</p>
+                <p className="text-sm text-[#BBBECC] mt-1">Personeelsleden</p>
+              </div>
+              <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-gradient-to-r from-[#667EEA] to-[#764BA2] rounded-lg">
+                    <BuildingOfficeIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <span className="text-xs text-[#BBBECC]">Admins</span>
+                </div>
+                <p className="text-2xl font-bold text-white">{staffMembers.filter(m => m.role === 'admin').length}</p>
+                <p className="text-sm text-[#BBBECC] mt-1">Restaurant Admins</p>
+              </div>
+              <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-gradient-to-r from-[#4ECDC4] to-[#44A08D] rounded-lg">
+                    <UserIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <span className="text-xs text-[#BBBECC]">Staff</span>
+                </div>
+                <p className="text-2xl font-bold text-white">{staffMembers.filter(m => m.role === 'staff').length}</p>
+                <p className="text-sm text-[#BBBECC] mt-1">Restaurant Staff</p>
+              </div>
+            </div>
+
             {/* Search and Filter */}
             <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
               <div className="flex flex-col md:flex-row gap-4">
@@ -93,7 +134,7 @@ export default function RestaurantStaffManagement() {
                     <input
                       id="search"
                       name="search"
-                      className="block w-full pl-10 pr-3 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className="block w-full pl-10 pr-3 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                       placeholder="Zoek op naam of email..."
                       type="search"
                       value={searchQuery}
@@ -104,7 +145,7 @@ export default function RestaurantStaffManagement() {
                 <select
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value)}
-                  className="bg-[#0F1117] border border-[#2a2d3a] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2BE89A]"
+                  className="bg-[#0A0B0F] border border-[#2a2d3a] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2BE89A]"
                 >
                   <option value="all">Alle Rollen</option>
                   <option value="admin">Restaurant Admin</option>
@@ -118,7 +159,7 @@ export default function RestaurantStaffManagement() {
                 {/* Empty State */}
                 <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden">
                   <div className="text-center py-20">
-                    <div className="mx-auto h-20 w-20 bg-[#0F1117] rounded-full flex items-center justify-center mb-6">
+                    <div className="mx-auto h-20 w-20 bg-[#0A0B0F] rounded-full flex items-center justify-center mb-6">
                       <UserGroupIcon className="h-10 w-10 text-[#BBBECC]" />
                     </div>
                     <h3 className="text-lg font-medium text-white mb-2">Nog geen personeel</h3>
@@ -150,7 +191,7 @@ export default function RestaurantStaffManagement() {
                     </div>
                     <div className="space-y-3">
                       {rolePermissions.admin.map((perm, index) => (
-                        <div key={index} className="flex items-start bg-[#0F1117] rounded-lg p-3">
+                        <div key={index} className="flex items-start bg-[#0A0B0F] rounded-lg p-3">
                           <perm.icon className="h-5 w-5 text-[#2BE89A] mr-3 mt-0.5" />
                           <span className="text-sm text-white">{perm.permission}</span>
                         </div>
@@ -171,7 +212,7 @@ export default function RestaurantStaffManagement() {
                     </div>
                     <div className="space-y-3">
                       {rolePermissions.staff.map((perm, index) => (
-                        <div key={index} className="flex items-start bg-[#0F1117] rounded-lg p-3">
+                        <div key={index} className="flex items-start bg-[#0A0B0F] rounded-lg p-3">
                           <perm.icon className="h-5 w-5 text-[#2BE89A] mr-3 mt-0.5" />
                           <span className="text-sm text-white">{perm.permission}</span>
                         </div>
@@ -189,7 +230,7 @@ export default function RestaurantStaffManagement() {
                   </div>
                   <div className="divide-y divide-[#2a2d3a]">
                     {filteredStaff.map((member) => (
-                      <div key={member.id} className="p-6 hover:bg-[#0F1117] transition">
+                      <div key={member.id} className="p-6 hover:bg-[#0A0B0F] transition">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-semibold">
@@ -202,11 +243,6 @@ export default function RestaurantStaffManagement() {
                             </div>
                           </div>
                           <div className="flex items-center space-x-4">
-                            {member.status === 'active' && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-[#2BE89A]/20 text-[#2BE89A]">
-                                • Online
-                              </span>
-                            )}
                             {member.role === 'admin' ? (
                               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-[#667EEA]/20 to-[#764BA2]/20 text-[#667EEA] border border-[#667EEA]/30">
                                 <BuildingOfficeIconSolid className="h-4 w-4 mr-1.5" />
@@ -228,40 +264,6 @@ export default function RestaurantStaffManagement() {
                         </div>
                       </div>
                     ))}
-                  </div>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="p-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-lg">
-                        <UserGroupIcon className="h-6 w-6 text-white" />
-                      </div>
-                      <span className="text-xs text-[#BBBECC]">Totaal</span>
-                    </div>
-                    <p className="text-2xl font-bold text-white">{staffMembers.length}</p>
-                    <p className="text-sm text-[#BBBECC] mt-1">Personeelsleden</p>
-                  </div>
-                  <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="p-3 bg-gradient-to-r from-[#667EEA] to-[#764BA2] rounded-lg">
-                        <BuildingOfficeIcon className="h-6 w-6 text-white" />
-                      </div>
-                      <span className="text-xs text-[#BBBECC]">Admins</span>
-                    </div>
-                    <p className="text-2xl font-bold text-white">{staffMembers.filter(m => m.role === 'admin').length}</p>
-                    <p className="text-sm text-[#BBBECC] mt-1">Restaurant Admins</p>
-                  </div>
-                  <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="p-3 bg-gradient-to-r from-[#4ECDC4] to-[#44A08D] rounded-lg">
-                        <UserIcon className="h-6 w-6 text-white" />
-                      </div>
-                      <span className="text-xs text-[#BBBECC]">Staff</span>
-                    </div>
-                    <p className="text-2xl font-bold text-white">{staffMembers.filter(m => m.role === 'staff').length}</p>
-                    <p className="text-sm text-[#BBBECC] mt-1">Restaurant Staff</p>
                   </div>
                 </div>
               </>

@@ -35,12 +35,11 @@ export default function NewRestaurant() {
     contact_phone: '+31',
     service_fee_type: 'flat',
     service_fee_amount: '0.7',
-    // Step 3: Media & Status
+    // Step 3: Media
     logo: null,
     logoPreview: null,
     banner: null,
     bannerPreview: null,
-    status: 'active',
   })
 
   const steps = [
@@ -58,8 +57,8 @@ export default function NewRestaurant() {
     },
     {
       number: 3,
-      title: 'Media & Status',
-      description: 'Upload afbeeldingen en stel restaurantstatus in',
+      title: 'Media & Branding',
+      description: 'Upload logo en banner afbeeldingen',
       icon: PhotoIcon,
     },
   ]
@@ -92,14 +91,20 @@ export default function NewRestaurant() {
         return
       }
       
-      // Create preview URL
+      // Create preview URL for immediate display
       const previewUrl = URL.createObjectURL(file)
       
-      setFormData(prev => ({
-        ...prev,
-        [fieldName]: file,
-        [`${fieldName}Preview`]: previewUrl,
-      }))
+      // Convert to base64 for persistent storage
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          [fieldName]: file,
+          [`${fieldName}Preview`]: previewUrl,
+          [`${fieldName}Base64`]: reader.result,
+        }))
+      }
+      reader.readAsDataURL(file)
       setShowMediaError(false)
     }
   }
@@ -159,17 +164,33 @@ export default function NewRestaurant() {
     const newRestaurant = {
       name: formData.name,
       location: `${formData.city}, ${formData.country}`,
-      status: formData.status,
+      status: 'inactive', // Always inactive until onboarding is complete
       email: formData.contact_email,
       phone: formData.contact_phone,
       tables: 0,
-      logo: formData.logoPreview, // Use the actual preview URL
+      logo: formData.logoBase64 || formData.logoPreview, // Use base64 if available, otherwise blob URL
+      banner: formData.bannerBase64 || formData.bannerPreview, // Store banner as well
+      address: {
+        street: formData.address,
+        postalCode: formData.postal_code,
+        city: formData.city,
+        country: formData.country,
+      },
+      serviceFee: {
+        type: formData.service_fee_type,
+        amount: parseFloat(formData.service_fee_amount),
+      }
     }
     
     // Add restaurant to context
-    addRestaurant(newRestaurant)
+    const addedRestaurant = addRestaurant(newRestaurant)
     
-    // Navigate back to restaurants page
+    // Store the new restaurant ID to highlight it on the restaurants page
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('highlightRestaurant', addedRestaurant.id.toString())
+    }
+    
+    // Redirect to restaurants page instead of onboarding
     router.push('/restaurants')
   }
 
@@ -241,7 +262,7 @@ export default function NewRestaurant() {
             name="name"
             id="name"
             required
-            className="w-full px-4 py-2.5 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
             placeholder="Bijv. Restaurant De Gouden Lepel"
             value={formData.name}
             onChange={handleInputChange}
@@ -257,7 +278,7 @@ export default function NewRestaurant() {
             name="address"
             id="address"
             required
-            className="w-full px-4 py-2.5 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
             placeholder="Straatnaam 123"
             value={formData.address}
             onChange={handleInputChange}
@@ -274,7 +295,7 @@ export default function NewRestaurant() {
               name="city"
               id="city"
               required
-              className="w-full px-4 py-2.5 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+              className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
               placeholder="Amsterdam"
               value={formData.city}
               onChange={handleInputChange}
@@ -290,7 +311,7 @@ export default function NewRestaurant() {
               name="postal_code"
               id="postal_code"
               required
-              className="w-full px-4 py-2.5 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+              className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
               placeholder="1234 AB"
               value={formData.postal_code}
               onChange={handleInputChange}
@@ -305,7 +326,7 @@ export default function NewRestaurant() {
               name="country"
               id="country"
               required
-              className="w-full px-3 py-2 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+              className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
               value={formData.country}
               onChange={handleInputChange}
             >
@@ -337,7 +358,7 @@ export default function NewRestaurant() {
               name="contact_email"
               id="contact_email"
               required
-              className="w-full px-4 py-2.5 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+              className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
               placeholder="restaurant@example.com"
               value={formData.contact_email}
               onChange={handleInputChange}
@@ -353,7 +374,7 @@ export default function NewRestaurant() {
               type="tel"
               name="contact_phone"
               id="contact_phone"
-              className="w-full px-4 py-2.5 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+              className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
               placeholder="+31 6 12345678"
               value={formData.contact_phone}
               onChange={handleInputChange}
@@ -375,7 +396,7 @@ export default function NewRestaurant() {
             <select
               name="service_fee_type"
               id="service_fee_type"
-              className="w-full px-3 py-2 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+              className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
               value={formData.service_fee_type}
               onChange={handleInputChange}
             >
@@ -394,7 +415,7 @@ export default function NewRestaurant() {
               id="service_fee_amount"
               step="0.01"
               min="0"
-              className="w-full px-4 py-2.5 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+              className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
               placeholder={formData.service_fee_type === 'flat' ? '0.70' : '3.00'}
               value={formData.service_fee_amount}
               onChange={handleInputChange}
@@ -410,7 +431,7 @@ export default function NewRestaurant() {
       <div>
         <div className="flex items-center space-x-3 mb-6">
           <PhotoIcon className="h-6 w-6 text-[#2BE89A]" />
-          <h2 className="text-xl font-semibold text-white">Media & Status</h2>
+          <h2 className="text-xl font-semibold text-white">Media & Branding</h2>
         </div>
         
         <div className="space-y-4">
@@ -436,7 +457,7 @@ export default function NewRestaurant() {
                 <img 
                   src={formData.logoPreview} 
                   alt="Logo preview" 
-                  className="w-full h-40 object-contain bg-[#0F1117] rounded-lg border border-[#2a2d3a]"
+                  className="w-full h-40 object-contain bg-[#0A0B0F] rounded-lg border border-[#2a2d3a]"
                 />
                 <button
                   type="button"
@@ -454,7 +475,7 @@ export default function NewRestaurant() {
               </div>
             ) : (
               <div 
-                className={`flex justify-center px-6 py-5 border-2 border-dashed rounded-lg transition-colors duration-200 bg-[#0F1117] ${
+                className={`flex justify-center px-6 py-5 border-2 border-dashed rounded-lg transition-colors duration-200 bg-[#0A0B0F] ${
                   dragActive.logo 
                     ? 'border-[#2BE89A] bg-[#2BE89A]/10' 
                     : 'border-[#2a2d3a] hover:border-[#2BE89A]/50'
@@ -499,7 +520,7 @@ export default function NewRestaurant() {
                 <img 
                   src={formData.bannerPreview} 
                   alt="Banner preview" 
-                  className="w-full h-40 object-cover bg-[#0F1117] rounded-lg border border-[#2a2d3a]"
+                  className="w-full h-40 object-cover bg-[#0A0B0F] rounded-lg border border-[#2a2d3a]"
                 />
                 <button
                   type="button"
@@ -517,7 +538,7 @@ export default function NewRestaurant() {
               </div>
             ) : (
               <div 
-                className={`flex justify-center px-6 py-5 border-2 border-dashed rounded-lg transition-colors duration-200 bg-[#0F1117] ${
+                className={`flex justify-center px-6 py-5 border-2 border-dashed rounded-lg transition-colors duration-200 bg-[#0A0B0F] ${
                   dragActive.banner 
                     ? 'border-[#2BE89A] bg-[#2BE89A]/10' 
                     : 'border-[#2a2d3a] hover:border-[#2BE89A]/50'
@@ -552,41 +573,19 @@ export default function NewRestaurant() {
             )}
           </div>
 
-          {/* Status Selection */}
-          <div className="border-t border-[#2a2d3a] pt-4">
-            <label className="block text-sm font-medium text-[#BBBECC] mb-3">
-              Restaurant Status
-            </label>
-            <div className="space-y-2">
-              <label className="flex items-center p-4 bg-[#0F1117] rounded-lg border border-[#2a2d3a] cursor-pointer hover:border-[#2BE89A]/30">
-                <input
-                  type="radio"
-                  name="status"
-                  value="active"
-                  checked={formData.status === 'active'}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] bg-[#0F1117]"
-                />
-                <span className="ml-3">
-                  <span className="block text-sm font-medium text-white">Actief</span>
-                  <span className="block text-sm text-[#BBBECC]">Restaurant accepteert bestellingen</span>
-                </span>
-              </label>
-              <label className="flex items-center p-4 bg-[#0F1117] rounded-lg border border-[#2a2d3a] cursor-pointer hover:border-[#2BE89A]/30">
-                <input
-                  type="radio"
-                  name="status"
-                  value="inactive"
-                  checked={formData.status === 'inactive'}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] bg-[#0F1117]"
-                />
-                <span className="ml-3">
-                  <span className="block text-sm font-medium text-white">Inactief</span>
-                  <span className="block text-sm text-[#BBBECC]">Restaurant is tijdelijk gesloten</span>
-                </span>
-              </label>
-            </div>
+        </div>
+      </div>
+      
+      {/* Next Steps Info */}
+      <div className="mt-6 bg-gradient-to-r from-[#2BE89A]/10 to-[#4FFFB0]/10 border border-[#2BE89A]/30 rounded-lg p-4">
+        <div className="flex items-start">
+          <ArrowRightIcon className="h-5 w-5 text-[#2BE89A] mt-0.5 mr-3 flex-shrink-0" />
+          <div>
+            <p className="text-[#2BE89A] font-medium mb-1">Wat gebeurt er hierna?</p>
+            <p className="text-sm text-[#BBBECC]">
+              Na het aanmaken van het restaurant word je direct naar de onboarding pagina gestuurd. 
+              Daar kun je personeel toevoegen, Stripe koppelen en het POS systeem configureren.
+            </p>
           </div>
         </div>
       </div>
@@ -631,14 +630,14 @@ export default function NewRestaurant() {
                 </div>
 
                 {/* Form Content - More compact padding */}
-                <div className="px-8 py-8 bg-[#0F1117]">
+                <div className="px-8 py-8 bg-[#0A0B0F]">
                   {currentStep === 1 && renderStep1()}
                   {currentStep === 2 && renderStep2()}
                   {currentStep === 3 && renderStep3()}
                 </div>
 
                 {/* Form Footer - More compact */}
-                <div className="px-8 py-5 bg-[#0F1117] border-t border-[#2a2d3a] flex justify-between">
+                <div className="px-8 py-5 bg-[#0A0B0F] border-t border-[#2a2d3a] flex justify-between">
                   {currentStep === 1 ? (
                     <Link
                       href="/restaurants"
@@ -674,7 +673,8 @@ export default function NewRestaurant() {
                       onClick={handleSubmit}
                       className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg"
                     >
-                      Restaurant Aanmaken
+                      Maak aan & Start Onboarding
+                      <ArrowRightIcon className="ml-2 -mr-1 h-5 w-5" />
                     </button>
                   )}
                 </div>

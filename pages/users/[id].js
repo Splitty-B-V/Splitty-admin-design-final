@@ -193,7 +193,7 @@ export default function EditUser() {
                         name="first_name"
                         id="first_name"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         value={formData.first_name}
                         onChange={handleInputChange}
                       />
@@ -208,7 +208,7 @@ export default function EditUser() {
                         name="last_name"
                         id="last_name"
                         required
-                        className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                         value={formData.last_name}
                         onChange={handleInputChange}
                       />
@@ -227,7 +227,7 @@ export default function EditUser() {
                           name="email"
                           id="email"
                           required
-                          className="w-full pl-10 pr-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                          className="w-full pl-10 pr-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                           value={formData.email}
                           onChange={handleInputChange}
                         />
@@ -246,7 +246,7 @@ export default function EditUser() {
                           type="tel"
                           name="phone"
                           id="phone"
-                          className="w-full pl-10 pr-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                          className="w-full pl-10 pr-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                           value={formData.phone}
                           onChange={handleInputChange}
                         />
@@ -274,8 +274,8 @@ export default function EditUser() {
                           key={role.value}
                           className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none transition-all ${
                             formData.role === role.value
-                              ? 'bg-[#0F1117] border-[#2BE89A]'
-                              : 'bg-[#0F1117] border-[#2a2d3a] hover:border-[#2BE89A]/50'
+                              ? 'bg-[#0A0B0F] border-[#2BE89A]'
+                              : 'bg-[#0A0B0F] border-[#2a2d3a] hover:border-[#2BE89A]/50'
                           }`}
                         >
                           <input
@@ -315,7 +315,7 @@ export default function EditUser() {
                       <select
                         id="department"
                         name="department"
-                        className="w-full pl-10 pr-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent appearance-none"
+                        className="w-full pl-10 pr-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent appearance-none"
                         value={formData.department}
                         onChange={handleInputChange}
                         required
@@ -331,13 +331,13 @@ export default function EditUser() {
                   </div>
 
                   {/* Active Status */}
-                  <div className="bg-[#0F1117] rounded-lg p-4">
+                  <div className="bg-[#0A0B0F] rounded-lg p-4">
                     <div className="flex items-center">
                       <input
                         id="is_active"
                         name="is_active"
                         type="checkbox"
-                        className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0F1117]"
+                        className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0A0B0F]"
                         checked={formData.is_active}
                         onChange={handleInputChange}
                       />
@@ -354,14 +354,14 @@ export default function EditUser() {
                   <div className="flex space-x-3">
                     <Link
                       href="/users"
-                      className="px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                      className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
                     >
                       Annuleren
                     </Link>
                     <button
                       type="button"
                       onClick={() => setShowPasswordModal(true)}
-                      className="inline-flex items-center px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                      className="inline-flex items-center px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
                     >
                       <KeyIcon className="h-5 w-5 mr-2" />
                       Wachtwoord Wijzigen
@@ -401,7 +401,7 @@ export default function EditUser() {
                   id="new_password"
                   required
                   minLength="8"
-                  className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                   placeholder="••••••••"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -416,7 +416,7 @@ export default function EditUser() {
                   type="password"
                   id="confirm_new_password"
                   required
-                  className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -431,7 +431,7 @@ export default function EditUser() {
                     setNewPassword('')
                     setConfirmPassword('')
                   }}
-                  className="px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                  className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
                 >
                   Annuleren
                 </button>
@@ -473,7 +473,7 @@ export default function EditUser() {
               <input
                 type="text"
                 id="delete_confirmation"
-                className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 placeholder={`${formData.first_name} ${formData.last_name}`}
                 value={deleteConfirmation}
                 onChange={(e) => setDeleteConfirmation(e.target.value)}
@@ -490,7 +490,7 @@ export default function EditUser() {
                   setShowDeleteModal(false)
                   setDeleteConfirmation('')
                 }}
-                className="px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
               >
                 Annuleren
               </button>

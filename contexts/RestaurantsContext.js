@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
+import db from '../utils/database'
 
 const RestaurantsContext = createContext()
 
@@ -11,7 +12,8 @@ export function useRestaurants() {
 }
 
 export function RestaurantsProvider({ children }) {
-  const [restaurants, setRestaurants] = useState([
+  // Initialize with default restaurants
+  const defaultRestaurants = [
     {
       id: 15,
       name: 'Loetje',
@@ -26,6 +28,7 @@ export function RestaurantsProvider({ children }) {
       activeOrders: 12,
       totalOrders: 1234,
       created: new Date('2024-01-15'),
+      isOnboarded: true,
     },
     {
       id: 16,
@@ -41,6 +44,7 @@ export function RestaurantsProvider({ children }) {
       activeOrders: 8,
       totalOrders: 956,
       created: new Date('2024-02-01'),
+      isOnboarded: true,
     },
     {
       id: 10,
@@ -56,6 +60,7 @@ export function RestaurantsProvider({ children }) {
       activeOrders: 5,
       totalOrders: 743,
       created: new Date('2024-02-15'),
+      isOnboarded: true,
     },
     {
       id: 11,
@@ -71,6 +76,7 @@ export function RestaurantsProvider({ children }) {
       activeOrders: 0,
       totalOrders: 412,
       created: new Date('2024-03-01'),
+      isOnboarded: true,
     },
     {
       id: 6,
@@ -86,6 +92,7 @@ export function RestaurantsProvider({ children }) {
       activeOrders: 15,
       totalOrders: 1567,
       created: new Date('2024-01-01'),
+      isOnboarded: true,
     },
     {
       id: 7,
@@ -101,6 +108,7 @@ export function RestaurantsProvider({ children }) {
       activeOrders: 7,
       totalOrders: 823,
       created: new Date('2024-03-15'),
+      isOnboarded: true,
     },
     {
       id: 17,
@@ -116,13 +124,82 @@ export function RestaurantsProvider({ children }) {
       activeOrders: 10,
       totalOrders: 1089,
       created: new Date('2024-04-01'),
+      isOnboarded: true,
     },
-  ])
+  ]
+
+  const [restaurants, setRestaurants] = useState([])
+
+  // Load restaurants from localStorage on mount
+  useEffect(() => {
+    const storedRestaurants = db.getRestaurants()
+    
+    if (storedRestaurants && storedRestaurants.length > 0) {
+      setRestaurants(storedRestaurants)
+    } else {
+      // Initialize with default restaurants if none exist
+      db.setRestaurants(defaultRestaurants)
+      setRestaurants(defaultRestaurants)
+    }
+  }, [])
+
+  // Save to localStorage whenever restaurants change
+  useEffect(() => {
+    if (restaurants.length > 0) {
+      db.setRestaurants(restaurants)
+    }
+  }, [restaurants])
 
   const deleteRestaurant = (restaurantId) => {
+    console.log('Deleting restaurant with ID:', restaurantId)
+    const restaurant = restaurants.find(r => r.id === parseInt(restaurantId))
+    console.log('Found restaurant:', restaurant)
+    
+    // Check if restaurant has started onboarding
+    let hasStartedOnboarding = false
+    if (restaurant && !restaurant.isOnboarded && typeof window !== 'undefined') {
+      const savedData = localStorage.getItem(`onboarding_${restaurantId}`)
+      if (savedData) {
+        const parsed = JSON.parse(savedData)
+        // Check if any step has been completed (currentStep > 1 or any staff added)
+        hasStartedOnboarding = (parsed.currentStep && parsed.currentStep > 1) || 
+                               (parsed.staff && parsed.staff.length > 0)
+      }
+    }
+    
+    // If restaurant is not onboarded AND has not started onboarding, delete permanently
+    if (restaurant && !restaurant.isOnboarded && !hasStartedOnboarding) {
+      console.log('Restaurant has not started onboarding, deleting permanently')
+      setRestaurants(prev => prev.filter(r => r.id !== parseInt(restaurantId)))
+      // Also clean up any onboarding data from localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(`onboarding_${restaurantId}`)
+      }
+    } else if (restaurant) {
+      console.log('Restaurant is onboarded or has started onboarding, archiving')
+      // Otherwise, archive it
+      setRestaurants(prev => prev.map(r => 
+        r.id === parseInt(restaurantId) 
+          ? { ...r, deleted: true, deletedAt: new Date() }
+          : r
+      ))
+    }
+  }
+  
+  const deleteRestaurantPermanently = (restaurantId) => {
+    setRestaurants(prev => prev.filter(restaurant => 
+      restaurant.id !== parseInt(restaurantId)
+    ))
+    // Also clean up any onboarding data from localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(`onboarding_${restaurantId}`)
+    }
+  }
+
+  const restoreRestaurant = (restaurantId) => {
     setRestaurants(prev => prev.map(restaurant => 
-      restaurant.id === parseInt(restaurantId) 
-        ? { ...restaurant, deleted: true, status: 'deleted' }
+      restaurant.id === parseInt(restaurantId)
+        ? { ...restaurant, deleted: false, deletedAt: null }
         : restaurant
     ))
   }
@@ -136,6 +213,8 @@ export function RestaurantsProvider({ children }) {
       revenue: '€0',
       activeOrders: 0,
       totalOrders: 0,
+      isOnboarded: false,
+      onboardingStep: 0,
     }
     setRestaurants(prev => [...prev, newRestaurant])
     return newRestaurant
@@ -146,16 +225,41 @@ export function RestaurantsProvider({ children }) {
   }
 
   const getActiveRestaurants = () => {
-    return restaurants.filter(restaurant => !restaurant.deleted)
+    return restaurants.filter(restaurant => !restaurant.deleted && restaurant.status !== 'deleted')
+  }
+
+  const getDeletedRestaurants = () => {
+    return restaurants.filter(restaurant => restaurant.deleted === true)
+  }
+
+  const updateRestaurant = (restaurantId, updates) => {
+    setRestaurants(prev => prev.map(restaurant => 
+      restaurant.id === parseInt(restaurantId)
+        ? { ...restaurant, ...updates }
+        : restaurant
+    ))
+  }
+
+  const updateRestaurantStaff = (restaurantId, staff) => {
+    setRestaurants(prev => prev.map(restaurant => 
+      restaurant.id === parseInt(restaurantId)
+        ? { ...restaurant, staff: staff }
+        : restaurant
+    ))
   }
 
   return (
     <RestaurantsContext.Provider value={{
       restaurants,
       deleteRestaurant,
+      deleteRestaurantPermanently,
+      restoreRestaurant,
       addRestaurant,
       getRestaurant,
       getActiveRestaurants,
+      getDeletedRestaurants,
+      updateRestaurant,
+      updateRestaurantStaff,
     }}>
       {children}
     </RestaurantsContext.Provider>

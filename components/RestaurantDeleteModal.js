@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import {
   ExclamationTriangleIcon,
   BuildingOfficeIcon,
@@ -14,6 +14,20 @@ export default function RestaurantDeleteModal({ restaurant, onClose, onConfirm }
     qrReturned: false,
     paymentsSettled: false,
   })
+  
+  // Check if restaurant is not fully onboarded (show simple delete for any non-onboarded restaurant)
+  const isNotOnboarded = !restaurant.isOnboarded
+  
+  // Check if onboarding has started
+  let hasStartedOnboarding = false
+  if (isNotOnboarded && typeof window !== 'undefined') {
+    const savedData = localStorage.getItem(`onboarding_${restaurant.id}`)
+    if (savedData) {
+      const parsed = JSON.parse(savedData)
+      hasStartedOnboarding = (parsed.currentStep && parsed.currentStep > 1) || 
+                            (parsed.staff && parsed.staff.length > 0)
+    }
+  }
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -59,54 +73,61 @@ export default function RestaurantDeleteModal({ restaurant, onClose, onConfirm }
     switch (step) {
       case 1:
         return (
-          <div>
-            <h4 className="text-lg font-medium text-white mb-4">Stap 1: Bevestig Restaurant Naam</h4>
-            <p className="text-[#BBBECC] mb-4">
-              Type de exacte naam van het restaurant om door te gaan met het verwijderingsproces.
-            </p>
-            <div className="bg-[#0F1117] border border-[#2a2d3a] rounded-lg p-4 mb-4">
-              <p className="text-sm text-[#BBBECC]">Restaurant dat verwijderd wordt:</p>
-              <p className="text-lg font-semibold text-white">{restaurant.name}</p>
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-2">Bevestig Restaurant</h4>
+              <p className="text-sm text-[#BBBECC]">
+                Type de naam van het restaurant om door te gaan.
+              </p>
             </div>
-            <input
-              type="text"
-              name="restaurantName"
-              className="w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              placeholder="Type de restaurant naam..."
-              value={formData.restaurantName}
-              onChange={handleInputChange}
-            />
-            <p className="text-xs text-[#BBBECC] mt-2">
-              Verwachte invoer: <span className="text-white font-mono">{restaurant.name}</span>
-            </p>
+            
+            <div className="bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg p-3">
+              <p className="text-xs text-[#BBBECC] mb-1">Te verwijderen restaurant:</p>
+              <p className="text-base font-medium text-white">{restaurant.name}</p>
+            </div>
+            
+            <div>
+              <input
+                type="text"
+                name="restaurantName"
+                className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                placeholder={`Type "${restaurant.name}"`}
+                value={formData.restaurantName}
+                onChange={handleInputChange}
+              />
+            </div>
           </div>
         )
       
       case 2:
         return (
-          <div>
-            <h4 className="text-lg font-medium text-white mb-4">Stap 2: Contact met Eigenaar</h4>
-            <p className="text-[#BBBECC] mb-4">
-              Bevestig dat je contact hebt gehad met de restaurant eigenaar of manager over het beëindigen van de samenwerking.
-            </p>
-            <div className="bg-[#FF6B6B]/10 border border-[#FF6B6B]/30 rounded-lg p-4 mb-4">
-              <p className="text-[#FF6B6B] font-medium mb-2">⚠️ Belangrijk</p>
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-2">Contact met Eigenaar</h4>
               <p className="text-sm text-[#BBBECC]">
-                Het is essentieel dat de restaurant eigenaar op de hoogte is van het beëindigen van de Splitty diensten.
+                Bevestig contact met de restaurant eigenaar.
               </p>
             </div>
-            <label className="flex items-start bg-[#0F1117] rounded-lg p-4 cursor-pointer border border-[#2a2d3a] hover:border-[#2BE89A]/50 transition">
+            
+            <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-3">
+              <p className="text-orange-400 text-sm font-medium mb-1">Belangrijk</p>
+              <p className="text-xs text-[#BBBECC]">
+                De eigenaar moet op de hoogte zijn van het beëindigen van de diensten.
+              </p>
+            </div>
+            
+            <label className="flex items-start bg-[#0A0B0F] rounded-lg p-3 cursor-pointer border border-[#2a2d3a] hover:border-[#2BE89A]/50 transition">
               <input
                 type="checkbox"
                 name="ownerTalked"
-                className="h-5 w-5 text-[#2BE89A] mt-0.5 focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0F1117]"
+                className="h-4 w-4 text-[#2BE89A] mt-0.5 focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0A0B0F]"
                 checked={formData.ownerTalked}
                 onChange={handleInputChange}
               />
-              <div className="ml-3">
-                <span className="text-white font-medium">Ja, ik heb gesproken met de eigenaar/manager</span>
-                <p className="text-sm text-[#BBBECC] mt-1">
-                  De restaurant eigenaar is geïnformeerd en heeft ingestemd met het beëindigen van de diensten.
+              <div className="ml-2.5">
+                <span className="text-sm text-white font-medium">Eigenaar is geïnformeerd</span>
+                <p className="text-xs text-[#BBBECC] mt-0.5">
+                  Ik heb contact gehad met de eigenaar/manager
                 </p>
               </div>
             </label>
@@ -115,29 +136,33 @@ export default function RestaurantDeleteModal({ restaurant, onClose, onConfirm }
       
       case 3:
         return (
-          <div>
-            <h4 className="text-lg font-medium text-white mb-4">Stap 3: QR Code Houders</h4>
-            <p className="text-[#BBBECC] mb-4">
-              Bevestig dat alle QR code houders zijn terugontvangen van het restaurant.
-            </p>
-            <div className="bg-[#667EEA]/10 border border-[#667EEA]/30 rounded-lg p-4 mb-4">
-              <p className="text-[#667EEA] font-medium mb-2">📱 QR Code Materialen</p>
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-2">QR Code Materialen</h4>
               <p className="text-sm text-[#BBBECC]">
-                Alle fysieke QR code houders, tafelstickers en andere Splitty materialen moeten worden terugontvangen.
+                Bevestig terugontvangst van alle materialen.
               </p>
             </div>
-            <label className="flex items-start bg-[#0F1117] rounded-lg p-4 cursor-pointer border border-[#2a2d3a] hover:border-[#2BE89A]/50 transition">
+            
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+              <p className="text-blue-400 text-sm font-medium mb-1">QR Materialen</p>
+              <p className="text-xs text-[#BBBECC]">
+                QR houders, stickers en andere materialen moeten retour.
+              </p>
+            </div>
+            
+            <label className="flex items-start bg-[#0A0B0F] rounded-lg p-3 cursor-pointer border border-[#2a2d3a] hover:border-[#2BE89A]/50 transition">
               <input
                 type="checkbox"
                 name="qrReturned"
-                className="h-5 w-5 text-[#2BE89A] mt-0.5 focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0F1117]"
+                className="h-4 w-4 text-[#2BE89A] mt-0.5 focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0A0B0F]"
                 checked={formData.qrReturned}
                 onChange={handleInputChange}
               />
-              <div className="ml-3">
-                <span className="text-white font-medium">Alle QR materialen zijn terugontvangen</span>
-                <p className="text-sm text-[#BBBECC] mt-1">
-                  Ik heb alle QR code houders en andere Splitty materialen terugontvangen van het restaurant.
+              <div className="ml-2.5">
+                <span className="text-sm text-white font-medium">Materialen terugontvangen</span>
+                <p className="text-xs text-[#BBBECC] mt-0.5">
+                  Alle QR materialen zijn retour
                 </p>
               </div>
             </label>
@@ -146,32 +171,35 @@ export default function RestaurantDeleteModal({ restaurant, onClose, onConfirm }
       
       case 4:
         return (
-          <div>
-            <h4 className="text-lg font-medium text-white mb-4">Stap 4: Financiële Afhandeling</h4>
-            <p className="text-[#BBBECC] mb-4">
-              Bevestig dat alle financiële zaken zijn afgehandeld en dat er geen openstaande betalingen zijn.
-            </p>
-            <div className="bg-[#2BE89A]/10 border border-[#2BE89A]/30 rounded-lg p-4 mb-4">
-              <p className="text-[#2BE89A] font-medium mb-2">💰 Financiële Checklist</p>
-              <ul className="text-sm text-[#BBBECC] space-y-1">
-                <li>• Laatste Stripe uitbetalingen zijn verwerkt</li>
-                <li>• Geen openstaande facturen of betalingen</li>
-                <li>• Alle transacties zijn afgerond</li>
-                <li>• Stripe account is afgesloten of overgezet</li>
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-2">Financiële Afhandeling</h4>
+              <p className="text-sm text-[#BBBECC]">
+                Bevestig afhandeling van alle betalingen.
+              </p>
+            </div>
+            
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+              <p className="text-green-400 text-sm font-medium mb-1">Checklist</p>
+              <ul className="text-xs text-[#BBBECC] space-y-0.5">
+                <li>• Stripe uitbetalingen verwerkt</li>
+                <li>• Geen openstaande facturen</li>
+                <li>• Transacties afgerond</li>
               </ul>
             </div>
-            <label className="flex items-start bg-[#0F1117] rounded-lg p-4 cursor-pointer border border-[#2a2d3a] hover:border-[#2BE89A]/50 transition">
+            
+            <label className="flex items-start bg-[#0A0B0F] rounded-lg p-3 cursor-pointer border border-[#2a2d3a] hover:border-[#2BE89A]/50 transition">
               <input
                 type="checkbox"
                 name="paymentsSettled"
-                className="h-5 w-5 text-[#2BE89A] mt-0.5 focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0F1117]"
+                className="h-4 w-4 text-[#2BE89A] mt-0.5 focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0A0B0F]"
                 checked={formData.paymentsSettled}
                 onChange={handleInputChange}
               />
-              <div className="ml-3">
-                <span className="text-white font-medium">Alle financiële zaken zijn afgehandeld</span>
-                <p className="text-sm text-[#BBBECC] mt-1">
-                  Er zijn geen openstaande betalingen en alle Stripe transacties zijn afgerond.
+              <div className="ml-2.5">
+                <span className="text-sm text-white font-medium">Financiën afgehandeld</span>
+                <p className="text-xs text-[#BBBECC] mt-0.5">
+                  Alle betalingen zijn verwerkt
                 </p>
               </div>
             </label>
@@ -183,6 +211,86 @@ export default function RestaurantDeleteModal({ restaurant, onClose, onConfirm }
     }
   }
 
+  // Simple delete modal for non-onboarded restaurants
+  if (isNotOnboarded) {
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-[#1c1e27] rounded-xl p-6 max-w-md w-full mx-4 border border-[#2a2d3a]">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-red-500/20 rounded-lg">
+                <ExclamationTriangleIcon className="h-6 w-6 text-red-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white ml-3">Restaurant Verwijderen</h3>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-[#BBBECC] hover:text-white transition"
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+          </div>
+
+          {/* Warning */}
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+            <p className="text-red-400 font-medium mb-1">Weet je het zeker?</p>
+            <p className="text-sm text-[#BBBECC]">
+              Je staat op het punt om <span className="font-semibold text-white">{restaurant.name}</span> {hasStartedOnboarding ? 'te archiveren' : 'permanent te verwijderen'}.
+            </p>
+            {hasStartedOnboarding && (
+              <p className="text-xs text-[#BBBECC] mt-2">
+                Dit restaurant heeft al onboarding stappen voltooid en wordt gearchiveerd in plaats van permanent verwijderd.
+              </p>
+            )}
+          </div>
+
+          {/* Name confirmation */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-[#BBBECC] mb-2">
+              Type de restaurant naam ter bevestiging
+            </label>
+            <input
+              type="text"
+              name="restaurantName"
+              className={`w-full px-4 py-3 bg-[#0A0B0F] border rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${
+                formData.restaurantName && formData.restaurantName.toLowerCase() !== restaurant.name.toLowerCase()
+                  ? 'border-red-500'
+                  : 'border-[#2a2d3a]'
+              }`}
+              placeholder={restaurant.name}
+              value={formData.restaurantName}
+              onChange={handleInputChange}
+            />
+            {formData.restaurantName && formData.restaurantName.toLowerCase() !== restaurant.name.toLowerCase() && (
+              <p className="mt-2 text-sm text-red-400">
+                De naam komt niet overeen. Type exact: "{restaurant.name}"
+              </p>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+            >
+              Annuleren
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={formData.restaurantName.toLowerCase() !== restaurant.name.toLowerCase()}
+              className="flex-1 px-6 py-3 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {hasStartedOnboarding ? 'Archiveren' : 'Verwijderen'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Full delete modal for onboarded restaurants
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-[#1c1e27] rounded-xl p-6 max-w-lg w-full mx-4 border border-[#2a2d3a] max-h-[90vh] overflow-y-auto">
@@ -204,51 +312,51 @@ export default function RestaurantDeleteModal({ restaurant, onClose, onConfirm }
 
         {/* Progress Bar */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center">
-                <div
-                  className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium transition ${
-                    i < step
-                      ? 'bg-[#2BE89A] text-black'
-                      : i === step
-                      ? 'bg-red-500 text-white'
-                      : 'bg-[#0F1117] text-[#BBBECC] border border-[#2a2d3a]'
-                  }`}
-                >
-                  {i < step ? <CheckCircleIcon className="h-5 w-5" /> : i}
+          <div className="flex items-center justify-between">
+            {[1, 2, 3, 4].map((i, index) => (
+              <React.Fragment key={i}>
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
+                      i < step
+                        ? 'bg-[#2BE89A] text-black'
+                        : i === step
+                        ? 'bg-red-500 text-white scale-110'
+                        : 'bg-[#0A0B0F] text-[#BBBECC] border border-[#2a2d3a]'
+                    }`}
+                  >
+                    {i < step ? <CheckCircleIcon className="h-5 w-5" /> : i}
+                  </div>
+                  <span className={`text-xs mt-2 transition-colors ${
+                    i <= step ? 'text-white' : 'text-[#BBBECC]'
+                  }`}>
+                    {['Naam', 'Contact', 'QR', 'Financieel'][index]}
+                  </span>
                 </div>
                 {i < 4 && (
-                  <div
-                    className={`h-0.5 w-full mx-2 transition ${
-                      i < step ? 'bg-[#2BE89A]' : 'bg-[#2a2d3a]'
-                    }`}
-                  />
+                  <div className={`flex-1 h-0.5 mx-2 -mt-5 transition-all ${
+                    i < step ? 'bg-[#2BE89A]' : 'bg-[#2a2d3a]'
+                  }`} />
                 )}
-              </div>
+              </React.Fragment>
             ))}
-          </div>
-          <div className="flex justify-between text-xs text-[#BBBECC]">
-            <span>Naam</span>
-            <span>Contact</span>
-            <span>QR</span>
-            <span>Financieel</span>
           </div>
         </div>
 
-        {/* Warning Banner */}
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
-          <div className="flex items-start">
-            <ExclamationTriangleIcon className="h-5 w-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" />
-            <div>
-              <p className="text-red-400 font-medium mb-1">Permanente Actie</p>
-              <p className="text-sm text-[#BBBECC]">
-                Het verwijderen van een restaurant profiel is permanent en kan niet ongedaan worden gemaakt. 
-                Alle data, gebruikers en bestellingen worden permanent verwijderd.
-              </p>
+        {/* Only show warning on first step */}
+        {step === 1 && (
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
+            <div className="flex items-start">
+              <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400 mt-0.5 mr-3 flex-shrink-0" />
+              <div>
+                <p className="text-yellow-400 font-medium mb-1">Let op!</p>
+                <p className="text-sm text-[#BBBECC]">
+                  Dit restaurant wordt gearchiveerd. Je kunt het later permanent verwijderen vanuit het archief.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Step Content */}
         <div className="mb-6">
@@ -256,24 +364,24 @@ export default function RestaurantDeleteModal({ restaurant, onClose, onConfirm }
         </div>
 
         {/* Actions */}
-        <div className="flex justify-between">
+        <div className="flex gap-3">
           <button
             onClick={handlePrevious}
             disabled={step === 1}
-            className="px-6 py-3 bg-[#0F1117] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Vorige
           </button>
           <button
             onClick={handleNext}
             disabled={!isStepValid()}
-            className={`px-6 py-3 font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`flex-1 px-4 py-2.5 font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed ${
               step === 4
                 ? 'bg-red-500 text-white hover:bg-red-600'
-                : 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black hover:opacity-90'
+                : 'bg-[#2BE89A] text-black hover:bg-[#4FFFB0]'
             }`}
           >
-            {step === 4 ? 'Permanent Verwijderen' : 'Volgende'}
+            {step === 4 ? 'Verwijderen' : 'Volgende'}
           </button>
         </div>
       </div>

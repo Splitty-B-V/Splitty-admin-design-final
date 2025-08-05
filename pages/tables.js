@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Layout from '../components/Layout'
 import Breadcrumb from '../components/Breadcrumb'
+import { useRestaurants } from '../contexts/RestaurantsContext'
 import {
   MagnifyingGlassIcon,
   ArrowPathIcon,
@@ -10,13 +11,68 @@ import {
   CurrencyEuroIcon,
   TableCellsIcon,
   ChartBarIcon,
+  BuildingStorefrontIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/outline'
 
 export default function Tables() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterRestaurant, setFilterRestaurant] = useState('all')
+  const { restaurants } = useRestaurants()
 
-  const activeTables = [
+  // Generate active tables for each restaurant
+  const generateActiveTables = () => {
+    const tables = []
+    const activeRestaurants = restaurants.filter(r => !r.deleted)
+    
+    activeRestaurants.forEach(restaurant => {
+      // Generate random number of active tables per restaurant
+      const numActiveTables = Math.floor(Math.random() * 8) + 2
+      
+      for (let i = 0; i < numActiveTables; i++) {
+        const tableNumber = Math.floor(Math.random() * 50) + 1
+        const guests = Math.floor(Math.random() * 8) + 1
+        const amount = Math.floor(Math.random() * 300) + 20 + Math.random()
+        const paidPercentage = Math.random()
+        const remaining = amount * (1 - paidPercentage)
+        const durationMinutes = Math.floor(Math.random() * 180) + 15
+        const durationHours = Math.floor(durationMinutes / 60)
+        const durationMins = durationMinutes % 60
+        
+        tables.push({
+          id: `T-${restaurant.id}-${tableNumber}`,
+          restaurant: restaurant.name,
+          restaurantId: restaurant.id,
+          tableNumber: tableNumber.toString(),
+          guests: guests,
+          orderId: Math.floor(Math.random() * 1000) + 100,
+          amount: amount,
+          remaining: remaining,
+          duration: durationHours > 0 ? `${durationHours}h ${durationMins}m` : `${durationMins}m`,
+          status: 'active',
+          lastActivity: new Date(Date.now() - durationMinutes * 60 * 1000),
+        })
+      }
+    })
+    
+    return tables
+  }
+  
+  const activeTables = generateActiveTables()
+  
+  // Group tables by restaurant
+  const tablesByRestaurant = activeTables.reduce((acc, table) => {
+    if (!acc[table.restaurantId]) {
+      acc[table.restaurantId] = {
+        restaurant: table.restaurant,
+        restaurantId: table.restaurantId,
+        tables: []
+      }
+    }
+    acc[table.restaurantId].tables.push(table)
+    return acc
+  }, {})
+  
+  const oldActiveTables = [
     {
       id: 'T-1001',
       restaurant: 'Limon B.V.',
@@ -187,17 +243,14 @@ export default function Tables() {
     },
   ]
 
-  const restaurants = ['all', 'Limon B.V.', 'Anatolii Restaurant', 'Viresh Kewalbansing']
-
-  const filteredTables = activeTables.filter((table) => {
-    const matchesSearch =
-      table.tableNumber.includes(searchQuery) ||
-      table.restaurant.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      table.orderId.toString().includes(searchQuery)
-    
-    const matchesRestaurant = filterRestaurant === 'all' || table.restaurant === filterRestaurant
-    
-    return matchesSearch && matchesRestaurant
+  const filteredRestaurants = Object.values(tablesByRestaurant).filter(group => {
+    const matchesSearch = 
+      group.restaurant.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      group.tables.some(table => 
+        table.tableNumber.includes(searchQuery) ||
+        table.orderId.toString().includes(searchQuery)
+      )
+    return matchesSearch
   })
 
   const formatCurrency = (amount) => {
@@ -212,7 +265,7 @@ export default function Tables() {
   }
 
   const handleRefresh = () => {
-    console.log('Refreshing tables...')
+    window.location.reload()
   }
 
   return (
@@ -227,7 +280,7 @@ export default function Tables() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-white">Actieve Tafels</h1>
-                <p className="text-[#BBBECC] mt-1">Monitor alle actieve tafels en bestellingen</p>
+                <p className="text-[#BBBECC] mt-1">Overzicht van alle actieve tafels per restaurant</p>
               </div>
               <button
                 type="button"
@@ -248,7 +301,7 @@ export default function Tables() {
                   </div>
                   <div className="ml-4">
                     <p className="text-[#BBBECC] text-sm">Actieve Tafels</p>
-                    <p className="text-2xl font-bold text-white">{filteredTables.length}</p>
+                    <p className="text-2xl font-bold text-white">{activeTables.length}</p>
                   </div>
                 </div>
               </div>
@@ -260,7 +313,7 @@ export default function Tables() {
                   <div className="ml-4">
                     <p className="text-[#BBBECC] text-sm">Totaal Gasten</p>
                     <p className="text-2xl font-bold text-white">
-                      {filteredTables.reduce((sum, table) => sum + table.guests, 0)}
+                      {activeTables.reduce((sum, table) => sum + table.guests, 0)}
                     </p>
                   </div>
                 </div>
@@ -273,7 +326,7 @@ export default function Tables() {
                   <div className="ml-4">
                     <p className="text-[#BBBECC] text-sm">Totaal Bedrag</p>
                     <p className="text-2xl font-bold text-white">
-                      {formatCurrency(filteredTables.reduce((sum, table) => sum + table.amount, 0))}
+                      {formatCurrency(activeTables.reduce((sum, table) => sum + table.amount, 0))}
                     </p>
                   </div>
                 </div>
@@ -286,7 +339,7 @@ export default function Tables() {
                   <div className="ml-4">
                     <p className="text-[#BBBECC] text-sm">Nog Te Betalen</p>
                     <p className="text-2xl font-bold text-white">
-                      {formatCurrency(filteredTables.reduce((sum, table) => sum + table.remaining, 0))}
+                      {formatCurrency(activeTables.reduce((sum, table) => sum + table.remaining, 0))}
                     </p>
                   </div>
                 </div>
@@ -310,89 +363,101 @@ export default function Tables() {
                       id="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
-                      placeholder="Zoek op tafel, restaurant, of bestelling ID..."
+                      className="block w-full pl-12 pr-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      placeholder="Zoek op restaurant, tafel nummer, of bestelling ID..."
                     />
                   </div>
-                </div>
-                <div>
-                  <select
-                    id="restaurant"
-                    name="restaurant"
-                    value={filterRestaurant}
-                    onChange={(e) => setFilterRestaurant(e.target.value)}
-                    className="block w-full px-4 py-3 bg-[#0F1117] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
-                  >
-                    {restaurants.map((restaurant) => (
-                      <option key={restaurant} value={restaurant}>
-                        {restaurant === 'all' ? 'Alle Restaurants' : restaurant}
-                      </option>
-                    ))}
-                  </select>
                 </div>
               </div>
             </div>
 
-            {/* Tables Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredTables.map((table) => (
-                <div
-                  key={table.id}
-                  className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden hover:border-[#2BE89A]/30 transition-all duration-200 group"
-                >
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-lg font-bold text-white group-hover:text-[#2BE89A] transition-colors">
-                          Tafel {table.tableNumber}
-                        </h3>
-                        <p className="text-sm text-[#BBBECC]">{table.restaurant}</p>
+            {/* Restaurants with Active Tables */}
+            <div className="space-y-6">
+              {filteredRestaurants.map((group) => (
+                <div key={group.restaurantId} className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden">
+                  <div className="p-6 border-b border-[#2a2d3a]">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <BuildingStorefrontIcon className="h-6 w-6 text-[#2BE89A] mr-3" />
+                        <div>
+                          <h2 className="text-xl font-bold text-white">{group.restaurant}</h2>
+                          <p className="text-sm text-[#BBBECC]">{group.tables.length} actieve tafels</p>
+                        </div>
                       </div>
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          table.remaining,
-                          table.amount
-                        )}`}
-                      >
-                        {table.remaining === table.amount ? 'Onbetaald' : 'Gedeeltelijk'}
-                      </span>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-[#BBBECC]">Bestelling #</span>
-                        <span className="text-white font-medium">{table.orderId}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-[#BBBECC]">Gasten</span>
-                        <span className="text-white font-medium">{table.guests}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-[#BBBECC]">Bedrag</span>
-                        <span className="text-white font-medium">{formatCurrency(table.amount)}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-[#BBBECC]">Resterend</span>
-                        <span className="text-yellow-400 font-medium">
-                          {formatCurrency(table.remaining)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-[#BBBECC]">Duur</span>
-                        <span className="text-white font-medium flex items-center">
-                          <ClockIcon className="h-4 w-4 mr-1" />
-                          {table.duration}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 pt-4 border-t border-[#2a2d3a]">
                       <Link
-                        href={`/orders/${table.orderId}`}
-                        className="w-full inline-flex justify-center items-center px-4 py-2.5 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg"
+                        href={`/restaurants/${group.restaurantId}`}
+                        className="inline-flex items-center px-4 py-2 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white hover:bg-[#1a1c25] transition"
                       >
-                        Bekijk Bestelling
+                        Restaurant Profiel
+                        <ArrowRightIcon className="ml-2 h-4 w-4" />
                       </Link>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                      {group.tables.map((table) => (
+                        <div
+                          key={table.id}
+                          className="bg-[#0A0B0F] rounded-xl border border-[#2a2d3a] overflow-hidden hover:border-[#2BE89A]/30 transition-all duration-200"
+                        >
+                          <div className="p-4">
+                            <div className="flex justify-between items-start mb-4">
+                              <div>
+                                <h3 className="text-lg font-bold text-white">
+                                  Tafel {table.tableNumber}
+                                </h3>
+                                <p className="text-sm text-[#BBBECC]">{table.restaurant}</p>
+                              </div>
+                              <span
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                                  table.remaining,
+                                  table.amount
+                                )}`}
+                              >
+                                {table.remaining === table.amount ? 'Onbetaald' : 'Gedeeltelijk'}
+                              </span>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-[#BBBECC]">Bestelling #</span>
+                                <span className="text-white font-medium">{table.orderId}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-[#BBBECC]">Gasten</span>
+                                <span className="text-white font-medium">{table.guests}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-[#BBBECC]">Bedrag</span>
+                                <span className="text-white font-medium">{formatCurrency(table.amount)}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-[#BBBECC]">Resterend</span>
+                                <span className="text-yellow-400 font-medium">
+                                  {formatCurrency(table.remaining)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-[#BBBECC]">Duur</span>
+                                <span className="text-white font-medium flex items-center">
+                                  <ClockIcon className="h-4 w-4 mr-1" />
+                                  {table.duration}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="mt-4 pt-4 border-t border-[#2a2d3a]">
+                              <Link
+                                href={`/orders/${table.orderId}`}
+                                className="w-full inline-flex justify-center items-center px-4 py-2.5 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg"
+                              >
+                                Bekijk Bestelling
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -400,7 +465,7 @@ export default function Tables() {
             </div>
 
             {/* Empty State */}
-            {filteredTables.length === 0 && (
+            {filteredRestaurants.length === 0 && (
               <div className="text-center py-16 bg-[#1c1e27] rounded-xl border border-[#2a2d3a]">
                 <TableCellsIcon className="mx-auto h-12 w-12 text-[#BBBECC]" />
                 <p className="mt-4 text-[#BBBECC]">
