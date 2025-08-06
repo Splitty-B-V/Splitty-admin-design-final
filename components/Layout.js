@@ -59,7 +59,15 @@ export default function Layout({ children }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState('en')
-  const [expandedMenus, setExpandedMenus] = useState({})
+  const [expandedMenus, setExpandedMenus] = useState(() => {
+    // Initialize with Restaurants menu expanded if on any of its pages
+    const initialExpanded = {}
+    const restaurantPaths = ['/restaurants', '/pos', '/payments/payouts']
+    if (typeof window !== 'undefined' && restaurantPaths.includes(window.location.pathname)) {
+      initialExpanded['Restaurants'] = true
+    }
+    return initialExpanded
+  })
   const router = useRouter()
   
   // Initialize user data with default values
@@ -134,17 +142,23 @@ export default function Layout({ children }) {
     if (savedCollapsed === 'true') {
       setSidebarCollapsed(true)
     }
+  }, [router.pathname])
 
-    // Auto-expand menu if on a submenu page OR if clicking on main item with submenu
+  // Separate useEffect for menu expansion to prevent re-triggering
+  useEffect(() => {
+    // Don't reset expanded menus on route change - keep them open
+    // Only auto-expand if menu is not already managed by user
     if (navigation && navigation.length > 0) {
       navigation.forEach(item => {
-        // Auto-expand if on any submenu page
-        if (item.submenu && item.submenu.some(sub => router.pathname === sub.href)) {
-          setExpandedMenus(prev => ({ ...prev, [item.name]: true }))
-        }
-        // Auto-expand Restaurants menu when on main restaurants page
-        if (item.name === 'Restaurants' && router.pathname === '/restaurants') {
-          setExpandedMenus(prev => ({ ...prev, [item.name]: true }))
+        // Check if we're on a submenu page or main page
+        const isOnSubmenuPage = item.submenu && item.submenu.some(sub => router.pathname === sub.href)
+        const isOnMainPage = item.name === 'Restaurants' && router.pathname === '/restaurants'
+        
+        if (isOnSubmenuPage || isOnMainPage) {
+          setExpandedMenus(prev => {
+            // Always keep it expanded when on these pages
+            return { ...prev, [item.name]: true }
+          })
         }
       })
     }
@@ -266,8 +280,13 @@ export default function Layout({ children }) {
                       if (item.href) {
                         router.push(item.href)
                       }
-                      // Always toggle the submenu
-                      toggleSubmenu(item.name)
+                      // Only toggle if not already on a submenu page
+                      // If already on submenu page, just expand without toggling
+                      if (item.submenu && item.submenu.some(sub => router.pathname === sub.href)) {
+                        setExpandedMenus(prev => ({ ...prev, [item.name]: true }))
+                      } else {
+                        toggleSubmenu(item.name)
+                      }
                     }}
                     className={`
                     w-full group flex items-center px-5 py-3 text-sm font-medium rounded-lg transition-all duration-200
@@ -327,10 +346,10 @@ export default function Layout({ children }) {
 
                 {/* Submenu */}
                 {hasSubmenu && !sidebarCollapsed && (
-                  <div className={`transition-all duration-150 ease-in-out transform-gpu ${
+                  <div className={`transition-all duration-300 ease-in-out ${
                     isExpanded ? 'mt-1' : ''
                   }`}>
-                    <div className={`ml-10 overflow-hidden transition-all duration-150 ease-in-out ${
+                    <div className={`ml-10 overflow-hidden transition-[max-height] duration-300 ease-in-out ${
                       isExpanded ? 'max-h-40' : 'max-h-0'
                     }`}>
                       {item.submenu.map((subItem) => {
