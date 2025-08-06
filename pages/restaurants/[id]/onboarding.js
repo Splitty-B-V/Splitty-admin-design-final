@@ -11,6 +11,7 @@ import {
   WifiIcon,
   CheckCircleIcon,
   StarIcon,
+  QrCodeIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   TrashIcon,
@@ -55,6 +56,12 @@ export default function RestaurantOnboarding() {
     reviewLink: '',
     placeId: '',
     isConfigured: false 
+  })
+  const [qrStandData, setQrStandData] = useState({
+    selectedDesign: '',
+    tableCount: '',
+    floorPlan: null,
+    isConfigured: false
   })
   const [showCopiedMessage, setShowCopiedMessage] = useState(false)
   
@@ -105,6 +112,9 @@ export default function RestaurantOnboarding() {
             if (parsed.completedSteps.includes(4)) {
               validCompletedSteps.push(4);
             }
+            if (parsed.completedSteps.includes(5)) {
+              validCompletedSteps.push(5);
+            }
             
             setCompletedSteps(validCompletedSteps);
           }
@@ -121,6 +131,9 @@ export default function RestaurantOnboarding() {
             }
             setGoogleReviewData(parsed.googleReviewData)
           }
+          if (parsed.qrStandData) {
+            setQrStandData(parsed.qrStandData)
+          }
           
           // Only set to next uncompleted step on initial page load
           if (!hasInitialized) {
@@ -132,9 +145,11 @@ export default function RestaurantOnboarding() {
               nextStep = 3;
             } else if (validCompletedSteps.includes(1) && validCompletedSteps.includes(2) && validCompletedSteps.includes(3) && !validCompletedSteps.includes(4)) {
               nextStep = 4;
-            } else if (validCompletedSteps.length === 4) {
+            } else if (validCompletedSteps.includes(1) && validCompletedSteps.includes(2) && validCompletedSteps.includes(3) && validCompletedSteps.includes(4) && !validCompletedSteps.includes(5)) {
+              nextStep = 5;
+            } else if (validCompletedSteps.length === 5) {
               // All steps completed, show the last step
-              nextStep = 4;
+              nextStep = 5;
             }
             
             setCurrentStep(nextStep);
@@ -172,16 +187,17 @@ export default function RestaurantOnboarding() {
       stripeData: updatedData.stripeData || stripeData,
       posData: updatedData.posData || posData,
       googleReviewData: updatedData.googleReviewData || googleReviewData,
+      qrStandData: updatedData.qrStandData || qrStandData,
       completedSteps: updatedData.completedSteps || completedSteps,
       currentStep: updatedData.currentStep || currentStep,
       savedAt: new Date().toISOString()
     }
     localStorage.setItem(`onboarding_${id}`, JSON.stringify(dataToSave))
     
-    // Also update the restaurant's onboardingStep
-    const completedCount = (updatedData.completedSteps || completedSteps).length;
+    // Also update the restaurant's onboardingStep - only count first 3 steps as required
+    const requiredStepsCompleted = (updatedData.completedSteps || completedSteps).filter(step => step <= 3).length;
     updateRestaurant(id, { 
-      onboardingStep: Math.min(completedCount, 4)
+      onboardingStep: Math.min(requiredStepsCompleted, 3)
     });
   }
 
@@ -196,6 +212,7 @@ export default function RestaurantOnboarding() {
         stripeData,
         posData,
         googleReviewData,
+        qrStandData,
         completedSteps,
         currentStep: step
       })
@@ -231,6 +248,7 @@ export default function RestaurantOnboarding() {
         stripeData,
         posData,
         googleReviewData,
+        qrStandData,
         completedSteps: newCompletedSteps,
         currentStep
       });
@@ -247,6 +265,7 @@ export default function RestaurantOnboarding() {
       stripeData,
       posData,
       googleReviewData,
+      qrStandData,
       completedSteps,
       currentStep
     });
@@ -256,7 +275,7 @@ export default function RestaurantOnboarding() {
     // For now, just navigate to next step without marking as complete
     // Completion logic will be added later when API connections are implemented
     
-    if (currentStep < 4) {
+    if (currentStep < 5) {
       const nextStep = currentStep + 1;
       setCurrentStep(nextStep);
       
@@ -267,14 +286,16 @@ export default function RestaurantOnboarding() {
         personnelData,
         stripeData,
         posData,
-        googleReviewData
+        googleReviewData,
+        qrStandData
       });
-    } else if (currentStep === 4) {
+    } else if (currentStep === 5) {
       // Complete onboarding - this is the final step
       updateRestaurant(id, { 
         isOnboarded: true,
-        onboardingStep: 4,
-        googleReviewLink: googleReviewData.reviewLink || null
+        onboardingStep: 5,
+        googleReviewLink: googleReviewData.reviewLink || null,
+        qrStandConfig: qrStandData.isConfigured ? qrStandData : null
       })
       
       // Also update users if personnel were added
@@ -767,9 +788,175 @@ export default function RestaurantOnboarding() {
             <div className="bg-[#1c1e27] rounded-xl p-8 border border-[#2a2d3a]">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Stap 4: Google Reviews</h3>
+                  <h3 className="text-2xl font-bold text-white mb-2">Stap 4: QR houders</h3>
                   <p className="text-[#BBBECC]">
-                    Optioneel: configureer Google Reviews link voor {restaurant?.name}
+                    Configureer QR stands en tafelindeling voor {restaurant?.name}
+                  </p>
+                </div>
+                <QrCodeIcon className="h-12 w-12 text-[#BBBECC] opacity-20" />
+              </div>
+
+              <div className="space-y-8">
+                {/* QR Stand Design Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-[#BBBECC] mb-4">
+                    Selecteer QR Stand Design
+                  </label>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[
+                      { id: 'classic', name: 'Classic', color: 'from-[#2BE89A] to-[#4FFFB0]' },
+                      { id: 'modern', name: 'Modern', color: 'from-[#635BFF] to-[#7C3AED]' },
+                      { id: 'minimal', name: 'Minimal', color: 'from-[#BBBECC] to-[#ffffff]' },
+                      { id: 'elegant', name: 'Elegant', color: 'from-[#FF6B6B] to-[#FF8E53]' }
+                    ].map((design) => (
+                      <button
+                        key={design.id}
+                        type="button"
+                        onClick={() => setQrStandData({...qrStandData, selectedDesign: design.id, isConfigured: true})}
+                        className={`p-6 rounded-xl border-2 transition-all group ${
+                          qrStandData.selectedDesign === design.id
+                            ? 'border-[#2BE89A] bg-[#2BE89A]/10'
+                            : 'border-[#2a2d3a] bg-[#0A0B0F] hover:border-[#2BE89A]/50'
+                        }`}
+                      >
+                        <div className={`w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br ${design.color} flex items-center justify-center`}>
+                          <QrCodeIcon className="h-8 w-8 text-black" />
+                        </div>
+                        <p className="text-white font-medium text-sm">{design.name}</p>
+                        <div className="mt-2 w-full h-1 bg-[#2a2d3a] rounded-full">
+                          <div className={`h-1 rounded-full bg-gradient-to-r ${design.color} transition-all duration-300 ${
+                            qrStandData.selectedDesign === design.id ? 'w-full' : 'w-0'
+                          }`} />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Table Count */}
+                <div>
+                  <label className="block text-sm font-medium text-[#BBBECC] mb-2">
+                    Aantal Tafels
+                  </label>
+                  <input
+                    type="number"
+                    value={qrStandData.tableCount}
+                    onChange={(e) => setQrStandData({...qrStandData, tableCount: e.target.value, isConfigured: true})}
+                    className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                    placeholder="bijv. 25"
+                    min="1"
+                    max="200"
+                  />
+                  <p className="text-xs text-[#BBBECC] mt-2">
+                    Het totaal aantal tafels in het restaurant (gebruikt voor QR code generatie)
+                  </p>
+                </div>
+
+                {/* Floor Plan Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-[#BBBECC] mb-4">
+                    Plattegrond Upload (Optioneel)
+                  </label>
+                  <div className="relative border-2 border-dashed border-[#2a2d3a] rounded-xl p-8 text-center hover:border-[#2BE89A]/50 hover:bg-[#1c1e27]/50 transition-all">
+                    {qrStandData.floorPlan ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-center">
+                          <div className="p-3 bg-[#2BE89A]/20 rounded-lg">
+                            <svg className="h-8 w-8 text-[#2BE89A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-white font-medium">{qrStandData.floorPlan.name}</p>
+                          <p className="text-sm text-[#BBBECC]">{(qrStandData.floorPlan.size / 1024).toFixed(1)} KB</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setQrStandData({...qrStandData, floorPlan: null})}
+                          className="text-red-400 hover:text-red-300 text-sm font-medium"
+                        >
+                          Bestand verwijderen
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-center">
+                          <div className="p-3 bg-[#BBBECC]/20 rounded-lg">
+                            <svg className="h-8 w-8 text-[#BBBECC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-white font-medium mb-2">Sleep bestand hier of klik om te uploaden</p>
+                          <p className="text-sm text-[#BBBECC]">
+                            PNG, JPG, PDF - Max 5MB
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          accept=".png,.jpg,.jpeg,.pdf"
+                          onChange={(e) => {
+                            const file = e.target.files[0]
+                            if (file) {
+                              setQrStandData({...qrStandData, floorPlan: file, isConfigured: true})
+                            }
+                          }}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-[#BBBECC] mt-2">
+                    Upload de plattegrond van het restaurant om tafelnummers optimaal te kunnen plaatsen
+                  </p>
+                </div>
+
+                {/* Configuration Summary */}
+                {qrStandData.isConfigured && (
+                  <div className="bg-[#0A0B0F] rounded-lg p-6 border border-[#2BE89A]/30">
+                    <div className="flex items-center mb-4">
+                      <CheckCircleIcon className="h-6 w-6 text-[#2BE89A] mr-3" />
+                      <h4 className="text-base font-medium text-white">QR Stand Configuratie</h4>
+                    </div>
+                    <div className="space-y-3">
+                      {qrStandData.selectedDesign && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-[#BBBECC]">Design</span>
+                          <span className="text-sm text-white font-medium capitalize">{qrStandData.selectedDesign}</span>
+                        </div>
+                      )}
+                      {qrStandData.tableCount && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-[#BBBECC]">Aantal tafels</span>
+                          <span className="text-sm text-white font-medium">{qrStandData.tableCount}</span>
+                        </div>
+                      )}
+                      {qrStandData.floorPlan && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-[#BBBECC]">Plattegrond</span>
+                          <span className="text-sm text-white font-medium">{qrStandData.floorPlan.name}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+
+      case 5:
+        return (
+          <div className="space-y-6">
+            {/* Main Content Card */}
+            <div className="bg-[#1c1e27] rounded-xl p-8 border border-[#2a2d3a]">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Stap 5: Google Reviews</h3>
+                  <p className="text-[#BBBECC]">
+                    Configureer Google Reviews link voor {restaurant?.name}
                   </p>
                 </div>
                 <StarIcon className="h-12 w-12 text-[#BBBECC] opacity-20" />
@@ -897,7 +1084,7 @@ export default function RestaurantOnboarding() {
                     />
                   </div>
                   <p className="text-xs text-[#BBBECC] mt-2">
-                    Optioneel - Het restaurant kan dit later altijd wijzigen
+                    Het restaurant kan dit later altijd wijzigen
                   </p>
                 </div>
 
@@ -978,7 +1165,7 @@ export default function RestaurantOnboarding() {
               </div>
               
               <div className="p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10">
                   <div className="bg-gradient-to-br from-[#0F1117] to-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a] hover:border-[#2BE89A]/50 transition-all group">
                     <UserGroupIcon className="h-10 w-10 text-[#2BE89A] mb-4 group-hover:scale-110 transition-transform" />
                     <h3 className="text-lg font-semibold text-white mb-2">Personeel</h3>
@@ -1008,6 +1195,14 @@ export default function RestaurantOnboarding() {
                     <h3 className="text-lg font-semibold text-white mb-2">Reviews</h3>
                     <p className="text-sm text-[#BBBECC]">
                       Configureer klantfeedback
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-[#0F1117] to-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a] hover:border-[#2BE89A]/50 transition-all group">
+                    <QrCodeIcon className="h-10 w-10 text-[#2BE89A] mb-4 group-hover:scale-110 transition-transform" />
+                    <h3 className="text-lg font-semibold text-white mb-2">QR Stands</h3>
+                    <p className="text-sm text-[#BBBECC]">
+                      Tafel QR codes en indeling
                     </p>
                   </div>
                 </div>

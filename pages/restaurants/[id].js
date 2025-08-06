@@ -38,7 +38,7 @@ import {
 export default function RestaurantDetail() {
   const router = useRouter()
   const { id } = router.query
-  const { getRestaurant, deleteRestaurant, deleteRestaurantPermanently } = useRestaurants()
+  const { getRestaurant, updateRestaurant, deleteRestaurant, deleteRestaurantPermanently } = useRestaurants()
   const { getCompanyUser, authenticateUser, restaurantUsers } = useUsers()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showPermanentDeleteModal, setShowPermanentDeleteModal] = useState(false)
@@ -970,453 +970,479 @@ export default function RestaurantDetail() {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Contact Information */}
-                <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
-                  <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
-                    <MapPinIcon className="h-6 w-6 text-[#2BE89A] mr-2" />
-                    Contact Informatie
-                  </h2>
-                <div className="space-y-5">
-                  <div className="bg-[#0A0B0F] rounded-lg p-4">
-                    <h3 className="text-xs font-medium text-[#BBBECC] uppercase tracking-wider mb-2">Adres</h3>
-                    <address className="not-italic text-white">
-                      {restaurant.address.street}<br />
-                      {restaurant.address.postalCode} {restaurant.address.city}<br />
-                      {restaurant.address.country}
-                    </address>
-                  </div>
-                  <div className="bg-[#0A0B0F] rounded-lg p-4">
-                    <h3 className="text-xs font-medium text-[#BBBECC] uppercase tracking-wider mb-2">Email</h3>
-                    <a href={`mailto:${restaurant.email}`} className="text-white hover:text-[#2BE89A] transition">
-                      {restaurant.email}
-                    </a>
-                  </div>
-                  <div className="bg-[#0A0B0F] rounded-lg p-4">
-                    <h3 className="text-xs font-medium text-[#BBBECC] uppercase tracking-wider mb-2">Telefoon</h3>
-                    <a href={`tel:${restaurant.phone}`} className="text-white hover:text-[#2BE89A] transition">
-                      {restaurant.phone}
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Restaurant Staff */}
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
-                <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
-                  <UserGroupIcon className="h-6 w-6 text-[#2BE89A] mr-2" />
-                  Restaurant Personeel
-                  {restaurantUsers[id] && restaurantUsers[id].length > 0 && (
-                    <span className="ml-auto text-lg font-normal text-[#BBBECC]">{restaurantUsers[id].length}</span>
-                  )}
-                </h2>
-                {(!restaurantUsers[id] || restaurantUsers[id].length === 0) ? (
-                  <div className="text-center py-12">
-                    <div className="mx-auto h-16 w-16 bg-[#0A0B0F] rounded-full flex items-center justify-center mb-4">
-                      <UserIcon className="h-8 w-8 text-[#BBBECC]" />
-                    </div>
-                    <h3 className="text-sm font-medium text-white mb-1">Geen personeel</h3>
-                    <p className="text-xs text-[#BBBECC]">Voeg personeel toe om toegang te geven</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {restaurantUsers[id].slice(0, 3).map((member) => (
-                      <div key={member.id} className="bg-[#0A0B0F] rounded-lg p-4 hover:bg-[#1a1c25] transition">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-semibold">
-                              {member.name.split(' ').map(n => n[0]).join('')}
-                            </div>
-                            <div className="ml-3">
-                              <p className="text-sm font-medium text-white">{member.name}</p>
-                              <p className="text-xs text-[#BBBECC]">{member.role}</p>
-                            </div>
-                          </div>
-                          <button className="text-[#2BE89A] hover:text-[#4FFFB0] text-sm transition">
-                            Bewerk
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {restaurantUsers[id] && restaurantUsers[id].length > 3 && (
-                  <div className="text-center py-3 text-sm text-[#BBBECC]">
-                    En nog {restaurantUsers[id].length - 3} anderen...
-                  </div>
-                )}
-                <Link
-                  href={`/restaurants/${id}/users`}
-                  className="block w-full text-center px-4 py-3 bg-[#0A0B0F] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition mt-4 border border-[#2a2d3a]"
-                >
-                  Beheer Personeel
-                </Link>
-              </div>
-
-              {/* Payment Settings */}
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
-                <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
-                  <CurrencyDollarIcon className="h-6 w-6 text-[#2BE89A] mr-2" />
-                  Betaalinstellingen
-                </h2>
-                <div className="space-y-5">
-                  <div className="bg-[#0A0B0F] rounded-lg p-4">
-                    <h3 className="text-xs font-medium text-[#BBBECC] uppercase tracking-wider mb-2">Service Kosten</h3>
-                    <p className="text-2xl font-bold text-white">
-                      {restaurant.serviceFee.type === 'flat' ? '€' : ''}
-                      {restaurant.serviceFee.amount}
-                      {restaurant.serviceFee.type === 'percentage' ? '%' : ''}
-                      <span className="text-sm font-normal text-[#BBBECC] ml-2">per bestelling</span>
-                    </p>
-                    <p className="text-xs text-[#BBBECC] mt-1 capitalize">{restaurant.serviceFee.type === 'flat' ? 'Vast bedrag' : 'Percentage'}</p>
-                  </div>
-                  
-                  <div className="bg-[#0A0B0F] rounded-lg p-4">
-                    {isNotFullyOnboarded ? (
-                      <div className="text-center py-4">
-                        <div className="p-3 bg-[#FF6B6B]/20 rounded-lg w-fit mx-auto mb-3">
-                          <CreditCardIcon className="h-8 w-8 text-[#FF6B6B]" />
-                        </div>
-                        <h3 className="font-medium text-white mb-1">Stripe Niet Gekoppeld</h3>
-                        <p className="text-xs text-[#BBBECC]">Koppel eerst Stripe in de onboarding</p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center">
-                            <div className="p-2 bg-blue-500/20 rounded-lg mr-3">
-                              <StripeIcon />
-                            </div>
-                            <div>
-                              <h3 className="font-medium text-white">Stripe</h3>
-                              <p className="text-xs text-[#BBBECC]">Account: {restaurant.stripe.accountId}</p>
-                            </div>
-                          </div>
-                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-[#2BE89A]/20 text-[#2BE89A]">
-                            Actief
-                          </span>
-                        </div>
-                        <div className="flex gap-2 mt-4">
-                          <button className="flex-1 px-3 py-2 bg-[#1c1e27] text-white text-sm rounded-lg hover:bg-[#2a2d3a] transition">
-                            Update
-                          </button>
-                          <button className="flex-1 px-3 py-2 bg-[#1c1e27] text-white text-sm rounded-lg hover:bg-[#2a2d3a] transition">
-                            Details
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  
-                  {!isNotFullyOnboarded && (
-                    <Link
-                      href={`/restaurants/${id}/stripe-transactions`}
-                      className="block w-full text-center px-4 py-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition"
-                    >
-                      Bekijk Transacties
-                    </Link>
-                  )}
-                </div>
-              </div>
-
-              {/* POS Integration */}
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
-                <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
-                  <BuildingStorefrontIcon className="h-6 w-6 text-[#2BE89A] mr-2" />
-                  POS Integratie
-                </h2>
-                {!restaurant.posData || restaurant.posIntegration === 'Niet gekoppeld' ? (
-                  <div className="text-center py-12">
-                    <div className="mx-auto h-16 w-16 bg-[#0A0B0F] rounded-full flex items-center justify-center mb-4">
-                      <BuildingStorefrontIcon className="h-8 w-8 text-[#BBBECC]" />
-                    </div>
-                    <h3 className="text-sm font-medium text-white mb-1">Geen POS gekoppeld</h3>
-                    <p className="text-xs text-[#BBBECC]">Koppel een POS systeem voor orders</p>
-                  </div>
-              ) : (
-                  <div className="space-y-3">
-                    <div className="bg-[#0A0B0F] rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-medium text-white">POS Systeem</h3>
-                        <span className="px-2 py-1 text-xs rounded-full bg-[#2BE89A]/20 text-[#2BE89A]">Actief</span>
-                      </div>
-                      <p className="text-sm text-[#BBBECC]">{restaurant.posIntegration}</p>
-                    </div>
-                    <div className="bg-[#0A0B0F] rounded-lg p-4">
-                      <h3 className="text-xs font-medium text-[#BBBECC] uppercase tracking-wider mb-2">Sync Status</h3>
-                      <p className="text-lg font-bold text-white">342 <span className="text-sm font-normal text-[#BBBECC]">orders vandaag</span></p>
-                    </div>
-                  </div>
-                )}
-                <button
-                  onClick={() => {
-                    router.push(`/restaurants/${id}/onboarding?step=3`)
-                  }}
-                  className="block w-full text-center px-4 py-3 bg-[#0A0B0F] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition mt-4 border border-[#2a2d3a]"
-                >
-                  Setup POS
-                </button>
-              </div>
-            </div>
-            )}
-
-            {/* Active Tables */}
-            <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a] mb-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center">
-                  <TableCellsIcon className="h-7 w-7 text-[#2BE89A] mr-3" />
-                  Actieve Tafels
-                </h2>
-                <Link
-                  href="/tables"
-                  className="inline-flex items-center text-sm font-medium text-[#2BE89A] hover:text-[#4FFFB0] transition"
-                >
-                  <span>Alle Tafels</span>
-                  <ArrowRightIcon className="ml-1.5 h-4 w-4" />
-                </Link>
-              </div>
-              
-              {restaurantTables.length === 0 ? (
-                <div className="text-center py-12 bg-[#0A0B0F] rounded-xl">
-                  <div className="mx-auto h-16 w-16 bg-[#1c1e27] rounded-full flex items-center justify-center mb-4">
-                    <TableCellsIcon className="h-8 w-8 text-[#BBBECC]" />
-                  </div>
-                  <h3 className="text-lg font-medium text-white mb-2">Geen Actieve Tafels</h3>
-                  <p className="text-[#BBBECC]">Er zijn momenteel geen actieve tafels in dit restaurant.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {restaurantTables.slice(0, 4).map((table) => (
-                    <div
-                      key={table.id}
-                      className="bg-[#0A0B0F] rounded-lg p-4 border border-[#2a2d3a] hover:border-[#2BE89A]/30 transition-all duration-200"
-                    >
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 className="text-lg font-bold text-white">Tafel {table.tableNumber}</h3>
-                          <p className="text-xs text-[#BBBECC]">{table.guests} gasten</p>
-                        </div>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          table.remaining === table.amount 
-                            ? 'bg-yellow-500/20 text-yellow-400' 
-                            : table.remaining > 0 
-                            ? 'bg-orange-500/20 text-orange-400'
-                            : 'bg-[#2BE89A]/20 text-[#2BE89A]'
-                        }`}>
-                          {table.remaining === table.amount ? 'Onbetaald' : table.remaining > 0 ? 'Gedeeltelijk' : 'Betaald'}
-                        </span>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-[#BBBECC]">Bestelling</span>
-                          <span className="text-white font-medium">#{table.orderId}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-[#BBBECC]">Bedrag</span>
-                          <span className="text-white font-medium">€{table.amount.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-[#BBBECC]">Resterend</span>
-                          <span className="text-yellow-400 font-medium">€{table.remaining.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-[#BBBECC]">Duur</span>
-                          <span className="text-white flex items-center">
-                            <ClockIcon className="h-3 w-3 mr-1" />
-                            {table.duration}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <Link
-                        href={`/orders/${table.orderId}`}
-                        className="mt-3 w-full inline-flex justify-center items-center px-3 py-2 bg-[#1c1e27] text-[#2BE89A] text-sm font-medium rounded-lg hover:bg-[#252833] transition border border-[#2a2d3a]"
-                      >
-                        Bekijk Details
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {restaurantTables.length > 4 && (
-                <div className="mt-4 text-center">
-                  <Link
-                    href="/tables"
-                    className="text-sm text-[#BBBECC] hover:text-[#2BE89A] transition"
-                  >
-                    +{restaurantTables.length - 4} meer actieve tafels →
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Transaction Analytics */}
-            <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center">
-                  <ChartBarIcon className="h-7 w-7 text-[#2BE89A] mr-3" />
-                  Transactie Analytics
-                </h2>
-                {!isNotFullyOnboarded && (
-                  <Link
-                    href={`/restaurants/${id}/stripe-transactions`}
-                    className="inline-flex items-center text-sm font-medium text-[#2BE89A] hover:text-[#4FFFB0] transition"
-                  >
-                    <span>Bekijk Alle Transacties</span>
-                    <ArrowTopRightOnSquareIcon className="ml-1.5 h-4 w-4" />
-                  </Link>
-                )}
-              </div>
-              
-              {restaurant.transactions.total === 0 || isNotFullyOnboarded ? (
-                <div className="text-center py-20 bg-[#0A0B0F] rounded-xl">
-                  <div className="mx-auto h-20 w-20 bg-[#1c1e27] rounded-full flex items-center justify-center mb-6">
-                    <CurrencyDollarIcon className="h-10 w-10 text-[#BBBECC]" />
-                  </div>
-                  <h3 className="text-lg font-medium text-white mb-2">Nog Geen Transacties</h3>
-                  <p className="text-[#BBBECC] max-w-sm mx-auto">Transactie analytics verschijnen hier zodra betalingen binnenkomen.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-[#0A0B0F] rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <p className="text-sm font-medium text-[#BBBECC]">Totaal Transacties</p>
-                      <div className="p-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-lg">
-                        <ShoppingBagIcon className="h-5 w-5 text-white" />
-                      </div>
-                    </div>
-                    <p className="text-3xl font-bold text-white">{restaurant.transactions.total.toLocaleString()}</p>
-                    <p className="text-xs text-[#BBBECC] mt-2">Alle tijd</p>
-                  </div>
-                  <div className="bg-[#0A0B0F] rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <p className="text-sm font-medium text-[#BBBECC]">Deze Maand</p>
-                      <div className="p-2 bg-gradient-to-r from-[#4ECDC4] to-[#44A08D] rounded-lg">
-                        <ArrowTrendingUpIcon className="h-5 w-5 text-white" />
-                      </div>
-                    </div>
-                    <p className="text-3xl font-bold text-white">{restaurant.transactions.thisMonth}</p>
-                    <p className="text-xs text-[#2BE89A] mt-2 flex items-center">
-                      <ArrowTrendingUpIcon className="h-3 w-3 mr-1" />
-                      +12.5% vs vorige maand
-                    </p>
-                  </div>
-                  <div className="bg-[#0A0B0F] rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <p className="text-sm font-medium text-[#BBBECC]">Vorige Maand</p>
-                      <div className="p-2 bg-gradient-to-r from-[#667EEA] to-[#764BA2] rounded-lg">
-                        <ChartBarIcon className="h-5 w-5 text-white" />
-                      </div>
-                    </div>
-                    <p className="text-3xl font-bold text-white">{restaurant.transactions.lastMonth}</p>
-                    <p className="text-xs text-[#BBBECC] mt-2">Voltooid</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Google Review Link */}
-            <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center">
-                  <StarIcon className="h-7 w-7 text-[#2BE89A] mr-3" />
-                  Google Reviews
-                </h2>
-              </div>
-              
-              {!editingGoogleReview ? (
+              // Onboarded Restaurant Layout
+              <div className="space-y-8">
+                {/* Setup Essentials Section */}
                 <div>
-                  {googleReviewLink || contextRestaurant?.googleReviewLink ? (
-                    <div className="bg-[#0A0B0F] rounded-lg p-4 border border-[#2a2d3a]">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm text-[#BBBECC] mb-1">Review link</p>
-                          <p className="text-white text-sm break-all">{googleReviewLink || contextRestaurant?.googleReviewLink}</p>
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-white mb-2">Setup Essentials</h2>
+                    <p className="text-[#BBBECC]">Essentiële configuratie voor restaurant operaties</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    {/* Row 1: Contact Info, Restaurant Staff, Payment Settings */}
+                    
+                    {/* Contact Information */}
+                    <div className="bg-[#1c1e27] p-5 rounded-xl border border-[#2a2d3a] h-fit">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-white flex items-center">
+                          <MapPinIcon className="h-5 w-5 text-[#2BE89A] mr-2" />
+                          Contact Info
+                        </h3>
+                        <Link
+                          href={`/restaurants/${id}/edit`}
+                          className="p-1.5 text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F] rounded-lg transition"
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </Link>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs text-[#BBBECC] uppercase tracking-wider mb-1">Adres</p>
+                          <p className="text-sm text-white leading-snug">
+                            {restaurant.address.street}<br />
+                            {restaurant.address.postalCode} {restaurant.address.city}
+                          </p>
                         </div>
-                        <div className="flex gap-2 ml-4">
-                          <a
-                            href={googleReviewLink || contextRestaurant?.googleReviewLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 bg-[#1c1e27] rounded-lg text-[#2BE89A] hover:bg-[#252833] transition"
+                        <div className="flex justify-between items-center py-2 border-t border-[#2a2d3a]">
+                          <div>
+                            <p className="text-xs text-[#BBBECC]">Email</p>
+                            <a href={`mailto:${restaurant.email}`} className="text-sm text-white hover:text-[#2BE89A] transition">
+                              {restaurant.email.length > 20 ? `${restaurant.email.substring(0, 20)}...` : restaurant.email}
+                            </a>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="text-xs text-[#BBBECC]">Telefoon</p>
+                            <a href={`tel:${restaurant.phone}`} className="text-sm text-white hover:text-[#2BE89A] transition">
+                              {restaurant.phone}
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Restaurant Staff */}
+                    <div className="bg-[#1c1e27] p-5 rounded-xl border border-[#2a2d3a] h-fit">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-white flex items-center">
+                          <UserGroupIcon className="h-5 w-5 text-[#2BE89A] mr-2" />
+                          Restaurant Staff
+                          {restaurantUsers[id] && restaurantUsers[id].length > 0 && (
+                            <span className="ml-2 px-2 py-0.5 text-xs bg-[#2BE89A]/20 text-[#2BE89A] rounded-full">{restaurantUsers[id].length}</span>
+                          )}
+                        </h3>
+                      </div>
+                      
+                      {(!restaurantUsers[id] || restaurantUsers[id].length === 0) ? (
+                        <div className="text-center py-6">
+                          <div className="mx-auto h-12 w-12 bg-[#0A0B0F] rounded-full flex items-center justify-center mb-3">
+                            <UserIcon className="h-6 w-6 text-[#BBBECC]" />
+                          </div>
+                          <p className="text-sm text-[#BBBECC] mb-3">Geen personeel toegevoegd</p>
+                          <Link
+                            href={`/restaurants/${id}/users`}
+                            className="inline-flex items-center text-sm text-[#2BE89A] hover:text-[#4FFFB0] font-medium"
                           >
-                            <ArrowTopRightOnSquareIcon className="h-5 w-5" />
-                          </a>
+                            <PlusIcon className="h-4 w-4 mr-1" />
+                            Personeel toevoegen
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {/* Show 1 user if 3+, show 2 users if exactly 2 */}
+                          {restaurantUsers[id].slice(0, restaurantUsers[id].length >= 3 ? 1 : 2).map((member) => (
+                            <div key={member.id} className="bg-[#0A0B0F] rounded-lg p-3">
+                              <div className="flex items-center">
+                                <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black text-xs font-semibold">
+                                  {member.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div className="ml-3">
+                                  <p className="text-sm font-medium text-white">{member.name}</p>
+                                  <p className="text-xs text-[#BBBECC]">{member.role}</p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {/* Show "+X meer" only if 3 or more users */}
+                          {restaurantUsers[id].length >= 3 && (
+                            <div className="bg-[#0A0B0F] rounded-lg p-3">
+                              <p className="text-sm text-[#BBBECC] text-center">
+                                +{restaurantUsers[id].length - 1} meer personeelsleden
+                              </p>
+                            </div>
+                          )}
+                          <Link
+                            href={`/restaurants/${id}/users`}
+                            className="block w-full text-center py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] text-sm text-[#2BE89A] hover:text-[#4FFFB0] hover:bg-[#1a1c25] font-medium rounded-lg transition"
+                          >
+                            Beheer alle personeel
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Payment Settings (Stripe) */}
+                    <div className="bg-[#1c1e27] p-5 rounded-xl border border-[#2a2d3a] h-fit">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-white flex items-center">
+                          <CreditCardIcon className="h-5 w-5 text-[#2BE89A] mr-2" />
+                          Payment Settings
+                        </h3>
+                        {!isNotFullyOnboarded && (
+                          <Link
+                            href={`/restaurants/${id}/stripe-transactions`}
+                            className="p-1.5 text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F] rounded-lg transition"
+                          >
+                            <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+                          </Link>
+                        )}
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="bg-[#0A0B0F] rounded-lg p-3">
+                          <p className="text-xs text-[#BBBECC] mb-1">Service Fee</p>
+                          <p className="text-lg font-bold text-white">
+                            {restaurant.serviceFee.type === 'flat' ? '€' : ''}
+                            {restaurant.serviceFee.amount}
+                            {restaurant.serviceFee.type === 'percentage' ? '%' : ''}
+                          </p>
+                          <p className="text-xs text-[#BBBECC]">{restaurant.serviceFee.type === 'flat' ? 'Per order' : 'Percentage'}</p>
+                        </div>
+                        
+                        {isNotFullyOnboarded ? (
+                          <div className="bg-[#FF6B6B]/10 border border-[#FF6B6B]/30 rounded-lg p-3">
+                            <div className="flex items-center mb-2">
+                              <CreditCardIcon className="h-4 w-4 text-[#FF6B6B] mr-2" />
+                              <span className="text-sm font-medium text-[#FF6B6B]">Stripe Required</span>
+                            </div>
+                            <p className="text-xs text-[#BBBECC]">Setup Stripe in onboarding</p>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between bg-[#0A0B0F] rounded-lg p-3">
+                            <div className="flex items-center">
+                              <div className="p-1.5 bg-blue-500/20 rounded-lg mr-2">
+                                <StripeIcon className="h-4 w-4" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-white">Stripe Connected</p>
+                                <p className="text-xs text-[#BBBECC]">Active account</p>
+                              </div>
+                            </div>
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-[#2BE89A]/20 text-[#2BE89A]">
+                              Active
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Row 2: POS Integration, Google Reviews */}
+                    
+                    {/* POS Integration */}
+                    <div className="bg-[#1c1e27] p-5 rounded-xl border border-[#2a2d3a] h-fit">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-white flex items-center">
+                          <WifiIcon className="h-5 w-5 text-[#2BE89A] mr-2" />
+                          POS Integration
+                        </h3>
+                        <button
+                          onClick={() => router.push(`/restaurants/${id}/onboarding?step=3`)}
+                          className="p-1.5 text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F] rounded-lg transition"
+                        >
+                          <Cog6ToothIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                      
+                      {!restaurant.posData || restaurant.posIntegration === 'Niet gekoppeld' ? (
+                        <div className="text-center py-6">
+                          <div className="mx-auto h-12 w-12 bg-[#0A0B0F] rounded-full flex items-center justify-center mb-3">
+                            <WifiIcon className="h-6 w-6 text-[#BBBECC]" />
+                          </div>
+                          <p className="text-sm text-[#BBBECC] mb-3">No POS connected</p>
                           <button
-                            onClick={() => setEditingGoogleReview(true)}
-                            className="p-2 bg-[#1c1e27] rounded-lg text-[#BBBECC] hover:text-white hover:bg-[#252833] transition"
+                            onClick={() => router.push(`/restaurants/${id}/onboarding?step=3`)}
+                            className="inline-flex items-center text-sm text-[#2BE89A] hover:text-[#4FFFB0] font-medium"
                           >
-                            <PencilIcon className="h-5 w-5" />
+                            <PlusIcon className="h-4 w-4 mr-1" />
+                            Setup POS
                           </button>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="bg-[#0A0B0F] rounded-lg p-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-sm font-medium text-white">Connected System</p>
+                              <span className="px-2 py-1 text-xs rounded-full bg-[#2BE89A]/20 text-[#2BE89A]">Active</span>
+                            </div>
+                            <p className="text-sm text-[#BBBECC]">{restaurant.posIntegration}</p>
+                          </div>
+                          <div className="bg-[#0A0B0F] rounded-lg p-3">
+                            <p className="text-xs text-[#BBBECC] mb-1">Today's Orders</p>
+                            <p className="text-lg font-bold text-white">342</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="mx-auto h-16 w-16 bg-[#1c1e27] rounded-full flex items-center justify-center mb-4">
-                        <StarIcon className="h-8 w-8 text-[#BBBECC]" />
+
+                    {/* Google Reviews */}
+                    <div className="bg-[#1c1e27] p-5 rounded-xl border border-[#2a2d3a] h-fit">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-white flex items-center">
+                          <StarIcon className="h-5 w-5 text-[#2BE89A] mr-2" />
+                          Google Reviews
+                        </h3>
+                        <button
+                          onClick={() => setEditingGoogleReview(true)}
+                          className="p-1.5 text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F] rounded-lg transition"
+                        >
+                          {googleReviewLink || contextRestaurant?.googleReviewLink ? (
+                            <PencilIcon className="h-4 w-4" />
+                          ) : (
+                            <PlusIcon className="h-4 w-4" />
+                          )}
+                        </button>
                       </div>
-                      <h3 className="text-lg font-medium text-white mb-2">Geen Review Link</h3>
-                      <p className="text-[#BBBECC] mb-4">Voeg een Google Review link toe voor dit restaurant</p>
-                      <button
-                        onClick={() => setEditingGoogleReview(true)}
-                        className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition"
-                      >
-                        <PlusIcon className="h-5 w-5 mr-2" />
-                        Link Toevoegen
-                      </button>
+                      
+                      {!editingGoogleReview ? (
+                        <div>
+                          {googleReviewLink || contextRestaurant?.googleReviewLink ? (
+                            <div className="space-y-3">
+                              <div className="bg-[#0A0B0F] rounded-lg p-3">
+                                <p className="text-xs text-[#BBBECC] mb-1">Review Link</p>
+                                <p className="text-sm text-white break-all mb-2">{(googleReviewLink || contextRestaurant?.googleReviewLink).substring(0, 35)}...</p>
+                                <div className="flex gap-2">
+                                  <a
+                                    href={googleReviewLink || contextRestaurant?.googleReviewLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-1 text-center px-3 py-2 bg-[#1c1e27] text-[#2BE89A] text-sm rounded-lg hover:bg-[#252833] transition"
+                                  >
+                                    Open Link
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-center py-6">
+                              <div className="mx-auto h-12 w-12 bg-[#0A0B0F] rounded-full flex items-center justify-center mb-3">
+                                <StarIcon className="h-6 w-6 text-[#BBBECC]" />
+                              </div>
+                              <p className="text-sm text-[#BBBECC] mb-3">No review link set</p>
+                              <button
+                                onClick={() => setEditingGoogleReview(true)}
+                                className="inline-flex items-center text-sm text-[#2BE89A] hover:text-[#4FFFB0] font-medium"
+                              >
+                                <PlusIcon className="h-4 w-4 mr-1" />
+                                Add Link
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div>
+                            <input
+                              type="url"
+                              value={googleReviewLink}
+                              onChange={(e) => setGoogleReviewLink(e.target.value)}
+                              placeholder="https://g.page/r/..."
+                              className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white text-sm placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setEditingGoogleReview(false)
+                                setGoogleReviewLink(contextRestaurant?.googleReviewLink || '')
+                              }}
+                              className="flex-1 px-3 py-2 bg-[#0A0B0F] border border-[#2a2d3a] text-[#BBBECC] text-sm rounded-lg hover:text-white transition"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={handleSaveGoogleReview}
+                              className="flex-1 px-3 py-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black text-sm font-medium rounded-lg hover:opacity-90 transition"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[#BBBECC] mb-2">
-                      Google Review Link
-                    </label>
-                    <input
-                      type="url"
-                      value={googleReviewLink}
-                      onChange={(e) => setGoogleReviewLink(e.target.value)}
-                      placeholder="https://g.page/r/..."
-                      className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
-                    />
-                    <p className="text-xs text-[#BBBECC] mt-2">
-                      Bijvoorbeeld: https://g.page/r/CRkSMBBJLKh7EAI/review
-                    </p>
+
+                {/* Operations & Analytics Section */}
+                <div>
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-white mb-2">Operations & Analytics</h2>
+                    <p className="text-[#BBBECC]">Real-time operational data and performance metrics</p>
                   </div>
                   
-                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-                    <p className="text-blue-400 font-medium mb-1">ℹ️ Hoe vind ik mijn Google Review link?</p>
-                    <ol className="text-sm text-[#BBBECC] space-y-1 list-decimal list-inside">
-                      <li>Zoek je restaurant op Google</li>
-                      <li>Klik op "Reviews schrijven"</li>
-                      <li>Kopieer de URL uit je browser</li>
-                    </ol>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => {
-                        setEditingGoogleReview(false)
-                        setGoogleReviewLink(contextRestaurant?.googleReviewLink || '')
-                      }}
-                      className="px-4 py-2 bg-[#0A0B0F] border border-[#2a2d3a] text-[#BBBECC] rounded-lg hover:text-white hover:border-[#2BE89A]/50 transition"
-                    >
-                      Annuleren
-                    </button>
-                    <button
-                      onClick={handleSaveGoogleReview}
-                      className="px-4 py-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition"
-                    >
-                      Opslaan
-                    </button>
+                    {/* Active Tables - Full Width */}
+                    <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-semibold text-white flex items-center">
+                          <TableCellsIcon className="h-6 w-6 text-[#2BE89A] mr-3" />
+                          Actieve Tafels
+                        </h3>
+                        <Link
+                          href="/tables"
+                          className="inline-flex items-center text-sm font-medium text-[#2BE89A] hover:text-[#4FFFB0] transition"
+                        >
+                          <span>Alle Tafels</span>
+                          <ArrowRightIcon className="ml-1.5 h-4 w-4" />
+                        </Link>
+                      </div>
+                      
+                      {restaurantTables.length === 0 ? (
+                        <div className="text-center py-16 bg-[#0A0B0F] rounded-xl">
+                          <div className="mx-auto h-16 w-16 bg-[#1c1e27] rounded-full flex items-center justify-center mb-4">
+                            <TableCellsIcon className="h-8 w-8 text-[#BBBECC]" />
+                          </div>
+                          <h4 className="text-lg font-medium text-white mb-2">Geen Actieve Tafels</h4>
+                          <p className="text-[#BBBECC]">Er zijn momenteel geen actieve tafels in dit restaurant.</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          {restaurantTables.slice(0, 8).map((table) => (
+                            <div
+                              key={table.id}
+                              className="bg-[#0A0B0F] rounded-lg p-4 border border-[#2a2d3a] hover:border-[#2BE89A]/30 transition-all duration-200"
+                            >
+                              <div className="flex justify-between items-start mb-3">
+                                <div>
+                                  <h4 className="text-lg font-bold text-white">Tafel {table.tableNumber}</h4>
+                                  <p className="text-xs text-[#BBBECC]">{table.guests} gasten</p>
+                                </div>
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                  table.remaining === table.amount 
+                                    ? 'bg-yellow-500/20 text-yellow-400' 
+                                    : table.remaining > 0 
+                                    ? 'bg-orange-500/20 text-orange-400'
+                                    : 'bg-[#2BE89A]/20 text-[#2BE89A]'
+                                }`}>
+                                  {table.remaining === table.amount ? 'Onbetaald' : table.remaining > 0 ? 'Gedeeltelijk' : 'Betaald'}
+                                </span>
+                              </div>
+                              
+                              <div className="space-y-2 mb-3">
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-[#BBBECC]">Order #</span>
+                                  <span className="text-white font-medium">{table.orderId}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-[#BBBECC]">Bedrag</span>
+                                  <span className="text-white font-medium">€{table.amount.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-[#BBBECC]">Resterend</span>
+                                  <span className="text-yellow-400 font-medium">€{table.remaining.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-[#BBBECC]">Duur</span>
+                                  <span className="text-white flex items-center">
+                                    <ClockIcon className="h-3 w-3 mr-1" />
+                                    {table.duration}
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              <Link
+                                href={`/orders/${table.orderId}`}
+                                className="w-full inline-flex justify-center items-center px-3 py-2 bg-[#1c1e27] text-[#2BE89A] text-sm font-medium rounded-lg hover:bg-[#252833] transition border border-[#2a2d3a]"
+                              >
+                                Bekijk Details
+                              </Link>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {restaurantTables.length > 8 && (
+                        <div className="mt-6 text-center">
+                          <Link
+                            href="/tables"
+                            className="inline-flex items-center text-sm text-[#BBBECC] hover:text-[#2BE89A] transition font-medium"
+                          >
+                            +{restaurantTables.length - 8} meer actieve tafels
+                            <ArrowRightIcon className="ml-2 h-4 w-4" />
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Transaction Analytics - Full Width */}
+                    <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a] mt-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-semibold text-white flex items-center">
+                          <ChartBarIcon className="h-6 w-6 text-[#2BE89A] mr-3" />
+                          Transactie Analytics
+                        </h3>
+                        {!isNotFullyOnboarded && (
+                          <Link
+                            href={`/restaurants/${id}/stripe-transactions`}
+                            className="inline-flex items-center text-sm font-medium text-[#2BE89A] hover:text-[#4FFFB0] transition"
+                          >
+                            <span>Bekijk Alle Transacties</span>
+                            <ArrowTopRightOnSquareIcon className="ml-1.5 h-4 w-4" />
+                          </Link>
+                        )}
+                      </div>
+                      
+                      {restaurant.transactions.total === 0 || isNotFullyOnboarded ? (
+                        <div className="text-center py-20 bg-[#0A0B0F] rounded-xl">
+                          <div className="mx-auto h-20 w-20 bg-[#1c1e27] rounded-full flex items-center justify-center mb-6">
+                            <CurrencyDollarIcon className="h-10 w-10 text-[#BBBECC]" />
+                          </div>
+                          <h4 className="text-lg font-medium text-white mb-2">Nog Geen Transacties</h4>
+                          <p className="text-[#BBBECC] max-w-sm mx-auto">Transactie analytics verschijnen hier zodra betalingen binnenkomen.</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="bg-[#0A0B0F] rounded-xl p-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <p className="text-sm font-medium text-[#BBBECC]">Totaal Transacties</p>
+                              <div className="p-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-lg">
+                                <ShoppingBagIcon className="h-5 w-5 text-white" />
+                              </div>
+                            </div>
+                            <p className="text-3xl font-bold text-white">{restaurant.transactions.total.toLocaleString()}</p>
+                            <p className="text-xs text-[#BBBECC] mt-2">Alle tijd</p>
+                          </div>
+                          <div className="bg-[#0A0B0F] rounded-xl p-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <p className="text-sm font-medium text-[#BBBECC]">Deze Maand</p>
+                              <div className="p-2 bg-gradient-to-r from-[#4ECDC4] to-[#44A08D] rounded-lg">
+                                <ArrowTrendingUpIcon className="h-5 w-5 text-white" />
+                              </div>
+                            </div>
+                            <p className="text-3xl font-bold text-white">{restaurant.transactions.thisMonth}</p>
+                            <p className="text-xs text-[#2BE89A] mt-2 flex items-center">
+                              <ArrowTrendingUpIcon className="h-3 w-3 mr-1" />
+                              +12.5% vs vorige maand
+                            </p>
+                          </div>
+                          <div className="bg-[#0A0B0F] rounded-xl p-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <p className="text-sm font-medium text-[#BBBECC]">Vorige Maand</p>
+                              <div className="p-2 bg-gradient-to-r from-[#667EEA] to-[#764BA2] rounded-lg">
+                                <ChartBarIcon className="h-5 w-5 text-white" />
+                              </div>
+                            </div>
+                            <p className="text-3xl font-bold text-white">{restaurant.transactions.lastMonth}</p>
+                            <p className="text-xs text-[#BBBECC] mt-2">Voltooid</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>

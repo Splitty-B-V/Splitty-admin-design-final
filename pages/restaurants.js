@@ -45,13 +45,16 @@ export default function Restaurants() {
       const restaurantId = localStorage.getItem('highlightRestaurant')
       if (restaurantId) {
         setHighlightedRestaurant(parseInt(restaurantId))
-        // Remove from localStorage after reading
+      }
+    }
+  }, [])
+
+  // Clean up highlight when leaving the page
+  useEffect(() => {
+    return () => {
+      // Remove highlight from localStorage when component unmounts (page switch)
+      if (typeof window !== 'undefined') {
         localStorage.removeItem('highlightRestaurant')
-        
-        // Remove highlight after animation completes
-        setTimeout(() => {
-          setHighlightedRestaurant(null)
-        }, 5000) // 5 seconds
       }
     }
   }, [])
@@ -160,10 +163,10 @@ export default function Restaurants() {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[#FF6B6B] text-sm font-medium">Setup Vereist</p>
+                      <p className="text-[#818CF8] text-sm font-medium">Setup Vereist</p>
                       <p className="text-2xl font-bold text-white mt-1">{onboardingRestaurants.length}</p>
                     </div>
-                    <div className="p-3 rounded-lg bg-gradient-to-r from-[#FF6B6B] to-[#FF8E53]">
+                    <div className="p-3 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#818CF8]">
                       <ClockIcon className="h-6 w-6 text-white" />
                     </div>
                   </div>
@@ -236,7 +239,7 @@ export default function Restaurants() {
                   key={restaurant.id}
                   className={`group bg-[#1c1e27] rounded-xl border transition-all duration-200 overflow-hidden flex flex-col ${
                     highlightedRestaurant === restaurant.id
-                      ? 'animate-pulse border-[#2BE89A] shadow-lg shadow-[#2BE89A]/50 ring-2 ring-[#2BE89A] ring-offset-4 ring-offset-[#0F1117]'
+                      ? 'animate-pulse border-[#2BE89A] shadow-lg shadow-[#2BE89A]/50 ring-2 ring-[#2BE89A] ring-offset-4 ring-offset-[#0F1117] scale-[1.02]'
                       : restaurant.deleted
                       ? 'border-[#2a2d3a]/60 hover:border-[#2a2d3a] bg-[#1c1e27]/60'
                       : !restaurant.isOnboarded
@@ -286,7 +289,7 @@ export default function Restaurants() {
                         restaurant.deleted
                           ? 'bg-[#2a2d3a]/50'
                           : !restaurant.isOnboarded
-                          ? 'bg-[#FF6B6B]/20'
+                          ? 'bg-[#6366F1]/20'
                           : restaurant.isActive 
                           ? 'bg-[#2BE89A]/20' 
                           : 'bg-yellow-500/20'
@@ -294,7 +297,7 @@ export default function Restaurants() {
                         {restaurant.deleted ? (
                           <TrashIcon className="h-5 w-5 text-[#BBBECC]" />
                         ) : !restaurant.isOnboarded ? (
-                          <ClockIcon className="h-5 w-5 text-[#FF6B6B]" />
+                          <ClockIcon className="h-5 w-5 text-[#818CF8]" />
                         ) : restaurant.isActive ? (
                           <CheckCircleIcon className="h-5 w-5 text-[#2BE89A]" />
                         ) : (
@@ -317,11 +320,11 @@ export default function Restaurants() {
                             
                             return (
                               <>
-                                <div className="bg-gradient-to-r from-[#FF6B6B]/10 to-[#FF8E53]/10 border border-[#FF6B6B]/30 rounded-lg p-3 mb-3">
+                                <div className="bg-gradient-to-r from-[#6366F1]/10 to-[#818CF8]/10 border border-[#FF6B6B]/30 rounded-lg p-3 mb-3">
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center">
-                                      <ClockIcon className="h-4 w-4 text-[#FF6B6B] mr-1.5" />
-                                      <p className="text-xs font-semibold text-[#FF6B6B]">
+                                      <ClockIcon className="h-4 w-4 text-[#818CF8] mr-1.5" />
+                                      <p className="text-xs font-semibold text-[#818CF8]">
                                         Setup Vereist
                                       </p>
                                     </div>
@@ -335,7 +338,7 @@ export default function Restaurants() {
                                 <div className="mb-3">
                                   <div className="w-full bg-[#0A0B0F] rounded-full h-1.5 overflow-hidden">
                                     <div
-                                      className="bg-gradient-to-r from-[#FF6B6B] to-[#FF8E53] h-1.5 rounded-full transition-all duration-300"
+                                      className="bg-gradient-to-r from-[#6366F1] to-[#818CF8] h-1.5 rounded-full transition-all duration-300"
                                       style={{ width: `${(actualProgress / 4) * 100}%` }}
                                     />
                                   </div>
@@ -354,24 +357,21 @@ export default function Restaurants() {
                                     ? localStorage.getItem(`onboarding_${restaurant.id}`)
                                     : null;
                                   const parsedData = savedData ? JSON.parse(savedData) : null;
-                                  const currentStep = parsedData?.currentStep || 1;
                                   const completedSteps = parsedData?.completedSteps || [];
                                   
-                                  // Determine actual step based on saved data
+                                  // Always show the FIRST incomplete step, regardless of currentStep
                                   if (parsedData) {
-                                    if (currentStep === 1 && !completedSteps.includes(1)) return 'Personeel toevoegen';
-                                    if (currentStep === 2 && !completedSteps.includes(2)) return 'Stripe koppelen';
-                                    if (currentStep === 3 && !completedSteps.includes(3)) return 'POS configureren';
-                                    if (currentStep === 4 && !completedSteps.includes(4)) return 'Reviews instellen';
-                                    if (completedSteps.length === 4) return 'Afronden';
+                                    // Check steps in order and return the first incomplete one
+                                    if (!completedSteps.includes(1)) return 'Personeel toevoegen';
+                                    if (!completedSteps.includes(2)) return 'Stripe koppelen';
+                                    if (!completedSteps.includes(3)) return 'POS configureren';
+                                    if (!completedSteps.includes(4)) return 'Reviews instellen';
+                                    // All steps completed
+                                    return 'Afronden';
                                   }
                                   
-                                  // Fallback to onboardingStep
-                                  if (restaurant.onboardingStep === 0) return 'Personeel toevoegen';
-                                  if (restaurant.onboardingStep === 1) return 'Stripe koppelen';
-                                  if (restaurant.onboardingStep === 2) return 'POS configureren';
-                                  if (restaurant.onboardingStep === 3) return 'Reviews instellen';
-                                  return 'Afronden';
+                                  // Fallback when no saved data exists
+                                  return 'Personeel toevoegen';
                                 })()}
                               </span>
                             </p>
@@ -460,11 +460,11 @@ export default function Restaurants() {
                           highlightedRestaurant === restaurant.id && !restaurant.isOnboarded
                             ? 'text-[#2BE89A] animate-pulse'
                             : !restaurant.isOnboarded 
-                            ? 'text-[#FF6B6B]' 
+                            ? 'text-[#818CF8]' 
                             : 'text-[#2BE89A]'
                         }`}>
                           {highlightedRestaurant === restaurant.id && !restaurant.isOnboarded
-                            ? '✨ Start nu de setup! →'
+                            ? 'Start nu de setup →'
                             : !restaurant.isOnboarded 
                             ? 'Start Onboarding →'
                             : 'Bekijk details →'
@@ -474,7 +474,7 @@ export default function Restaurants() {
                           highlightedRestaurant === restaurant.id && !restaurant.isOnboarded
                             ? 'text-[#2BE89A] animate-pulse'
                             : !restaurant.isOnboarded 
-                            ? 'text-[#FF6B6B]' 
+                            ? 'text-[#818CF8]' 
                             : 'text-[#2BE89A]'
                         } group-hover:translate-x-1 transition-transform`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

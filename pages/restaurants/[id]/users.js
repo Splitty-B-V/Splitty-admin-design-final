@@ -230,7 +230,11 @@ export default function RestaurantStaffManagement() {
                   </div>
                   <div className="divide-y divide-[#2a2d3a]">
                     {filteredStaff.map((member) => (
-                      <div key={member.id} className="p-6 hover:bg-[#0A0B0F] transition">
+                      <Link
+                        key={member.id}
+                        href={`/restaurants/${id}/users/${member.id}`}
+                        className="block p-6 hover:bg-[#0A0B0F] transition cursor-pointer"
+                      >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-semibold">
@@ -254,15 +258,12 @@ export default function RestaurantStaffManagement() {
                                 Staff
                               </span>
                             )}
-                            <Link
-                              href={`/restaurants/${id}/users/${member.id}`}
-                              className="text-[#2BE89A] hover:text-[#4FFFB0] transition"
-                            >
+                            <div className="text-[#2BE89A]">
                               <CogIcon className="h-5 w-5" />
-                            </Link>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>
