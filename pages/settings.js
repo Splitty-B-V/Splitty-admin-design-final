@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import Layout from '../components/Layout'
 import Breadcrumb from '../components/Breadcrumb'
 import { useUsers } from '../contexts/UsersContext'
@@ -20,6 +21,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function Settings() {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState('profile')
   const [saved, setSaved] = useState(false)
   const [avatar, setAvatar] = useState(null)
@@ -38,6 +40,22 @@ export default function Settings() {
     newPassword: '',
     confirmPassword: ''
   })
+  
+  useEffect(() => {
+    // Check for tab query parameter
+    if (router.query.tab) {
+      const tabMap = {
+        'profiel': 'profile',
+        'algemeen': 'general',
+        'profile': 'profile',
+        'general': 'general',
+        'notifications': 'notifications',
+        'notificaties': 'notifications'
+      }
+      const mappedTab = tabMap[router.query.tab] || router.query.tab
+      setActiveTab(mappedTab)
+    }
+  }, [router.query.tab])
   
   useEffect(() => {
     // Only access localStorage on client side

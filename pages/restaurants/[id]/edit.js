@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Layout from '../../../components/Layout'
+import Breadcrumb from '../../../components/Breadcrumb'
 import { useRestaurants } from '../../../contexts/RestaurantsContext'
+import { useTheme } from '../../../contexts/ThemeContext'
 import {
   ArrowLeftIcon,
   BuildingStorefrontIcon,
@@ -17,6 +19,7 @@ export default function EditRestaurant() {
   const router = useRouter()
   const { id } = router.query
   const { getRestaurant, updateRestaurant } = useRestaurants()
+  const { darkMode } = useTheme()
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
   const [formData, setFormData] = useState({
@@ -153,8 +156,8 @@ export default function EditRestaurant() {
   if (!restaurant) {
     return (
       <Layout>
-        <div className="min-h-screen bg-[#0A0B0F] flex items-center justify-center">
-          <p className="text-white">Restaurant niet gevonden</p>
+        <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'} flex items-center justify-center`}>
+          <p className={darkMode ? 'text-white' : 'text-[#111827]'}>Restaurant niet gevonden</p>
         </div>
       </Layout>
     )
@@ -162,35 +165,58 @@ export default function EditRestaurant() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0A0B0F]">
-        <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+        <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-3xl mx-auto">
+            {/* Breadcrumb */}
+            <Breadcrumb items={[
+              { name: 'Restaurants', href: '/restaurants' },
+              { name: restaurant?.name || 'Restaurant', href: `/restaurants/${id}` },
+              { name: 'Bewerken' }
+            ]} />
+            
+            {/* Back Button */}
+            <Link
+              href={`/restaurants/${id}`}
+              className={`inline-flex items-center px-4 py-2 rounded-lg transition-all text-sm font-medium mb-4 group ${
+                darkMode 
+                  ? 'bg-[#1c1e27] border border-[#2a2d3a] text-[#BBBECC] hover:text-white hover:bg-[#0A0B0F] hover:border-green-500' 
+                  : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-700 hover:bg-gray-100 hover:border-green-300'
+              }`}
+            >
+              <ArrowLeftIcon className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+              Terug naar Restaurant Profiel
+            </Link>
+
             {/* Header */}
             <div className="mb-8">
-              <Link
-                href={`/restaurants/${id}`}
-                className="inline-flex items-center text-[#BBBECC] hover:text-white transition mb-6"
-              >
-                <ArrowLeftIcon className="h-5 w-5 mr-2" />
-                Terug naar restaurant
-              </Link>
-              <h1 className="text-3xl font-bold text-white">Restaurant Bewerken</h1>
-              <p className="text-[#BBBECC] mt-2">Pas de restaurant gegevens aan</p>
+              <h1 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'} mb-1`}>
+                Restaurant Bewerken
+              </h1>
+              <p className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Pas de restaurant gegevens aan</p>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Basic Information */}
-              <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
-                <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
-                  <BuildingStorefrontIcon className="h-6 w-6 text-[#2BE89A] mr-2" />
+              <div className={`rounded-xl p-6 ${
+                darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+              }`}>
+                <h2 className={`text-xl font-semibold mb-6 flex items-center ${
+                  darkMode ? 'text-white' : 'text-[#111827]'
+                }`}>
+                  <BuildingStorefrontIcon className={`h-6 w-6 mr-2 ${
+                    darkMode ? 'text-[#2BE89A]' : 'text-green-500'
+                  }`} />
                   Basis Informatie
                 </h2>
                 
                 <div className="space-y-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-[#BBBECC] mb-2">
-                      Restaurant Naam <span className="text-red-400">*</span>
+                    <label htmlFor="name" className={`block text-sm font-medium mb-2 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                    }`}>
+                      Restaurant Naam <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -198,11 +224,15 @@ export default function EditRestaurant() {
                       id="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 bg-[#0A0B0F] border ${errors.name ? 'border-red-500' : 'border-[#2a2d3a]'} rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent`}
+                      className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
+                        darkMode
+                          ? `bg-[#0A0B0F] border ${errors.name ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
+                          : `bg-white border ${errors.name ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
+                      }`}
                       placeholder="Bijv. Restaurant Amsterdam"
                     />
                     {errors.name && (
-                      <p className="mt-2 text-sm text-red-400 flex items-center">
+                      <p className="mt-2 text-sm text-red-500 flex items-center">
                         <ExclamationCircleIcon className="h-4 w-4 mr-1" />
                         {errors.name}
                       </p>
@@ -210,12 +240,16 @@ export default function EditRestaurant() {
                   </div>
 
                   <div>
-                    <label htmlFor="logo" className="block text-sm font-medium text-[#BBBECC] mb-2">
+                    <label htmlFor="logo" className={`block text-sm font-medium mb-2 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                    }`}>
                       Restaurant Logo
                     </label>
                     <div className="flex items-center space-x-6">
                       {formData.logoPreview && (
-                        <div className="h-20 w-20 rounded-lg overflow-hidden border-2 border-[#2a2d3a]">
+                        <div className={`h-20 w-20 rounded-lg overflow-hidden border-2 ${
+                          darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'
+                        }`}>
                           <img
                             src={formData.logoPreview}
                             alt="Logo preview"
@@ -225,8 +259,12 @@ export default function EditRestaurant() {
                       )}
                       <div className="flex-1">
                         <label className="cursor-pointer">
-                          <div className="px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-[#BBBECC] hover:bg-[#1a1c25] transition inline-flex items-center">
-                            <PhotoIcon className="h-5 w-5 mr-2" />
+                          <div className={`px-4 py-2.5 rounded-lg transition inline-flex items-center ${
+                            darkMode
+                              ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-[#BBBECC] hover:bg-[#1c1e27]'
+                              : 'bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100'
+                          }`}>
+                            <PhotoIcon className={`h-5 w-5 mr-2 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
                             {formData.logoPreview ? 'Logo Wijzigen' : 'Logo Uploaden'}
                           </div>
                           <input
@@ -236,18 +274,22 @@ export default function EditRestaurant() {
                             className="hidden"
                           />
                         </label>
-                        <p className="text-xs text-[#BBBECC] mt-2">PNG, JPG tot 5MB</p>
+                        <p className={`text-xs mt-2 ${darkMode ? 'text-[#9CA3B5]' : 'text-gray-500'}`}>PNG, JPG tot 5MB</p>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="banner" className="block text-sm font-medium text-[#BBBECC] mb-2">
+                    <label htmlFor="banner" className={`block text-sm font-medium mb-2 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                    }`}>
                       Restaurant Banner
                     </label>
                     <div className="space-y-4">
                       {formData.bannerPreview && (
-                        <div className="w-full h-40 rounded-lg overflow-hidden border-2 border-[#2a2d3a]">
+                        <div className={`w-full h-40 rounded-lg overflow-hidden border-2 ${
+                          darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'
+                        }`}>
                           <img
                             src={formData.bannerPreview}
                             alt="Banner preview"
@@ -256,8 +298,12 @@ export default function EditRestaurant() {
                         </div>
                       )}
                       <label className="cursor-pointer">
-                        <div className="px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-[#BBBECC] hover:bg-[#1a1c25] transition inline-flex items-center">
-                          <PhotoIcon className="h-5 w-5 mr-2" />
+                        <div className={`px-4 py-2.5 rounded-lg transition inline-flex items-center ${
+                          darkMode
+                            ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-[#BBBECC] hover:bg-[#1c1e27]'
+                            : 'bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100'
+                        }`}>
+                          <PhotoIcon className={`h-5 w-5 mr-2 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
                           {formData.bannerPreview ? 'Banner Wijzigen' : 'Banner Uploaden'}
                         </div>
                         <input
@@ -267,27 +313,35 @@ export default function EditRestaurant() {
                           className="hidden"
                         />
                       </label>
-                      <p className="text-xs text-[#BBBECC]">Aanbevolen: 1920x400px, PNG of JPG tot 5MB</p>
+                      <p className={`text-xs ${darkMode ? 'text-[#9CA3B5]' : 'text-gray-500'}`}>Aanbevolen: 1920x400px, PNG of JPG tot 5MB</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Contact Information */}
-              <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
-                <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
-                  <EnvelopeIcon className="h-6 w-6 text-[#2BE89A] mr-2" />
+              <div className={`rounded-xl p-6 ${
+                darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+              }`}>
+                <h2 className={`text-xl font-semibold mb-6 flex items-center ${
+                  darkMode ? 'text-white' : 'text-[#111827]'
+                }`}>
+                  <EnvelopeIcon className={`h-6 w-6 mr-2 ${
+                    darkMode ? 'text-[#2BE89A]' : 'text-green-500'
+                  }`} />
                   Contact Informatie
                 </h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-[#BBBECC] mb-2">
-                      Email <span className="text-red-400">*</span>
+                    <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                    }`}>
+                      Email <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <EnvelopeIcon className="h-5 w-5 text-[#BBBECC]" />
+                        <EnvelopeIcon className={`h-5 w-5 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
                       </div>
                       <input
                         type="email"
@@ -295,12 +349,16 @@ export default function EditRestaurant() {
                         id="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        className={`w-full pl-10 pr-4 py-3 bg-[#0A0B0F] border ${errors.email ? 'border-red-500' : 'border-[#2a2d3a]'} rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent`}
+                        className={`w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? `bg-[#0A0B0F] border ${errors.email ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
+                            : `bg-white border ${errors.email ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
+                        }`}
                         placeholder="info@restaurant.nl"
                       />
                     </div>
                     {errors.email && (
-                      <p className="mt-2 text-sm text-red-400 flex items-center">
+                      <p className="mt-2 text-sm text-red-500 flex items-center">
                         <ExclamationCircleIcon className="h-4 w-4 mr-1" />
                         {errors.email}
                       </p>
@@ -308,12 +366,14 @@ export default function EditRestaurant() {
                   </div>
 
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-[#BBBECC] mb-2">
-                      Telefoon <span className="text-red-400">*</span>
+                    <label htmlFor="phone" className={`block text-sm font-medium mb-2 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                    }`}>
+                      Telefoon <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <PhoneIcon className="h-5 w-5 text-[#BBBECC]" />
+                        <PhoneIcon className={`h-5 w-5 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
                       </div>
                       <input
                         type="tel"
@@ -321,12 +381,16 @@ export default function EditRestaurant() {
                         id="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        className={`w-full pl-10 pr-4 py-3 bg-[#0A0B0F] border ${errors.phone ? 'border-red-500' : 'border-[#2a2d3a]'} rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent`}
+                        className={`w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? `bg-[#0A0B0F] border ${errors.phone ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
+                            : `bg-white border ${errors.phone ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
+                        }`}
                         placeholder="+31 20 123 4567"
                       />
                     </div>
                     {errors.phone && (
-                      <p className="mt-2 text-sm text-red-400 flex items-center">
+                      <p className="mt-2 text-sm text-red-500 flex items-center">
                         <ExclamationCircleIcon className="h-4 w-4 mr-1" />
                         {errors.phone}
                       </p>
@@ -336,16 +400,24 @@ export default function EditRestaurant() {
               </div>
 
               {/* Address Information */}
-              <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
-                <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
-                  <MapPinIcon className="h-6 w-6 text-[#2BE89A] mr-2" />
+              <div className={`rounded-xl p-6 ${
+                darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+              }`}>
+                <h2 className={`text-xl font-semibold mb-6 flex items-center ${
+                  darkMode ? 'text-white' : 'text-[#111827]'
+                }`}>
+                  <MapPinIcon className={`h-6 w-6 mr-2 ${
+                    darkMode ? 'text-[#2BE89A]' : 'text-green-500'
+                  }`} />
                   Adres Informatie
                 </h2>
                 
                 <div className="space-y-6">
                   <div>
-                    <label htmlFor="street" className="block text-sm font-medium text-[#BBBECC] mb-2">
-                      Straat & Huisnummer <span className="text-red-400">*</span>
+                    <label htmlFor="street" className={`block text-sm font-medium mb-2 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                    }`}>
+                      Straat & Huisnummer <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -353,11 +425,15 @@ export default function EditRestaurant() {
                       id="street"
                       value={formData.street}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 bg-[#0A0B0F] border ${errors.street ? 'border-red-500' : 'border-[#2a2d3a]'} rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent`}
+                      className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
+                        darkMode
+                          ? `bg-[#0A0B0F] border ${errors.street ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
+                          : `bg-white border ${errors.street ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
+                      }`}
                       placeholder="Herengracht 182"
                     />
                     {errors.street && (
-                      <p className="mt-2 text-sm text-red-400 flex items-center">
+                      <p className="mt-2 text-sm text-red-500 flex items-center">
                         <ExclamationCircleIcon className="h-4 w-4 mr-1" />
                         {errors.street}
                       </p>
@@ -366,8 +442,10 @@ export default function EditRestaurant() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="postalCode" className="block text-sm font-medium text-[#BBBECC] mb-2">
-                        Postcode <span className="text-red-400">*</span>
+                      <label htmlFor="postalCode" className={`block text-sm font-medium mb-2 ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                      }`}>
+                        Postcode <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -375,11 +453,15 @@ export default function EditRestaurant() {
                         id="postalCode"
                         value={formData.postalCode}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 bg-[#0A0B0F] border ${errors.postalCode ? 'border-red-500' : 'border-[#2a2d3a]'} rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent`}
+                        className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? `bg-[#0A0B0F] border ${errors.postalCode ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
+                            : `bg-white border ${errors.postalCode ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
+                        }`}
                         placeholder="1016 BR"
                       />
                       {errors.postalCode && (
-                        <p className="mt-2 text-sm text-red-400 flex items-center">
+                        <p className="mt-2 text-sm text-red-500 flex items-center">
                           <ExclamationCircleIcon className="h-4 w-4 mr-1" />
                           {errors.postalCode}
                         </p>
@@ -387,8 +469,10 @@ export default function EditRestaurant() {
                     </div>
 
                     <div>
-                      <label htmlFor="city" className="block text-sm font-medium text-[#BBBECC] mb-2">
-                        Stad <span className="text-red-400">*</span>
+                      <label htmlFor="city" className={`block text-sm font-medium mb-2 ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                      }`}>
+                        Stad <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -396,11 +480,15 @@ export default function EditRestaurant() {
                         id="city"
                         value={formData.city}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 bg-[#0A0B0F] border ${errors.city ? 'border-red-500' : 'border-[#2a2d3a]'} rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent`}
+                        className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? `bg-[#0A0B0F] border ${errors.city ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
+                            : `bg-white border ${errors.city ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
+                        }`}
                         placeholder="Amsterdam"
                       />
                       {errors.city && (
-                        <p className="mt-2 text-sm text-red-400 flex items-center">
+                        <p className="mt-2 text-sm text-red-500 flex items-center">
                           <ExclamationCircleIcon className="h-4 w-4 mr-1" />
                           {errors.city}
                         </p>
@@ -409,7 +497,9 @@ export default function EditRestaurant() {
                   </div>
 
                   <div>
-                    <label htmlFor="country" className="block text-sm font-medium text-[#BBBECC] mb-2">
+                    <label htmlFor="country" className={`block text-sm font-medium mb-2 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                    }`}>
                       Land
                     </label>
                     <select
@@ -417,7 +507,11 @@ export default function EditRestaurant() {
                       id="country"
                       value={formData.country}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
+                        darkMode
+                          ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white focus:ring-[#2BE89A]'
+                          : 'bg-white border border-gray-200 text-gray-900 focus:ring-green-500 hover:border-gray-300'
+                      }`}
                     >
                       <option value="Netherlands">Nederland</option>
                       <option value="Belgium">België</option>
@@ -432,14 +526,18 @@ export default function EditRestaurant() {
               <div className="flex justify-end space-x-4">
                 <Link
                   href={`/restaurants/${id}`}
-                  className="px-6 py-3 bg-[#1c1e27] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#2a2d3a] transition"
+                  className={`px-4 py-2.5 font-medium rounded-lg transition-all ${
+                    darkMode
+                      ? 'bg-[#1c1e27] border border-[#2a2d3a] text-white hover:bg-[#0A0B0F]'
+                      : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
                   Annuleren
                 </Link>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-6 py-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition shadow-lg disabled:opacity-50"
+                  className="px-4 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-sm disabled:opacity-50"
                 >
                   {loading ? 'Opslaan...' : 'Wijzigingen Opslaan'}
                 </button>

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Layout from '../components/Layout'
 import Breadcrumb from '../components/Breadcrumb'
 import { useRestaurants } from '../contexts/RestaurantsContext'
+import { useTheme } from '../contexts/ThemeContext'
 import {
   BuildingStorefrontIcon,
   CheckCircleIcon,
@@ -12,10 +13,11 @@ import {
   ArrowPathIcon,
   CpuChipIcon,
   ExclamationTriangleIcon,
-  ArrowRightIcon,
+  ChevronRightIcon
 } from '@heroicons/react/24/outline'
 
 export default function POSIntegration() {
+  const { darkMode } = useTheme()
   const { restaurants } = useRestaurants()
   const [posStatuses, setPosStatuses] = useState({})
   const [refreshing, setRefreshing] = useState(false)
@@ -27,7 +29,6 @@ export default function POSIntegration() {
       
       restaurants.forEach(restaurant => {
         if (!restaurant.deleted) {
-          // Try to load onboarding data
           const onboardingData = localStorage.getItem(`onboarding_${restaurant.id}`)
           if (onboardingData) {
             try {
@@ -39,7 +40,7 @@ export default function POSIntegration() {
                   username: parsed.posData.username,
                   environment: parsed.posData.environment || 'production',
                   isActive: parsed.posData.isActive !== false,
-                  lastSync: new Date().toISOString(), // In real app, this would come from server
+                  lastSync: new Date().toISOString(),
                 }
               } else {
                 statuses[restaurant.id] = { connected: false }
@@ -58,7 +59,6 @@ export default function POSIntegration() {
 
     loadPosStatuses()
     
-    // Set up interval to refresh every 5 seconds (simulating real-time updates)
     const interval = setInterval(loadPosStatuses, 5000)
     
     return () => clearInterval(interval)
@@ -66,43 +66,11 @@ export default function POSIntegration() {
 
   const handleRefresh = () => {
     setRefreshing(true)
-    // Simulate refresh
     setTimeout(() => {
       setRefreshing(false)
-      // Reload POS statuses
       const event = new Event('storage')
       window.dispatchEvent(event)
     }, 1000)
-  }
-
-  const getStatusIcon = (status) => {
-    if (!status || !status.connected) {
-      return <XCircleIcon className="h-5 w-5 text-red-400" />
-    }
-    if (!status.isActive) {
-      return <ClockIcon className="h-5 w-5 text-yellow-400" />
-    }
-    return <CheckCircleIcon className="h-5 w-5 text-[#2BE89A]" />
-  }
-
-  const getStatusText = (status) => {
-    if (!status || !status.connected) {
-      return 'Niet Verbonden'
-    }
-    if (!status.isActive) {
-      return 'Inactief'
-    }
-    return 'Actief'
-  }
-
-  const getStatusColor = (status) => {
-    if (!status || !status.connected) {
-      return 'bg-red-500/20 text-red-400 border-red-500/30'
-    }
-    if (!status.isActive) {
-      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-    }
-    return 'bg-[#2BE89A]/20 text-[#2BE89A] border-[#2BE89A]/30'
   }
 
   const activeRestaurants = restaurants.filter(r => !r.deleted)
@@ -111,8 +79,8 @@ export default function POSIntegration() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0A0B0F]">
-        <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+        <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Breadcrumb */}
             <Breadcrumb items={[{ name: 'POS Integratie' }]} />
@@ -120,65 +88,106 @@ export default function POSIntegration() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-white">POS Integratie Overzicht</h1>
-                <p className="text-[#BBBECC] mt-1">Real-time status van alle restaurant POS integraties</p>
+                <h1 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'} mb-1`}>
+                  POS Integratie Overzicht
+                </h1>
+                <p className={`${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                  Real-time status van alle restaurant POS integraties
+                </p>
               </div>
               <button
                 type="button"
                 onClick={handleRefresh}
-                className={`inline-flex items-center px-4 py-3 border border-[#2a2d3a] rounded-lg text-white bg-[#1c1e27] hover:bg-[#252833] transition-all duration-200 ${
+                className={`inline-flex items-center px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                  darkMode 
+                    ? 'border border-[#2a2d3a] text-white bg-[#1c1e27] hover:bg-[#252833]'
+                    : 'border border-gray-200 text-[#6B7280] bg-white hover:bg-gray-50 shadow-sm'
+                } ${
                   refreshing ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
                 disabled={refreshing}
               >
-                <ArrowPathIcon className={`-ml-1 mr-2 h-5 w-5 text-[#BBBECC] ${refreshing ? 'animate-spin' : ''}`} />
+                <ArrowPathIcon className={`-ml-1 mr-2 h-5 w-5 ${refreshing ? 'animate-spin' : ''} ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
                 {refreshing ? 'Vernieuwen...' : 'Ververs Status'}
               </button>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+              <div className={`p-6 rounded-xl ${
+                darkMode 
+                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                  : 'bg-white shadow-sm'
+              }`}>
                 <div className="flex items-center">
-                  <div className="p-3 rounded-lg bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]">
-                    <BuildingStorefrontIcon className="h-6 w-6 text-black" />
+                  <div className={darkMode ? "p-3 rounded-lg bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]" : "p-3 rounded-lg bg-green-100"}>
+                    <BuildingStorefrontIcon className={darkMode ? "h-6 w-6 text-black" : "h-6 w-6 text-green-600"} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Totaal Restaurants</p>
-                    <p className="text-2xl font-bold text-white">{activeRestaurants.length}</p>
+                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                      TOTAAL RESTAURANTS
+                    </p>
+                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                      {activeRestaurants.length}
+                    </p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
+
+              <div className={`p-6 rounded-xl ${
+                darkMode 
+                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                  : 'bg-white shadow-sm'
+              }`}>
                 <div className="flex items-center">
-                  <div className="p-3 rounded-lg bg-blue-500/20">
-                    <CpuChipIcon className="h-6 w-6 text-blue-400" />
+                  <div className={darkMode ? "p-3 rounded-lg bg-emerald-500/20" : "p-3 rounded-lg bg-emerald-50"}>
+                    <CpuChipIcon className={darkMode ? "h-6 w-6 text-emerald-400" : "h-6 w-6 text-emerald-600"} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">POS Verbonden</p>
-                    <p className="text-2xl font-bold text-white">{connectedCount}</p>
+                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                      POS VERBONDEN
+                    </p>
+                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                      {connectedCount}
+                    </p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
+
+              <div className={`p-6 rounded-xl ${
+                darkMode 
+                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                  : 'bg-white shadow-sm'
+              }`}>
                 <div className="flex items-center">
-                  <div className="p-3 rounded-lg bg-[#2BE89A]/20">
-                    <WifiIcon className="h-6 w-6 text-[#2BE89A]" />
+                  <div className={darkMode ? "p-3 rounded-lg bg-[#2BE89A]/20" : "p-3 rounded-lg bg-green-50"}>
+                    <WifiIcon className={darkMode ? "h-6 w-6 text-[#2BE89A]" : "h-6 w-6 text-green-500"} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Actief</p>
-                    <p className="text-2xl font-bold text-white">{activeCount}</p>
+                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                      ACTIEF
+                    </p>
+                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                      {activeCount}
+                    </p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
+
+              <div className={`p-6 rounded-xl ${
+                darkMode 
+                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                  : 'bg-white shadow-sm'
+              }`}>
                 <div className="flex items-center">
-                  <div className="p-3 rounded-lg bg-red-500/20">
-                    <ExclamationTriangleIcon className="h-6 w-6 text-red-400" />
+                  <div className={darkMode ? "p-3 rounded-lg bg-red-500/20" : "p-3 rounded-lg bg-red-50"}>
+                    <ExclamationTriangleIcon className={darkMode ? "h-6 w-6 text-red-400" : "h-6 w-6 text-red-500"} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Niet Verbonden</p>
-                    <p className="text-2xl font-bold text-white">
+                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                      NIET VERBONDEN
+                    </p>
+                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
                       {activeRestaurants.length - connectedCount}
                     </p>
                   </div>
@@ -186,91 +195,146 @@ export default function POSIntegration() {
               </div>
             </div>
 
-            {/* Restaurants POS Status */}
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-4">Restaurant POS Status</h2>
-              <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden">
-                <div className="divide-y divide-[#2a2d3a]">
-                  {activeRestaurants.map((restaurant) => {
-                    const posStatus = posStatuses[restaurant.id]
-                    return (
-                      <div key={restaurant.id} className="p-6 hover:bg-[#0A0B0F] transition">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            <div className="h-12 w-12 rounded-lg overflow-hidden bg-white flex items-center justify-center">
-                              {restaurant.logo ? (
-                                <img
-                                  src={restaurant.logo}
-                                  alt={restaurant.name}
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                <div className="h-full w-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-bold text-lg">
-                                  {restaurant.name.charAt(0)}
-                                </div>
-                              )}
-                            </div>
-                            <div>
-                              <h3 className="text-lg font-semibold text-white">{restaurant.name}</h3>
-                              <p className="text-sm text-[#BBBECC]">{restaurant.location}</p>
-                            </div>
+            {/* Restaurant POS Status List */}
+            <div className={`rounded-xl overflow-hidden ${
+              darkMode 
+                ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                : 'bg-white shadow-sm'
+            }`}>
+              <div className={`px-6 py-4 border-b ${
+                darkMode ? 'border-[#2a2d3a] bg-[#0A0B0F]' : 'border-gray-200 bg-gray-50'
+              }`}>
+                <h2 className={`text-lg font-semibold ${
+                  darkMode ? 'text-white' : 'text-[#111827]'
+                }`}>
+                  Restaurant POS Status
+                </h2>
+              </div>
+
+              <div className={`divide-y ${darkMode ? 'divide-[#2a2d3a]' : 'divide-gray-200'}`}>
+                {activeRestaurants.map((restaurant) => {
+                  const posStatus = posStatuses[restaurant.id]
+                  return (
+                    <div 
+                      key={restaurant.id} 
+                      className={`p-6 transition-all ${
+                        darkMode ? 'hover:bg-[#0A0B0F]' : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 bg-white relative">
+                            {restaurant.logo ? (
+                              <img
+                                src={restaurant.logo}
+                                alt={restaurant.name}
+                                className="h-full w-full object-contain p-1"
+                              />
+                            ) : (
+                              <div className="h-full w-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-lg">
+                                {restaurant.name.charAt(0)}
+                              </div>
+                            )}
                           </div>
                           
-                          <div className="flex items-center space-x-6">
-                            {posStatus && posStatus.connected ? (
-                              <>
-                                <div className="text-right">
-                                  <p className="text-sm font-medium text-white">{posStatus.posType}</p>
-                                  <p className="text-xs text-[#BBBECC]">
+                          <div className="min-w-0 flex-1">
+                            <h3 className={`text-base font-semibold ${
+                              darkMode ? 'text-white' : 'text-[#111827]'
+                            }`}>
+                              {restaurant.name}
+                            </h3>
+                            <div className="mt-1 flex items-center space-x-4 text-sm">
+                              <span className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>
+                                {restaurant.location}
+                              </span>
+                              {posStatus && posStatus.connected && (
+                                <>
+                                  <span className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>
+                                    {posStatus.posType}
+                                  </span>
+                                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                    posStatus.environment === 'production'
+                                      ? 'bg-green-100 text-green-700'
+                                      : 'bg-yellow-100 text-yellow-700'
+                                  }`}>
                                     {posStatus.environment === 'production' ? 'Productie' : posStatus.environment}
-                                  </p>
-                                </div>
-                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(posStatus)}`}>
-                                  {getStatusIcon(posStatus)}
-                                  <span className="ml-1.5">{getStatusText(posStatus)}</span>
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(posStatus)}`}>
-                                  {getStatusIcon(posStatus)}
-                                  <span className="ml-1.5">{getStatusText(posStatus)}</span>
-                                </span>
-                              </>
-                            )}
-                            
-                            <Link
-                              href={posStatus && posStatus.connected 
-                                ? `/restaurants/${restaurant.id}` 
-                                : `/restaurants/${restaurant.id}/onboarding?step=3`
-                              }
-                              className="inline-flex items-center px-4 py-2 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white hover:bg-[#1a1c25] transition"
-                            >
-                              {posStatus && posStatus.connected ? 'Bekijk Details' : 'Configureer POS'}
-                              <ArrowRightIcon className="ml-2 h-4 w-4" />
-                            </Link>
+                                  </span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
+                        
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center">
+                            {posStatus && posStatus.connected ? (
+                              posStatus.isActive ? (
+                                <>
+                                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
+                                  <span className="text-sm font-medium text-green-600">Actief</span>
+                                </>
+                              ) : (
+                                <>
+                                  <ClockIcon className="h-5 w-5 text-yellow-500 mr-2" />
+                                  <span className="text-sm font-medium text-yellow-600">Inactief</span>
+                                </>
+                              )
+                            ) : (
+                              <>
+                                <XCircleIcon className="h-5 w-5 text-red-500 mr-2" />
+                                <span className="text-sm font-medium text-red-600">Niet Verbonden</span>
+                              </>
+                            )}
+                          </div>
+                          
+                          <Link
+                            href={posStatus && posStatus.connected 
+                              ? `/restaurants/${restaurant.id}` 
+                              : `/restaurants/${restaurant.id}/onboarding?step=3`
+                            }
+                            className={`inline-flex items-center px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                              posStatus && posStatus.connected
+                                ? darkMode
+                                  ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white hover:bg-[#1a1c25]'
+                                  : 'bg-white border border-gray-200 text-[#6B7280] hover:bg-gray-50'
+                                : 'bg-green-500 text-white hover:bg-green-600'
+                            }`}
+                          >
+                            {posStatus && posStatus.connected ? 'Bekijk Details' : 'Configureer POS'}
+                            <ChevronRightIcon className="ml-1 h-4 w-4" />
+                          </Link>
+                        </div>
                       </div>
-                    )
-                  })}
-                </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
 
             {/* Empty State */}
             {activeRestaurants.length === 0 && (
-              <div className="text-center py-16 bg-[#1c1e27] rounded-xl border border-[#2a2d3a]">
-                <BuildingStorefrontIcon className="mx-auto h-12 w-12 text-[#BBBECC]" />
-                <p className="mt-4 text-[#BBBECC]">
-                  Geen actieve restaurants gevonden.
+              <div className={`text-center py-16 rounded-xl ${
+                darkMode 
+                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                  : 'bg-white shadow-sm'
+              }`}>
+                <BuildingStorefrontIcon className={`mx-auto h-12 w-12 ${
+                  darkMode ? 'text-[#BBBECC]' : 'text-gray-400'
+                }`} />
+                <h3 className={`mt-4 text-base font-medium ${
+                  darkMode ? 'text-white' : 'text-[#111827]'
+                }`}>
+                  Geen actieve restaurants
+                </h3>
+                <p className={`mt-2 text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                  Begin met het toevoegen van je eerste restaurant partner.
                 </p>
                 <Link
                   href="/restaurants/new"
-                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition mt-4"
+                  className="mt-6 inline-flex items-center px-4 py-2.5 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition-all"
                 >
+                  <BuildingStorefrontIcon className="mr-2 h-5 w-5" />
                   Voeg Restaurant Toe
-                  <ArrowRightIcon className="ml-2 h-4 w-4" />
                 </Link>
               </div>
             )}

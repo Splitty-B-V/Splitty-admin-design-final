@@ -60,7 +60,13 @@ export default function RestaurantOnboarding() {
   const [qrStandData, setQrStandData] = useState({
     selectedDesign: '',
     tableCount: '',
-    floorPlan: null,
+    tableSections: {
+      bar: '',
+      binnen: '',
+      terras: '',
+      lounge: ''
+    },
+    floorPlans: [],
     isConfigured: false
   })
   const [showCopiedMessage, setShowCopiedMessage] = useState(false)
@@ -132,6 +138,24 @@ export default function RestaurantOnboarding() {
             setGoogleReviewData(parsed.googleReviewData)
           }
           if (parsed.qrStandData) {
+            // Ensure tableSections exists for backwards compatibility
+            if (!parsed.qrStandData.tableSections) {
+              parsed.qrStandData.tableSections = {
+                bar: '',
+                binnen: '',
+                terras: '',
+                lounge: ''
+              }
+            }
+            // Convert old floorPlan to new floorPlans array
+            if (parsed.qrStandData.floorPlan && !parsed.qrStandData.floorPlans) {
+              parsed.qrStandData.floorPlans = [parsed.qrStandData.floorPlan];
+              delete parsed.qrStandData.floorPlan;
+            }
+            // Ensure floorPlans is an array
+            if (!parsed.qrStandData.floorPlans) {
+              parsed.qrStandData.floorPlans = [];
+            }
             setQrStandData(parsed.qrStandData)
           }
           
@@ -174,8 +198,8 @@ export default function RestaurantOnboarding() {
   if (!restaurant) {
     return (
       <Layout>
-        <div className="min-h-screen bg-[#0A0B0F] flex items-center justify-center">
-          <div className="text-white">Restaurant niet gevonden...</div>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-gray-900">Restaurant niet gevonden...</div>
         </div>
       </Layout>
     )
@@ -316,37 +340,37 @@ export default function RestaurantOnboarding() {
         return (
           <div className="space-y-6">
             {/* Main Content Card */}
-            <div className="bg-[#1c1e27] rounded-xl p-8 border border-[#2a2d3a]">
+            <div className="bg-white rounded-xl p-8 border border-gray-200">
               {/* Header */}
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Stap 1: Restaurant Team</h3>
-                  <p className="text-[#BBBECC]">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Stap 1: Restaurant Team</h3>
+                  <p className="text-gray-600">
                     Voeg minimaal één manager toe om door te kunnen gaan • {personnelData.length} gebruiker{personnelData.length !== 1 ? 's' : ''} toegevoegd
                   </p>
                 </div>
-                <UserGroupIcon className="h-12 w-12 text-[#BBBECC] opacity-20" />
+                <UserGroupIcon className="h-12 w-12 text-gray-600 opacity-20" />
               </div>
 
               {/* Personnel List */}
               {personnelData.length > 0 && (
                 <div className="mb-8">
-                  <h4 className="text-sm font-medium text-[#BBBECC] mb-4">Toegevoegde gebruikers</h4>
+                  <h4 className="text-sm font-medium text-gray-600 mb-4">Toegevoegde gebruikers</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {personnelData.map((person) => (
-                      <div key={person.id} className="bg-[#0A0B0F] rounded-xl p-5 border border-[#2a2d3a] hover:border-[#2BE89A]/30 transition-all">
+                      <div key={person.id} className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:border-green-400/30 transition-all">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center">
                             <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-bold mr-4">
                               {person.firstName.charAt(0)}{person.lastName.charAt(0)}
                             </div>
                             <div>
-                              <p className="text-white font-semibold">{person.firstName} {person.lastName}</p>
-                              <p className="text-sm text-[#BBBECC]">{person.email}</p>
+                              <p className="text-gray-900 font-semibold">{person.firstName} {person.lastName}</p>
+                              <p className="text-sm text-gray-600">{person.email}</p>
                               <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mt-2 ${
                                 person.role === 'manager' 
-                                  ? 'bg-[#2BE89A]/20 text-[#2BE89A]' 
-                                  : 'bg-[#635BFF]/20 text-[#635BFF]'
+                                  ? 'bg-green-100 text-green-500' 
+                                  : 'bg-blue-100 text-blue-500'
                               }`}>
                                 {person.role === 'manager' ? 'Manager' : 'Personeel'}
                               </span>
@@ -354,7 +378,7 @@ export default function RestaurantOnboarding() {
                           </div>
                           <button
                             onClick={() => handleRemovePerson(person.id)}
-                            className="text-[#BBBECC] hover:text-red-400 transition p-2"
+                            className="text-gray-600 hover:text-red-500 transition p-2"
                           >
                             <TrashIcon className="h-5 w-5" />
                           </button>
@@ -367,12 +391,12 @@ export default function RestaurantOnboarding() {
 
               {/* Add Person Form */}
               {showPersonForm ? (
-                <div className="bg-[#0A0B0F] rounded-xl p-6 border border-[#2BE89A]/30">
+                <div className="bg-gray-50 rounded-xl p-6 border border-green-200">
                   <div className="flex items-center justify-between mb-6">
-                    <h4 className="text-lg font-semibold text-white">Nieuwe gebruiker toevoegen</h4>
+                    <h4 className="text-lg font-semibold text-gray-900">Nieuwe gebruiker toevoegen</h4>
                     <button
                       onClick={() => setShowPersonForm(false)}
-                      className="text-[#BBBECC] hover:text-white transition p-2"
+                      className="text-gray-600 hover:text-gray-900 transition p-2"
                     >
                       <XMarkIcon className="h-5 w-5" />
                     </button>
@@ -381,63 +405,63 @@ export default function RestaurantOnboarding() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-[#BBBECC] mb-2">Voornaam</label>
+                        <label className="block text-sm font-medium text-gray-600 mb-2">Voornaam</label>
                         <input
                           type="text"
                           value={newPerson.firstName}
                           onChange={(e) => setNewPerson({...newPerson, firstName: e.target.value})}
-                          className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="Jan"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-[#BBBECC] mb-2">Achternaam</label>
+                        <label className="block text-sm font-medium text-gray-600 mb-2">Achternaam</label>
                         <input
                           type="text"
                           value={newPerson.lastName}
                           onChange={(e) => setNewPerson({...newPerson, lastName: e.target.value})}
-                          className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="Jansen"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#BBBECC] mb-2">Email</label>
+                      <label className="block text-sm font-medium text-gray-600 mb-2">Email</label>
                       <input
                         type="email"
                         value={newPerson.email}
                         onChange={(e) => setNewPerson({...newPerson, email: e.target.value})}
-                        className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         placeholder="jan@restaurant.nl"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#BBBECC] mb-2">Telefoon (optioneel)</label>
+                      <label className="block text-sm font-medium text-gray-600 mb-2">Telefoon (optioneel)</label>
                       <input
                         type="tel"
                         value={newPerson.phone}
                         onChange={(e) => setNewPerson({...newPerson, phone: e.target.value})}
-                        className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         placeholder="+31 6 12345678"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#BBBECC] mb-2">Wachtwoord</label>
+                      <label className="block text-sm font-medium text-gray-600 mb-2">Wachtwoord</label>
                       <div className="relative">
                         <input
                           type={showPassword ? "text" : "password"}
                           value={newPerson.password}
                           onChange={(e) => setNewPerson({...newPerson, password: e.target.value})}
-                          className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent pr-12"
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12"
                           placeholder="••••••••"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#BBBECC] hover:text-white"
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-900"
                         >
                           {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                         </button>
@@ -445,15 +469,15 @@ export default function RestaurantOnboarding() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#BBBECC] mb-3">Rol</label>
+                      <label className="block text-sm font-medium text-gray-600 mb-3">Rol</label>
                       <div className="grid grid-cols-2 gap-3">
                         <button
                           type="button"
                           onClick={() => setNewPerson({...newPerson, role: 'staff'})}
                           className={`p-4 rounded-lg border-2 transition-all ${
                             newPerson.role === 'staff'
-                              ? 'bg-[#635BFF]/10 border-[#635BFF] text-white'
-                              : 'bg-[#0A0B0F] border-[#2a2d3a] text-[#BBBECC] hover:border-[#635BFF]/50'
+                              ? 'bg-blue-50 border-blue-400 text-gray-900'
+                              : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-blue-400/50'
                           }`}
                         >
                           <UserGroupIcon className="h-6 w-6 mx-auto mb-2" />
@@ -465,8 +489,8 @@ export default function RestaurantOnboarding() {
                           onClick={() => setNewPerson({...newPerson, role: 'manager'})}
                           className={`p-4 rounded-lg border-2 transition-all ${
                             newPerson.role === 'manager'
-                              ? 'bg-[#2BE89A]/10 border-[#2BE89A] text-white'
-                              : 'bg-[#0A0B0F] border-[#2a2d3a] text-[#BBBECC] hover:border-[#2BE89A]/50'
+                              ? 'bg-green-50 border-green-400 text-gray-900'
+                              : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-green-300'
                           }`}
                         >
                           <ShieldCheckIcon className="h-6 w-6 mx-auto mb-2" />
@@ -488,17 +512,17 @@ export default function RestaurantOnboarding() {
               ) : (
                 <button
                   onClick={() => setShowPersonForm(true)}
-                  className="w-full px-6 py-4 bg-[#0A0B0F] border-2 border-dashed border-[#2a2d3a] rounded-xl text-[#BBBECC] hover:border-[#2BE89A]/50 hover:bg-[#1c1e27] transition-all group"
+                  className="w-full px-6 py-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl text-gray-600 hover:border-green-300 hover:bg-gray-50 transition-all group"
                 >
-                  <UserGroupIcon className="h-8 w-8 mx-auto mb-2 group-hover:text-[#2BE89A] transition" />
-                  <p className="font-medium group-hover:text-white transition">Nieuwe gebruiker toevoegen</p>
+                  <UserGroupIcon className="h-8 w-8 mx-auto mb-2 group-hover:text-green-500 transition" />
+                  <p className="font-medium group-hover:text-gray-900 transition">Nieuwe gebruiker toevoegen</p>
                 </button>
               )}
 
               {/* Info Box */}
-              <div className="mt-8 bg-[#0A0B0F] rounded-lg p-4 border border-[#2a2d3a]">
-                <p className="text-sm text-[#BBBECC]">
-                  <span className="text-[#2BE89A] font-medium">Tip:</span> Voeg minimaal één manager toe. 
+              <div className="mt-8 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <p className="text-sm text-gray-600">
+                  <span className="text-green-500 font-medium">Tip:</span> Voeg minimaal één manager toe. 
                   Je kunt later altijd meer gebruikers toevoegen via het gebruikersbeheer.
                 </p>
               </div>
@@ -510,15 +534,15 @@ export default function RestaurantOnboarding() {
         return (
           <div className="space-y-6">
             {/* Main Content Card */}
-            <div className="bg-[#1c1e27] rounded-xl p-8 border border-[#2a2d3a]">
+            <div className="bg-white rounded-xl p-8 border border-gray-200">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Stap 2: Stripe Connect</h3>
-                  <p className="text-[#BBBECC]">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Stap 2: Stripe Connect</h3>
+                  <p className="text-gray-600">
                     Configureer betalingsverwerking voor het restaurant {stripeData.connected && '• ✓ Gekoppeld'}
                   </p>
                 </div>
-                <CreditCardIcon className="h-12 w-12 text-[#BBBECC] opacity-20" />
+                <CreditCardIcon className="h-12 w-12 text-gray-600 opacity-20" />
               </div>
 
               <div className="space-y-6">
@@ -526,34 +550,34 @@ export default function RestaurantOnboarding() {
                   <>
                     {/* Restaurant Info - Disabled */}
                     <div className="opacity-50 cursor-not-allowed">
-                      <label className="block text-sm font-medium text-[#BBBECC] mb-2">
+                      <label className="block text-sm font-medium text-gray-600 mb-2">
                         Restaurant
                       </label>
-                      <div className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white">
+                      <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
                         {restaurant?.name}
                       </div>
                     </div>
 
                     {/* Stripe Connect Info */}
-                    <div className="bg-[#0A0B0F] rounded-lg p-6 border border-[#2a2d3a]">
-                      <h4 className="text-base font-medium text-white mb-4">Stripe Connect Integratie</h4>
-                      <p className="text-sm text-[#BBBECC] mb-6">
+                    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                      <h4 className="text-base font-medium text-gray-900 mb-4">Stripe Connect Integratie</h4>
+                      <p className="text-sm text-gray-600 mb-6">
                         Stripe Connect stelt het restaurant in staat om veilig betalingen te ontvangen. 
                         Het restaurant beheert zijn eigen Stripe account en ontvangt uitbetalingen direct.
                       </p>
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div className="text-center">
-                          <ShieldCheckIcon className="h-8 w-8 text-[#BBBECC] mx-auto mb-2" />
-                          <p className="text-xs text-[#BBBECC]">PCI Compliant</p>
+                          <ShieldCheckIcon className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                          <p className="text-xs text-gray-600">PCI Compliant</p>
                         </div>
                         <div className="text-center">
-                          <ClockIcon className="h-8 w-8 text-[#BBBECC] mx-auto mb-2" />
-                          <p className="text-xs text-[#BBBECC]">Dagelijkse uitbetaling</p>
+                          <ClockIcon className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                          <p className="text-xs text-gray-600">Dagelijkse uitbetaling</p>
                         </div>
                         <div className="text-center">
-                          <SparklesIcon className="h-8 w-8 text-[#BBBECC] mx-auto mb-2" />
-                          <p className="text-xs text-[#BBBECC]">Real-time inzicht</p>
+                          <SparklesIcon className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                          <p className="text-xs text-gray-600">Real-time inzicht</p>
                         </div>
                       </div>
                     </div>
@@ -564,7 +588,7 @@ export default function RestaurantOnboarding() {
                         // TODO: Implement Stripe Connect OAuth flow
                         alert('Stripe Connect integratie komt binnenkort beschikbaar. Neem contact op met het Splitty team voor handmatige setup.');
                       }}
-                      className="w-full px-6 py-3 bg-gradient-to-r from-[#635BFF] to-[#7C3AED] text-white font-semibold rounded-lg opacity-75 cursor-not-allowed transition-all shadow-lg flex items-center justify-center"
+                      className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg opacity-75 cursor-not-allowed transition-all shadow-lg flex items-center justify-center"
                       disabled
                     >
                       <svg className="w-20 h-6 mr-3" viewBox="0 0 60 25" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -577,31 +601,31 @@ export default function RestaurantOnboarding() {
                 ) : (
                   <div className="space-y-4">
                     {/* Success State */}
-                    <div className="bg-[#0A0B0F] rounded-lg p-6 border border-[#2BE89A]/30">
+                    <div className="bg-gray-50 rounded-lg p-6 border border-green-200">
                       <div className="flex items-center mb-4">
-                        <CheckCircleIcon className="h-6 w-6 text-[#2BE89A] mr-3" />
-                        <h4 className="text-base font-medium text-white">Stripe Connect Actief</h4>
+                        <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3" />
+                        <h4 className="text-base font-medium text-gray-900">Stripe Connect Actief</h4>
                       </div>
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-[#BBBECC]">Account ID</span>
-                          <span className="text-sm text-white font-mono">{stripeData.accountId || 'acct_demo_123456'}</span>
+                          <span className="text-sm text-gray-600">Account ID</span>
+                          <span className="text-sm text-gray-900 font-mono">{stripeData.accountId || 'acct_demo_123456'}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-[#BBBECC]">Status</span>
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#2BE89A]/20 text-[#2BE89A]">
+                          <span className="text-sm text-gray-600">Status</span>
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-500">
                             Geverifieerd
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-[#BBBECC]">Uitbetaling frequentie</span>
-                          <span className="text-sm text-white">Dagelijks</span>
+                          <span className="text-sm text-gray-600">Uitbetaling frequentie</span>
+                          <span className="text-sm text-gray-900">Dagelijks</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-[#0A0B0F] rounded-lg p-5 border border-[#2a2d3a]">
-                      <p className="text-sm text-[#BBBECC]">
+                    <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                      <p className="text-sm text-gray-600">
                         ✓ Het restaurant kan nu split betalingen ontvangen. Uitbetalingen gebeuren automatisch naar de gekoppelde bankrekening.
                       </p>
                     </div>
@@ -616,26 +640,26 @@ export default function RestaurantOnboarding() {
         return (
           <div className="space-y-6">
             {/* Main Content Card */}
-            <div className="bg-[#1c1e27] rounded-xl p-8 border border-[#2a2d3a]">
+            <div className="bg-white rounded-xl p-8 border border-gray-200">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Stap 3: POS Systeem Koppeling</h3>
-                  <p className="text-[#BBBECC]">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Stap 3: POS Systeem Koppeling</h3>
+                  <p className="text-gray-600">
                     Configureer het kassasysteem van {restaurant?.name} voor automatische synchronisatie
                   </p>
                 </div>
-                <WifiIcon className="h-12 w-12 text-[#BBBECC] opacity-20" />
+                <WifiIcon className="h-12 w-12 text-gray-600 opacity-20" />
               </div>
 
               <div className="space-y-6">
                 {/* Restaurant Selection - Disabled in onboarding as we already know the restaurant */}
                 <div className="opacity-50 cursor-not-allowed">
-                  <label className="block text-sm font-medium text-[#BBBECC] mb-2">
-                    Restaurant <span className="text-[#FF6B6B]">*</span>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">
+                    Restaurant <span className="text-red-500">*</span>
                   </label>
-                  <div className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg">
-                    <span className="text-white font-medium">{restaurant?.name}</span>
-                    <span className="text-[#BBBECC] ml-3">
+                  <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <span className="text-gray-900 font-medium">{restaurant?.name}</span>
+                    <span className="text-gray-600 ml-3">
                       • {restaurant?.address 
                           ? `${restaurant.address.street || ''} ${restaurant.address.postalCode || ''} ${restaurant.address.city || ''}`
                           : restaurant?.location}
@@ -645,13 +669,13 @@ export default function RestaurantOnboarding() {
 
                 {/* POS Type */}
                 <div>
-                  <label className="block text-sm font-medium text-[#BBBECC] mb-2">
-                    POS Systeem <span className="text-[#FF6B6B]">*</span>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">
+                    POS Systeem <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={posData.posType}
                     onChange={(e) => setPosData({...posData, posType: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   >
                     <option value="">Selecteer het POS systeem van het restaurant</option>
@@ -665,28 +689,28 @@ export default function RestaurantOnboarding() {
                 {/* Username and Password Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-[#BBBECC] mb-2">
-                      POS Gebruikersnaam <span className="text-[#FF6B6B]">*</span>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      POS Gebruikersnaam <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={posData.username}
                       onChange={(e) => setPosData({...posData, username: e.target.value})}
-                      className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="POS account gebruikersnaam"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-[#BBBECC] mb-2">
-                      POS Wachtwoord <span className="text-[#FF6B6B]">*</span>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      POS Wachtwoord <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="password"
                       value={posData.password}
                       onChange={(e) => setPosData({...posData, password: e.target.value})}
-                      className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="POS account wachtwoord"
                       required
                     />
@@ -695,28 +719,28 @@ export default function RestaurantOnboarding() {
 
                 {/* Base URL */}
                 <div>
-                  <label className="block text-sm font-medium text-[#BBBECC] mb-2">
-                    API URL <span className="text-[#FF6B6B]">*</span>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">
+                    API URL <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     placeholder="https://restaurant-pos-server.com"
                     value={posData.baseUrl}
                     onChange={(e) => setPosData({...posData, baseUrl: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   />
                 </div>
 
                 {/* Environment */}
                 <div>
-                  <label className="block text-sm font-medium text-[#BBBECC] mb-2">
+                  <label className="block text-sm font-medium text-gray-600 mb-2">
                     Omgeving
                   </label>
                   <select
                     value={posData.environment}
                     onChange={(e) => setPosData({...posData, environment: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="production">Productie</option>
                     <option value="staging">Staging</option>
@@ -733,14 +757,14 @@ export default function RestaurantOnboarding() {
                       type="checkbox"
                       checked={posData.isActive}
                       onChange={(e) => setPosData({...posData, isActive: e.target.checked})}
-                      className="h-4 w-4 rounded border-[#2a2d3a] bg-[#0A0B0F] text-[#2BE89A] focus:ring-[#2BE89A] focus:ring-offset-0 focus:ring-offset-[#0F1117]"
+                      className="h-4 w-4 rounded border-gray-200 bg-gray-50 text-green-500 focus:ring-green-500 focus:ring-offset-0 focus:ring-offset-[#0F1117]"
                     />
                   </div>
                   <div className="ml-3">
-                    <label htmlFor="is-active" className="text-sm font-medium text-white">
+                    <label htmlFor="is-active" className="text-sm font-medium text-gray-900">
                       Activeren
                     </label>
-                    <p className="text-sm text-[#BBBECC]">Schakel deze POS integratie in voor {restaurant?.name}</p>
+                    <p className="text-sm text-gray-600">Schakel deze POS integratie in voor {restaurant?.name}</p>
                   </div>
                 </div>
 
@@ -785,29 +809,29 @@ export default function RestaurantOnboarding() {
         return (
           <div className="space-y-6">
             {/* Main Content Card */}
-            <div className="bg-[#1c1e27] rounded-xl p-8 border border-[#2a2d3a]">
+            <div className="bg-white rounded-xl p-8 border border-gray-200">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Stap 4: QR houders</h3>
-                  <p className="text-[#BBBECC]">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Stap 4: QR houders</h3>
+                  <p className="text-gray-600">
                     Configureer QR stands en tafelindeling voor {restaurant?.name}
                   </p>
                 </div>
-                <QrCodeIcon className="h-12 w-12 text-[#BBBECC] opacity-20" />
+                <QrCodeIcon className="h-12 w-12 text-gray-600 opacity-20" />
               </div>
 
               <div className="space-y-8">
                 {/* QR Stand Design Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-[#BBBECC] mb-4">
+                  <label className="block text-sm font-medium text-gray-600 mb-4">
                     Selecteer QR Stand Design
                   </label>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
-                      { id: 'classic', name: 'Classic', color: 'from-[#2BE89A] to-[#4FFFB0]' },
-                      { id: 'modern', name: 'Modern', color: 'from-[#635BFF] to-[#7C3AED]' },
-                      { id: 'minimal', name: 'Minimal', color: 'from-[#BBBECC] to-[#ffffff]' },
-                      { id: 'elegant', name: 'Elegant', color: 'from-[#FF6B6B] to-[#FF8E53]' }
+                      { id: 'houder1', name: 'HOUDER#1', color: 'from-[#2BE89A] to-[#4FFFB0]' },
+                      { id: 'houder2', name: 'HOUDER#2', color: 'from-[#635BFF] to-[#7C3AED]' },
+                      { id: 'houder3', name: 'HOUDER#3', color: 'from-[#BBBECC] to-[#ffffff]' },
+                      { id: 'houder4', name: 'HOUDER#4', color: 'from-[#FF6B6B] to-[#FF8E53]' }
                     ].map((design) => (
                       <button
                         key={design.id}
@@ -815,15 +839,15 @@ export default function RestaurantOnboarding() {
                         onClick={() => setQrStandData({...qrStandData, selectedDesign: design.id, isConfigured: true})}
                         className={`p-6 rounded-xl border-2 transition-all group ${
                           qrStandData.selectedDesign === design.id
-                            ? 'border-[#2BE89A] bg-[#2BE89A]/10'
-                            : 'border-[#2a2d3a] bg-[#0A0B0F] hover:border-[#2BE89A]/50'
+                            ? 'border-green-400 bg-green-50'
+                            : 'border-gray-200 bg-gray-50 hover:border-green-300'
                         }`}
                       >
                         <div className={`w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br ${design.color} flex items-center justify-center`}>
                           <QrCodeIcon className="h-8 w-8 text-black" />
                         </div>
-                        <p className="text-white font-medium text-sm">{design.name}</p>
-                        <div className="mt-2 w-full h-1 bg-[#2a2d3a] rounded-full">
+                        <p className="text-gray-900 font-medium text-sm">{design.name}</p>
+                        <div className="mt-2 w-full h-1 bg-gray-200 rounded-full">
                           <div className={`h-1 rounded-full bg-gradient-to-r ${design.color} transition-all duration-300 ${
                             qrStandData.selectedDesign === design.id ? 'w-full' : 'w-0'
                           }`} />
@@ -833,110 +857,228 @@ export default function RestaurantOnboarding() {
                   </div>
                 </div>
 
-                {/* Table Count */}
+                {/* Table Count by Section */}
                 <div>
-                  <label className="block text-sm font-medium text-[#BBBECC] mb-2">
-                    Aantal Tafels
+                  <label className="block text-sm font-medium text-gray-600 mb-4">
+                    Aantal Tafels per Sectie
                   </label>
-                  <input
-                    type="number"
-                    value={qrStandData.tableCount}
-                    onChange={(e) => setQrStandData({...qrStandData, tableCount: e.target.value, isConfigured: true})}
-                    className="w-full px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
-                    placeholder="bijv. 25"
-                    min="1"
-                    max="200"
-                  />
-                  <p className="text-xs text-[#BBBECC] mt-2">
-                    Het totaal aantal tafels in het restaurant (gebruikt voor QR code generatie)
-                  </p>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    {/* Bar */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-2">Bar</label>
+                      <input
+                        type="number"
+                        value={qrStandData.tableSections?.bar || ''}
+                        onChange={(e) => {
+                          const newSections = {...qrStandData.tableSections, bar: e.target.value};
+                          const total = Object.values(newSections).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
+                          setQrStandData({...qrStandData, tableSections: newSections, tableCount: total.toString(), isConfigured: true});
+                        }}
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="0"
+                        min="0"
+                        max="50"
+                      />
+                    </div>
+                    {/* Binnen */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-2">Binnen</label>
+                      <input
+                        type="number"
+                        value={qrStandData.tableSections?.binnen || ''}
+                        onChange={(e) => {
+                          const newSections = {...qrStandData.tableSections, binnen: e.target.value};
+                          const total = Object.values(newSections).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
+                          setQrStandData({...qrStandData, tableSections: newSections, tableCount: total.toString(), isConfigured: true});
+                        }}
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="0"
+                        min="0"
+                        max="50"
+                      />
+                    </div>
+                    {/* Terras */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-2">Terras</label>
+                      <input
+                        type="number"
+                        value={qrStandData.tableSections?.terras || ''}
+                        onChange={(e) => {
+                          const newSections = {...qrStandData.tableSections, terras: e.target.value};
+                          const total = Object.values(newSections).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
+                          setQrStandData({...qrStandData, tableSections: newSections, tableCount: total.toString(), isConfigured: true});
+                        }}
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="0"
+                        min="0"
+                        max="50"
+                      />
+                    </div>
+                    {/* Lounge */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-2">Lounge</label>
+                      <input
+                        type="number"
+                        value={qrStandData.tableSections?.lounge || ''}
+                        onChange={(e) => {
+                          const newSections = {...qrStandData.tableSections, lounge: e.target.value};
+                          const total = Object.values(newSections).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
+                          setQrStandData({...qrStandData, tableSections: newSections, tableCount: total.toString(), isConfigured: true});
+                        }}
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="0"
+                        min="0"
+                        max="50"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Total Calculator */}
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-600">Totaal aantal tafels</span>
+                      <span className="text-xl font-bold text-green-500">
+                        {qrStandData.tableCount || '0'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 mt-2">
+                      Automatisch berekend op basis van alle secties
+                    </p>
+                  </div>
                 </div>
 
                 {/* Floor Plan Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-[#BBBECC] mb-4">
+                  <label className="block text-sm font-medium text-gray-600 mb-4">
                     Plattegrond Upload (Optioneel)
                   </label>
-                  <div className="relative border-2 border-dashed border-[#2a2d3a] rounded-xl p-8 text-center hover:border-[#2BE89A]/50 hover:bg-[#1c1e27]/50 transition-all">
-                    {qrStandData.floorPlan ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-center">
-                          <div className="p-3 bg-[#2BE89A]/20 rounded-lg">
-                            <svg className="h-8 w-8 text-[#2BE89A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
+                  
+                  {/* Display uploaded files */}
+                  {qrStandData.floorPlans && qrStandData.floorPlans.length > 0 && (
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                      {qrStandData.floorPlans.map((file, index) => (
+                        <div key={index} className="bg-white border border-gray-200 rounded-lg p-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="p-2 bg-green-100 rounded">
+                                <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs text-gray-900 font-medium truncate">{file.name}</p>
+                                <p className="text-xs text-gray-600">{(file.size / 1024).toFixed(1)} KB</p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newFiles = qrStandData.floorPlans.filter((_, i) => i !== index);
+                                setQrStandData({...qrStandData, floorPlans: newFiles});
+                              }}
+                              className="p-1 hover:bg-red-100 rounded transition"
+                            >
+                              <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
                           </div>
                         </div>
-                        <div>
-                          <p className="text-white font-medium">{qrStandData.floorPlan.name}</p>
-                          <p className="text-sm text-[#BBBECC]">{(qrStandData.floorPlan.size / 1024).toFixed(1)} KB</p>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="relative border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-green-300 hover:bg-gray-50/50 transition-all">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-center">
+                        <div className="p-3 bg-gray-100 rounded-lg">
+                          <svg className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setQrStandData({...qrStandData, floorPlan: null})}
-                          className="text-red-400 hover:text-red-300 text-sm font-medium"
-                        >
-                          Bestand verwijderen
-                        </button>
                       </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-center">
-                          <div className="p-3 bg-[#BBBECC]/20 rounded-lg">
-                            <svg className="h-8 w-8 text-[#BBBECC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                            </svg>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-white font-medium mb-2">Sleep bestand hier of klik om te uploaden</p>
-                          <p className="text-sm text-[#BBBECC]">
-                            PNG, JPG, PDF - Max 5MB
-                          </p>
-                        </div>
-                        <input
-                          type="file"
-                          accept=".png,.jpg,.jpeg,.pdf"
-                          onChange={(e) => {
-                            const file = e.target.files[0]
-                            if (file) {
-                              setQrStandData({...qrStandData, floorPlan: file, isConfigured: true})
-                            }
-                          }}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        />
+                      <div>
+                        <p className="text-gray-900 font-medium mb-2">Sleep bestanden hier of klik om te uploaden</p>
+                        <p className="text-sm text-gray-600">
+                          PNG, JPG, PDF - Max 5MB per bestand - Meerdere bestanden toegestaan
+                        </p>
                       </div>
-                    )}
+                      <input
+                        type="file"
+                        accept=".png,.jpg,.jpeg,.pdf"
+                        multiple
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files);
+                          if (files.length > 0) {
+                            const currentFiles = qrStandData.floorPlans || [];
+                            setQrStandData({...qrStandData, floorPlans: [...currentFiles, ...files], isConfigured: true});
+                          }
+                        }}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                    </div>
                   </div>
-                  <p className="text-xs text-[#BBBECC] mt-2">
-                    Upload de plattegrond van het restaurant om tafelnummers optimaal te kunnen plaatsen
+                  <p className="text-xs text-gray-600 mt-2">
+                    Upload plattegronden, foto's of documenten van het restaurant (meerdere bestanden mogelijk)
                   </p>
                 </div>
 
                 {/* Configuration Summary */}
                 {qrStandData.isConfigured && (
-                  <div className="bg-[#0A0B0F] rounded-lg p-6 border border-[#2BE89A]/30">
+                  <div className="bg-gray-50 rounded-lg p-6 border border-green-200">
                     <div className="flex items-center mb-4">
-                      <CheckCircleIcon className="h-6 w-6 text-[#2BE89A] mr-3" />
-                      <h4 className="text-base font-medium text-white">QR Stand Configuratie</h4>
+                      <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3" />
+                      <h4 className="text-base font-medium text-gray-900">QR Stand Configuratie</h4>
                     </div>
                     <div className="space-y-3">
                       {qrStandData.selectedDesign && (
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-[#BBBECC]">Design</span>
-                          <span className="text-sm text-white font-medium capitalize">{qrStandData.selectedDesign}</span>
+                          <span className="text-sm text-gray-600">Design</span>
+                          <span className="text-sm text-gray-900 font-medium uppercase">
+                            {qrStandData.selectedDesign.replace('houder', 'HOUDER#')}
+                          </span>
                         </div>
                       )}
                       {qrStandData.tableCount && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-[#BBBECC]">Aantal tafels</span>
-                          <span className="text-sm text-white font-medium">{qrStandData.tableCount}</span>
-                        </div>
+                        <>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Totaal aantal tafels</span>
+                            <span className="text-sm text-gray-900 font-medium">{qrStandData.tableCount}</span>
+                          </div>
+                          {qrStandData.tableSections && (qrStandData.tableSections.bar || qrStandData.tableSections.binnen || qrStandData.tableSections.terras || qrStandData.tableSections.lounge) && (
+                            <div className="pl-4 space-y-1">
+                              {qrStandData.tableSections.bar > 0 && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs text-gray-600">• Bar</span>
+                                  <span className="text-xs text-gray-900">{qrStandData.tableSections.bar}</span>
+                                </div>
+                              )}
+                              {qrStandData.tableSections.binnen > 0 && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs text-gray-600">• Binnen</span>
+                                  <span className="text-xs text-gray-900">{qrStandData.tableSections.binnen}</span>
+                                </div>
+                              )}
+                              {qrStandData.tableSections.terras > 0 && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs text-gray-600">• Terras</span>
+                                  <span className="text-xs text-gray-900">{qrStandData.tableSections.terras}</span>
+                                </div>
+                              )}
+                              {qrStandData.tableSections.lounge > 0 && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs text-gray-600">• Lounge</span>
+                                  <span className="text-xs text-gray-900">{qrStandData.tableSections.lounge}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>
                       )}
-                      {qrStandData.floorPlan && (
+                      {qrStandData.floorPlans && qrStandData.floorPlans.length > 0 && (
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-[#BBBECC]">Plattegrond</span>
-                          <span className="text-sm text-white font-medium">{qrStandData.floorPlan.name}</span>
+                          <span className="text-sm text-gray-600">Bestanden</span>
+                          <span className="text-sm text-gray-900 font-medium">{qrStandData.floorPlans.length} bestand{qrStandData.floorPlans.length > 1 ? 'en' : ''}</span>
                         </div>
                       )}
                     </div>
@@ -951,27 +1093,27 @@ export default function RestaurantOnboarding() {
         return (
           <div className="space-y-6">
             {/* Main Content Card */}
-            <div className="bg-[#1c1e27] rounded-xl p-8 border border-[#2a2d3a]">
+            <div className="bg-white rounded-xl p-8 border border-gray-200">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Stap 5: Google Reviews</h3>
-                  <p className="text-[#BBBECC]">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Stap 5: Google Reviews</h3>
+                  <p className="text-gray-600">
                     Configureer Google Reviews link voor {restaurant?.name}
                   </p>
                 </div>
-                <StarIcon className="h-12 w-12 text-[#BBBECC] opacity-20" />
+                <StarIcon className="h-12 w-12 text-gray-600 opacity-20" />
               </div>
 
               <div className="space-y-6">
                 {/* Restaurant Info - Disabled */}
                 <div>
-                  <label className="block text-sm font-medium text-[#BBBECC] mb-2">
+                  <label className="block text-sm font-medium text-gray-600 mb-2">
                     Restaurant
                   </label>
                   <div className="relative">
-                    <div className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg pr-12">
-                      <span className="text-white font-medium">{restaurant?.name}</span>
-                      <span className="text-[#BBBECC] ml-3">
+                    <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg pr-12">
+                      <span className="text-gray-900 font-medium">{restaurant?.name}</span>
+                      <span className="text-gray-600 ml-3">
                         {restaurant?.address 
                           ? `${restaurant.address.street || ''} ${restaurant.address.postalCode || ''} ${restaurant.address.city || ''}`
                           : restaurant?.location}
@@ -986,11 +1128,11 @@ export default function RestaurantOnboarding() {
                         setShowCopiedMessage(true);
                         setTimeout(() => setShowCopiedMessage(false), 2000);
                       }}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#BBBECC] hover:text-white transition"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-900 transition"
                       title="Kopieer restaurant informatie"
                     >
                       {showCopiedMessage ? (
-                        <span className="text-xs text-[#2BE89A] font-medium mr-2">Gekopieerd!</span>
+                        <span className="text-xs text-green-500 font-medium mr-2">Gekopieerd!</span>
                       ) : null}
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -1000,15 +1142,15 @@ export default function RestaurantOnboarding() {
                 </div>
 
                 {/* Instructions with Steps */}
-                <div className="bg-[#0A0B0F] rounded-lg p-6 border border-[#2a2d3a]">
-                  <h4 className="text-base font-medium text-white mb-4">Google Review link instellen voor {restaurant?.name}</h4>
+                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                  <h4 className="text-base font-medium text-gray-900 mb-4">Google Review link instellen voor {restaurant?.name}</h4>
                   
                   {/* Step 1 */}
                   <div className="mb-6">
                     <div className="flex items-start mb-3">
-                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#2BE89A] text-black text-sm font-bold mr-3 flex-shrink-0">1</span>
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-500 text-black text-sm font-bold mr-3 flex-shrink-0">1</span>
                       <div className="flex-1">
-                        <p className="text-sm text-white font-medium mb-2">Zoek {restaurant?.name} op Google</p>
+                        <p className="text-sm text-gray-900 font-medium mb-2">Zoek {restaurant?.name} op Google</p>
                         <a 
                           href="https://developers.google.com/maps/documentation/places/web-service/place-id"
                           target="_blank"
@@ -1027,10 +1169,10 @@ export default function RestaurantOnboarding() {
                   {/* Step 2 */}
                   <div className="mb-6">
                     <div className="flex items-start">
-                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#2BE89A] text-black text-sm font-bold mr-3 flex-shrink-0">2</span>
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-500 text-black text-sm font-bold mr-3 flex-shrink-0">2</span>
                       <div className="flex-1">
-                        <p className="text-sm text-white font-medium mb-1">Zoek onder "Find the ID of a particular place"</p>
-                        <p className="text-xs text-[#BBBECC]">Typ "{restaurant?.name}" en selecteer het juiste resultaat</p>
+                        <p className="text-sm text-gray-900 font-medium mb-1">Zoek onder "Find the ID of a particular place"</p>
+                        <p className="text-xs text-gray-600">Typ "{restaurant?.name}" en selecteer het juiste resultaat</p>
                       </div>
                     </div>
                   </div>
@@ -1038,10 +1180,10 @@ export default function RestaurantOnboarding() {
                   {/* Step 3 */}
                   <div className="mb-6">
                     <div className="flex items-start">
-                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#2BE89A] text-black text-sm font-bold mr-3 flex-shrink-0">3</span>
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-500 text-black text-sm font-bold mr-3 flex-shrink-0">3</span>
                       <div className="flex-1">
-                        <p className="text-sm text-white font-medium mb-1">Kopieer de Place ID</p>
-                        <p className="text-xs text-[#BBBECC]">Deze verschijnt onder de kaart (bijv: ChIJN1t_tDeuEmsRU...)</p>
+                        <p className="text-sm text-gray-900 font-medium mb-1">Kopieer de Place ID</p>
+                        <p className="text-xs text-gray-600">Deze verschijnt onder de kaart (bijv: ChIJN1t_tDeuEmsRU...)</p>
                       </div>
                     </div>
                   </div>
@@ -1049,10 +1191,10 @@ export default function RestaurantOnboarding() {
                   {/* Step 4 */}
                   <div>
                     <div className="flex items-start">
-                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#2BE89A] text-black text-sm font-bold mr-3 flex-shrink-0">4</span>
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-500 text-black text-sm font-bold mr-3 flex-shrink-0">4</span>
                       <div className="flex-1">
-                        <p className="text-sm text-white font-medium mb-1">Plak de Place ID hieronder</p>
-                        <p className="text-xs text-[#BBBECC]">Vervang alleen "PLACE_ID" met de gekopieerde ID van {restaurant?.name}</p>
+                        <p className="text-sm text-gray-900 font-medium mb-1">Plak de Place ID hieronder</p>
+                        <p className="text-xs text-gray-600">Vervang alleen "PLACE_ID" met de gekopieerde ID van {restaurant?.name}</p>
                       </div>
                     </div>
                   </div>
@@ -1060,11 +1202,11 @@ export default function RestaurantOnboarding() {
 
                 {/* Google Review Link Input */}
                 <div>
-                  <label className="block text-sm font-medium text-[#BBBECC] mb-2">
+                  <label className="block text-sm font-medium text-gray-600 mb-2">
                     Google Review Link
                   </label>
-                  <div className="flex items-center bg-[#1c1e27] border border-[#2a2d3a] rounded-lg focus-within:ring-2 focus-within:ring-[#2BE89A] focus-within:border-transparent">
-                    <span className="text-[#BBBECC] font-mono text-sm pl-4 pr-0 whitespace-nowrap">
+                  <div className="flex items-center bg-white border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-[#2BE89A] focus-within:border-transparent">
+                    <span className="text-gray-600 font-mono text-sm pl-4 pr-0 whitespace-nowrap">
                       https://search.google.com/local/writereview?placeid=
                     </span>
                     <input
@@ -1080,19 +1222,19 @@ export default function RestaurantOnboarding() {
                         });
                       }}
                       placeholder="PLACE_ID"
-                      className="flex-1 bg-transparent py-3 pr-4 pl-0 text-white font-mono text-sm placeholder-[#BBBECC]/50 focus:outline-none"
+                      className="flex-1 bg-transparent py-3 pr-4 pl-0 text-gray-900 font-mono text-sm placeholder-gray-400 focus:outline-none"
                     />
                   </div>
-                  <p className="text-xs text-[#BBBECC] mt-2">
+                  <p className="text-xs text-gray-600 mt-2">
                     Het restaurant kan dit later altijd wijzigen
                   </p>
                 </div>
 
                 {/* Success Message */}
                 {googleReviewData.isConfigured && (
-                  <div className="bg-[#0A0B0F] rounded-lg p-5 border border-[#2BE89A]/30">
-                    <p className="text-sm text-[#BBBECC] flex items-center">
-                      <CheckCircleIcon className="h-5 w-5 text-[#2BE89A] mr-2" />
+                  <div className="bg-gray-50 rounded-lg p-5 border border-green-200">
+                    <p className="text-sm text-gray-600 flex items-center">
+                      <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
                       Review link toegevoegd! Klanten van {restaurant?.name} ontvangen na betaling een review verzoek.
                     </p>
                   </div>
@@ -1115,18 +1257,18 @@ export default function RestaurantOnboarding() {
         onStepChange={handleStepChange}
         restaurant={restaurant}
       >
-        <div className="max-w-5xl mx-auto">
+        <div>
           {/* Locked State Banner for Archived Restaurants */}
           {isLocked && (
-            <div className="mb-6 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl p-6">
+            <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="p-3 bg-yellow-500/20 rounded-lg mr-4">
-                    <LockClosedIcon className="h-6 w-6 text-yellow-400" />
+                  <div className="p-3 bg-yellow-100 rounded-lg mr-4">
+                    <LockClosedIcon className="h-6 w-6 text-yellow-500" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-1">Restaurant is gearchiveerd</h3>
-                    <p className="text-sm text-[#BBBECC]">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">Restaurant is gearchiveerd</h3>
+                    <p className="text-sm text-gray-600">
                       Dit restaurant is gearchiveerd. Je kunt de onboarding voortgang bekijken maar geen wijzigingen maken.
                     </p>
                   </div>
@@ -1136,7 +1278,7 @@ export default function RestaurantOnboarding() {
                     restoreRestaurant(id)
                     router.reload()
                   }}
-                  className="flex items-center px-6 py-3 bg-[#2BE89A] text-black font-semibold rounded-lg hover:bg-[#4FFFB0] transition-colors"
+                  className="flex items-center px-6 py-3 bg-green-500 text-black font-semibold rounded-lg hover:bg-green-600 transition-colors"
                 >
                   <ArrowPathIcon className="h-5 w-5 mr-2" />
                   Herstel om door te gaan
@@ -1147,18 +1289,18 @@ export default function RestaurantOnboarding() {
 
           {showWelcome && !isLocked ? (
             // Welcome Screen
-            <div className="bg-[#1c1e27] rounded-2xl border border-[#2a2d3a] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-700">
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-700">
               <div className="relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#2BE89A]/20 via-transparent to-[#635BFF]/20" />
+                <div className="absolute inset-0 bg-gradient-to-br from-green-100 via-transparent to-blue-100" />
                 <div className="relative px-8 py-10 lg:py-12 xl:py-14 2xl:py-16 text-center">
                   <div className="inline-flex items-center justify-center w-16 h-16 lg:w-18 lg:h-18 xl:w-20 xl:h-20 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-full mb-4 lg:mb-5 xl:mb-6 animate-pulse">
                     <RocketLaunchIcon className="h-8 w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-black" />
                   </div>
-                  <h1 className="text-3xl lg:text-3xl xl:text-4xl font-bold text-white mb-3 lg:mb-3 xl:mb-4">
+                  <h1 className="text-3xl lg:text-3xl xl:text-4xl font-bold text-gray-900 mb-3 lg:mb-3 xl:mb-4">
                     Welkom bij Splitty Onboarding!
                   </h1>
-                  <p className="text-lg lg:text-lg xl:text-xl text-[#BBBECC] mb-0 max-w-3xl mx-auto">
-                    Laten we <span className="text-[#2BE89A] font-semibold">{restaurant?.name}</span> klaar maken 
+                  <p className="text-lg lg:text-lg xl:text-xl text-gray-600 mb-0 max-w-3xl mx-auto">
+                    Laten we <span className="text-green-500 font-semibold">{restaurant?.name}</span> klaar maken 
                     voor de toekomst van restaurant betalingen
                   </p>
                 </div>
@@ -1166,67 +1308,67 @@ export default function RestaurantOnboarding() {
               
               <div className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10">
-                  <div className="bg-gradient-to-br from-[#0F1117] to-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a] hover:border-[#2BE89A]/50 transition-all group">
-                    <UserGroupIcon className="h-10 w-10 text-[#2BE89A] mb-4 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-lg font-semibold text-white mb-2">Personeel</h3>
-                    <p className="text-sm text-[#BBBECC]">
+                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-green-300 transition-all group">
+                    <UserGroupIcon className="h-10 w-10 text-green-500 mb-4 group-hover:scale-110 transition-transform" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Personeel</h3>
+                    <p className="text-sm text-gray-600">
                       Configureer toegang voor het restaurant team
                     </p>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-[#0F1117] to-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a] hover:border-[#4FFFB0]/50 transition-all group">
-                    <CreditCardIcon className="h-10 w-10 text-[#4FFFB0] mb-4 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-lg font-semibold text-white mb-2">Betalingen</h3>
-                    <p className="text-sm text-[#BBBECC]">
+                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-green-400 transition-all group">
+                    <CreditCardIcon className="h-10 w-10 text-green-400 mb-4 group-hover:scale-110 transition-transform" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Betalingen</h3>
+                    <p className="text-sm text-gray-600">
                       Stel Stripe in voor het restaurant
                     </p>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-[#0F1117] to-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a] hover:border-[#BBBECC]/50 transition-all group">
-                    <WifiIcon className="h-10 w-10 text-[#BBBECC] mb-4 group-hover:text-white transition-all" />
-                    <h3 className="text-lg font-semibold text-white mb-2">POS Systeem</h3>
-                    <p className="text-sm text-[#BBBECC]">
+                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-gray-400 transition-all group">
+                    <WifiIcon className="h-10 w-10 text-gray-600 mb-4 group-hover:text-gray-900 transition-all" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">POS Systeem</h3>
+                    <p className="text-sm text-gray-600">
                       Koppel het kassasysteem
                     </p>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-[#0F1117] to-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a] hover:border-[#FFC107]/50 transition-all group">
-                    <StarIcon className="h-10 w-10 text-[#FFC107] mb-4 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-lg font-semibold text-white mb-2">Reviews</h3>
-                    <p className="text-sm text-[#BBBECC]">
+                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-yellow-400 transition-all group">
+                    <StarIcon className="h-10 w-10 text-yellow-500 mb-4 group-hover:scale-110 transition-transform" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Reviews</h3>
+                    <p className="text-sm text-gray-600">
                       Configureer klantfeedback
                     </p>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-[#0F1117] to-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a] hover:border-[#2BE89A]/50 transition-all group">
-                    <QrCodeIcon className="h-10 w-10 text-[#2BE89A] mb-4 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-lg font-semibold text-white mb-2">QR Stands</h3>
-                    <p className="text-sm text-[#BBBECC]">
+                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-green-300 transition-all group">
+                    <QrCodeIcon className="h-10 w-10 text-green-500 mb-4 group-hover:scale-110 transition-transform" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">QR Stands</h3>
+                    <p className="text-sm text-gray-600">
                       Tafel QR codes en indeling
                     </p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                  <div className="bg-gradient-to-r from-[#2BE89A]/5 to-[#4FFFB0]/5 border border-[#2BE89A]/30 rounded-lg p-4 text-center">
-                    <ClockIcon className="h-6 w-6 text-[#2BE89A] mx-auto mb-2" />
-                    <p className="text-sm text-white font-medium">10-15 minuten</p>
-                    <p className="text-xs text-[#BBBECC]">Geschatte tijd</p>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                    <ClockIcon className="h-6 w-6 text-green-500 mx-auto mb-2" />
+                    <p className="text-sm text-gray-900 font-medium">10-15 minuten</p>
+                    <p className="text-xs text-gray-600">Geschatte tijd</p>
                   </div>
-                  <div className="bg-gradient-to-r from-[#1c1e27] to-[#252833] border border-[#2a2d3a] rounded-lg p-4 text-center">
-                    <ShieldCheckIcon className="h-6 w-6 text-white mx-auto mb-2" />
-                    <p className="text-sm text-white font-medium">Automatisch opgeslagen</p>
-                    <p className="text-xs text-[#BBBECC]">Ga later verder</p>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+                    <ShieldCheckIcon className="h-6 w-6 text-gray-900 mx-auto mb-2" />
+                    <p className="text-sm text-gray-900 font-medium">Automatisch opgeslagen</p>
+                    <p className="text-xs text-gray-600">Ga later verder</p>
                   </div>
-                  <div className="bg-gradient-to-r from-[#252833] to-[#1c1e27] border border-[#2a2d3a] rounded-lg p-4 text-center">
-                    <SparklesIcon className="h-6 w-6 text-white mx-auto mb-2" />
-                    <p className="text-sm text-white font-medium">Direct actief</p>
-                    <p className="text-xs text-[#BBBECC]">Na voltooiing</p>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+                    <SparklesIcon className="h-6 w-6 text-gray-900 mx-auto mb-2" />
+                    <p className="text-sm text-gray-900 font-medium">Direct actief</p>
+                    <p className="text-xs text-gray-600">Na voltooiing</p>
                   </div>
                 </div>
               </div>
               
-              <div className="px-8 py-6 bg-[#0A0B0F] border-t border-[#2a2d3a]">
+              <div className="px-8 py-6 bg-gray-50 border-t border-gray-200">
                 <button
                   onClick={() => setShowWelcome(false)}
                   disabled={isLocked}
@@ -1246,12 +1388,12 @@ export default function RestaurantOnboarding() {
               {renderStepContent()}
 
               {/* Navigation */}
-              <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
+              <div className="bg-white rounded-xl p-6 border border-gray-200">
                 <div className="flex justify-between items-center">
                   {currentStep > 1 ? (
                     <button
                       onClick={() => setCurrentStep(currentStep - 1)}
-                      className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white rounded-lg hover:bg-[#1c1e27] transition"
+                      className="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
                     >
                       <ChevronLeftIcon className="h-5 w-5 mr-2 inline" />
                       Vorige
@@ -1265,7 +1407,7 @@ export default function RestaurantOnboarding() {
                     disabled={isLocked || (currentStep === 1 && personnelData.filter(p => p.role === 'manager').length === 0)}
                     className={`px-8 py-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-semibold rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed group`}
                   >
-                    {currentStep === 4 ? (
+                    {currentStep === 5 ? (
                       <>
                         Onboarding Afronden
                         <CheckCircleIcon className="h-5 w-5 ml-2 inline group-hover:scale-110 transition-transform" />

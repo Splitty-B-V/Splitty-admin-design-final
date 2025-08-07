@@ -171,7 +171,15 @@ export function UsersProvider({ children }) {
 
   const authenticateUser = (email, password) => {
     // Use database to authenticate
-    return db.authenticateUser(email, password)
+    const user = db.authenticateUser(email, password)
+    
+    console.log('Authenticating user:', email, 'Result:', user)
+    
+    if (user) {
+      return { success: true, user }
+    } else {
+      return { success: false, error: 'Invalid email or password' }
+    }
   }
 
   const deleteRestaurantUser = (restaurantId, userId) => {

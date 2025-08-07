@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline'
 import RestaurantDeleteModal from './RestaurantDeleteModal'
 import { useRestaurants } from '../contexts/RestaurantsContext'
+import { useTheme } from '../contexts/ThemeContext'
 
 const OnboardingSteps = [
   {
@@ -58,6 +59,7 @@ export default function OnboardingSidebar({
 }) {
   const router = useRouter()
   const { deleteRestaurant } = useRestaurants()
+  const { darkMode } = useTheme()
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
@@ -101,68 +103,68 @@ export default function OnboardingSidebar({
   return (
     <>
       {/* Mobile Header */}
-      <div className="lg:hidden bg-[#1c1e27] border-b border-[#2a2d3a] px-4 py-4">
+      <div className={`lg:hidden ${darkMode ? 'bg-[#1c1e27] border-[#2a2d3a]' : 'bg-white border-gray-200'} border-b px-4 py-4`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <button
               onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-              className="mr-3 p-2 rounded-lg bg-[#0A0B0F] text-white hover:bg-[#252833] transition"
+              className={`mr-3 p-2 rounded-lg transition ${darkMode ? 'bg-[#0A0B0F] text-white hover:bg-[#2a2d3a]' : 'bg-gray-50 text-gray-900 hover:bg-gray-100'}`}
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             <div>
-              <h1 className="text-lg font-semibold text-white">{restaurant?.name} Onboarding</h1>
-              <p className="text-sm text-[#BBBECC]">Stap {currentStep} van 4</p>
+              <h1 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{restaurant?.name} Onboarding</h1>
+              <p className={`text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>Stap {currentStep} van 4</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex min-h-[calc(100vh-64px)] bg-[#0A0B0F]">
+      <div className={`flex min-h-[calc(100vh-64px)] ${darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-50'}`}>
         {/* Sidebar - Desktop */}
-        <div className="hidden lg:block w-80 bg-[#1c1e27] border-r border-[#2a2d3a] sticky 2xl:fixed top-16 2xl:top-16 h-[calc(100vh-64px)] flex flex-col">
+        <div className={`hidden lg:block w-80 ${darkMode ? 'bg-[#1c1e27] border-[#2a2d3a]' : 'bg-white border-gray-200'} border-r fixed h-screen overflow-y-auto`}>
           <div className="p-6 flex flex-col h-full">
             {/* Header */}
             <div className="mb-6">
               <Link
                 href="/restaurants"
-                className="inline-flex items-center px-4 py-2 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-[#BBBECC] hover:text-white hover:bg-[#1a1c25] hover:border-[#2BE89A]/30 transition-all text-sm font-medium mb-4 group"
+                className={`inline-flex items-center px-4 py-2 rounded-lg transition-all text-sm font-medium mb-4 group ${darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-[#BBBECC] hover:text-white hover:bg-[#2a2d3a] hover:border-green-500' : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-700 hover:bg-gray-100 hover:border-green-300'}`}
               >
                 <ArrowLeftIcon className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
                 Terug naar restaurants
               </Link>
               <div>
-                <h2 className="text-xl font-bold text-white">{restaurant?.name}</h2>
-                <p className="text-sm text-[#BBBECC]">Restaurant Onboarding</p>
+                <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{restaurant?.name}</h2>
+                <p className={`text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>Restaurant Onboarding</p>
               </div>
             </div>
 
             {/* Progress Overview */}
-            <div className="mb-6 bg-gradient-to-r from-[#2BE89A]/10 to-[#4FFFB0]/10 rounded-xl p-4 border border-[#2BE89A]/30">
+            <div className={`mb-6 rounded-xl p-4 border ${darkMode ? 'bg-gradient-to-r from-green-900/20 to-green-800/20 border-green-700' : 'bg-gradient-to-r from-green-50 to-green-100 border-green-200'}`}>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-white flex items-center">
-                  <div className="w-2 h-2 bg-[#2BE89A] rounded-full mr-2 animate-pulse"></div>
+                <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} flex items-center`}>
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
                   Voortgang
                 </span>
-                <span className="text-xs font-medium text-[#2BE89A]">
+                <span className="text-xs font-medium text-green-600">
                   {completedSteps.length}/5
                 </span>
               </div>
-              <div className="w-full bg-[#0A0B0F] rounded-full h-3 overflow-hidden shadow-inner">
+              <div className={`w-full rounded-full h-3 overflow-hidden shadow-inner ${darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-50'}`}>
                 <div
-                  className="bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] h-3 rounded-full transition-all duration-500 ease-out shadow-lg relative"
+                  className="bg-gradient-to-r from-green-500 to-green-400 h-3 rounded-full transition-all duration-500 ease-out shadow-lg relative"
                   style={{ width: `${(completedSteps.filter(step => step <= 3).length / 3) * 100}%` }}
                 >
-                  <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
+                  <div className="absolute inset-0 bg-green-200/30 rounded-full animate-pulse"></div>
                 </div>
               </div>
             </div>
 
             {/* Scrollable Steps Section */}
-            <div className="flex-1 overflow-y-auto mb-4 scrollbar-thin scrollbar-track-[#0A0B0F] scrollbar-thumb-[#2a2d3a] hover:scrollbar-thumb-[#2BE89A]/30">
-              <div className="space-y-2 pr-2">
+            <div className="flex-1 overflow-y-auto mb-4 pr-2">
+              <div className="space-y-2">
                 {/* Required Steps */}
                 {OnboardingSteps.slice(0, 3).map((step) => {
                   const status = getStepStatus(step.id)
@@ -175,52 +177,66 @@ export default function OnboardingSidebar({
                       disabled={!isClickable}
                       className={`w-full text-left p-4 rounded-xl transition-all duration-200 group ${
                         status === 'current'
-                          ? 'bg-gradient-to-r from-[#2BE89A]/10 to-[#4FFFB0]/10 border-2 border-[#2BE89A] shadow-lg shadow-[#2BE89A]/20 cursor-pointer'
+                          ? darkMode
+                            ? 'bg-gradient-to-r from-green-900/30 to-green-800/30 border-2 border-green-500 shadow-lg shadow-green-900/20 cursor-pointer'
+                            : 'bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-400 shadow-lg shadow-green-200 cursor-pointer'
                           : status === 'completed'
-                          ? 'bg-[#0A0B0F] border border-[#2BE89A]/50 hover:bg-[#1a1c25] hover:border-[#2BE89A] cursor-pointer'
+                          ? darkMode
+                            ? 'bg-[#0A0B0F] border border-green-700 hover:bg-[#1a1c25] hover:border-green-600 cursor-pointer'
+                            : 'bg-gray-50 border border-green-300 hover:bg-gray-100 hover:border-green-400 cursor-pointer'
                           : status === 'available'
-                          ? 'bg-[#0A0B0F] border border-[#2a2d3a] hover:bg-[#1a1c25] hover:border-[#2BE89A]/30 cursor-pointer'
-                          : 'bg-[#0A0B0F]/50 border border-[#2a2d3a]/50 opacity-50 cursor-not-allowed'
+                          ? darkMode
+                            ? 'bg-[#0A0B0F] border border-[#2a2d3a] hover:bg-[#1a1c25] hover:border-green-700 cursor-pointer'
+                            : 'bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:border-green-300 cursor-pointer'
+                          : darkMode
+                            ? 'bg-[#0A0B0F]/50 border border-[#2a2d3a]/50 opacity-50 cursor-not-allowed'
+                            : 'bg-gray-50/50 border border-gray-200/50 opacity-50 cursor-not-allowed'
                       }`}
                     >
                       <div className="flex items-start">
                         <div className={`p-2.5 rounded-lg mr-3 transition-all ${
                           status === 'current'
-                            ? 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] shadow-md'
+                            ? 'bg-gradient-to-r from-green-500 to-green-400 shadow-md'
                             : status === 'completed'
-                            ? 'bg-[#2BE89A]'
+                            ? 'bg-green-500'
                             : status === 'available'
-                            ? 'bg-gradient-to-r from-[#1c1e27] to-[#252833] group-hover:from-[#2BE89A]/10 group-hover:to-[#4FFFB0]/10'
-                            : 'bg-[#1c1e27]/50'
+                            ? darkMode
+                              ? 'bg-gradient-to-r from-[#2a2d3a] to-[#1a1c25] group-hover:from-green-900/30 group-hover:to-green-800/30'
+                              : 'bg-gradient-to-r from-gray-100 to-gray-200 group-hover:from-green-50 group-hover:to-green-100'
+                            : darkMode
+                              ? 'bg-[#0A0B0F]/50'
+                              : 'bg-white/50'
                         }`}>
                           {status === 'completed' ? (
-                            <CheckCircleIcon className="h-5 w-5 text-black" />
+                            <CheckCircleIcon className={`h-5 w-5 ${darkMode ? 'text-white' : 'text-black'}`} />
                           ) : (
                             <step.icon className={`h-5 w-5 ${
-                              status === 'current' ? 'text-black' 
-                              : status === 'available' ? 'text-white group-hover:text-[#2BE89A]' 
-                              : 'text-[#BBBECC]/50'
+                              status === 'current' ? darkMode ? 'text-white' : 'text-black' 
+                              : status === 'available' ? darkMode ? 'text-[#BBBECC] group-hover:text-green-400' : 'text-gray-900 group-hover:text-green-600' 
+                              : darkMode ? 'text-[#BBBECC]/50' : 'text-gray-600/50'
                             }`} />
                           )}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
                             <h3 className={`font-medium ${
-                              status === 'current' || status === 'completed' ? 'text-white' : 'text-[#BBBECC]'
+                              status === 'current' || status === 'completed' 
+                                ? darkMode ? 'text-white' : 'text-gray-900' 
+                                : darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
                             }`}>
                               {step.name}
                             </h3>
                             <div className={`w-2 h-2 rounded-full ${
                               status === 'completed'
-                                ? 'bg-[#2BE89A]'
+                                ? 'bg-green-500'
                                 : status === 'current'
-                                ? 'bg-[#818CF8]'
+                                ? 'bg-blue-400'
                                 : status === 'available'
-                                ? 'bg-[#FB923C]'
-                                : 'bg-[#2a2d3a]'
+                                ? 'bg-yellow-400'
+                                : 'bg-gray-300'
                             }`} />
                           </div>
-                          <p className="text-sm text-[#BBBECC] mt-1">{step.description}</p>
+                          <p className={`text-sm mt-1 ${darkMode ? 'text-[#9CA3B5]' : 'text-gray-600'}`}>{step.description}</p>
                         </div>
                       </div>
                     </button>
@@ -230,11 +246,11 @@ export default function OnboardingSidebar({
                 {/* Optional Section Separator */}
                 <div className="py-4">
                   <div className="flex items-center">
-                    <div className="flex-1 border-t border-[#2a2d3a]"></div>
-                    <span className="px-3 text-xs font-medium text-orange-300 bg-orange-500/20 rounded-full">
+                    <div className={`flex-1 border-t ${darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'}`}></div>
+                    <span className={`px-3 text-xs font-medium rounded-full ${darkMode ? 'text-yellow-400 bg-yellow-900/30' : 'text-yellow-600 bg-yellow-50'}`}>
                       Kun je ook later doen
                     </span>
-                    <div className="flex-1 border-t border-[#2a2d3a]"></div>
+                    <div className={`flex-1 border-t ${darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'}`}></div>
                   </div>
                 </div>
 
@@ -250,52 +266,66 @@ export default function OnboardingSidebar({
                       disabled={!isClickable}
                       className={`w-full text-left p-4 rounded-xl transition-all duration-200 group ${
                         status === 'current'
-                          ? 'bg-gradient-to-r from-[#2BE89A]/10 to-[#4FFFB0]/10 border-2 border-[#2BE89A] shadow-lg shadow-[#2BE89A]/20 cursor-pointer'
+                          ? darkMode
+                            ? 'bg-gradient-to-r from-green-900/30 to-green-800/30 border-2 border-green-500 shadow-lg shadow-green-900/20 cursor-pointer'
+                            : 'bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-400 shadow-lg shadow-green-200 cursor-pointer'
                           : status === 'completed'
-                          ? 'bg-[#0A0B0F] border border-[#2BE89A]/50 hover:bg-[#1a1c25] hover:border-[#2BE89A] cursor-pointer'
+                          ? darkMode
+                            ? 'bg-[#0A0B0F] border border-green-700 hover:bg-[#1a1c25] hover:border-green-600 cursor-pointer'
+                            : 'bg-gray-50 border border-green-300 hover:bg-gray-100 hover:border-green-400 cursor-pointer'
                           : status === 'available'
-                          ? 'bg-[#0A0B0F] border border-[#2a2d3a] hover:bg-[#1a1c25] hover:border-[#2BE89A]/30 cursor-pointer'
-                          : 'bg-[#0A0B0F]/50 border border-[#2a2d3a]/50 opacity-50 cursor-not-allowed'
+                          ? darkMode
+                            ? 'bg-[#0A0B0F] border border-[#2a2d3a] hover:bg-[#1a1c25] hover:border-green-700 cursor-pointer'
+                            : 'bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:border-green-300 cursor-pointer'
+                          : darkMode
+                            ? 'bg-[#0A0B0F]/50 border border-[#2a2d3a]/50 opacity-50 cursor-not-allowed'
+                            : 'bg-gray-50/50 border border-gray-200/50 opacity-50 cursor-not-allowed'
                       }`}
                     >
                       <div className="flex items-start">
                         <div className={`p-2.5 rounded-lg mr-3 transition-all ${
                           status === 'current'
-                            ? 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] shadow-md'
+                            ? 'bg-gradient-to-r from-green-500 to-green-400 shadow-md'
                             : status === 'completed'
-                            ? 'bg-[#2BE89A]'
+                            ? 'bg-green-500'
                             : status === 'available'
-                            ? 'bg-gradient-to-r from-[#1c1e27] to-[#252833] group-hover:from-[#2BE89A]/10 group-hover:to-[#4FFFB0]/10'
-                            : 'bg-[#1c1e27]/50'
+                            ? darkMode
+                              ? 'bg-gradient-to-r from-[#2a2d3a] to-[#1a1c25] group-hover:from-green-900/30 group-hover:to-green-800/30'
+                              : 'bg-gradient-to-r from-gray-100 to-gray-200 group-hover:from-green-50 group-hover:to-green-100'
+                            : darkMode
+                              ? 'bg-[#0A0B0F]/50'
+                              : 'bg-white/50'
                         }`}>
                           {status === 'completed' ? (
-                            <CheckCircleIcon className="h-5 w-5 text-black" />
+                            <CheckCircleIcon className={`h-5 w-5 ${darkMode ? 'text-white' : 'text-black'}`} />
                           ) : (
                             <step.icon className={`h-5 w-5 ${
-                              status === 'current' ? 'text-black' 
-                              : status === 'available' ? 'text-white group-hover:text-[#2BE89A]' 
-                              : 'text-[#BBBECC]/50'
+                              status === 'current' ? darkMode ? 'text-white' : 'text-black' 
+                              : status === 'available' ? darkMode ? 'text-[#BBBECC] group-hover:text-green-400' : 'text-gray-900 group-hover:text-green-600' 
+                              : darkMode ? 'text-[#BBBECC]/50' : 'text-gray-600/50'
                             }`} />
                           )}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
                             <h3 className={`font-medium ${
-                              status === 'current' || status === 'completed' ? 'text-white' : 'text-[#BBBECC]'
+                              status === 'current' || status === 'completed' 
+                                ? darkMode ? 'text-white' : 'text-gray-900' 
+                                : darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
                             }`}>
                               {step.name}
                             </h3>
                             <div className={`w-2 h-2 rounded-full ${
                               status === 'completed'
-                                ? 'bg-[#2BE89A]'
+                                ? 'bg-green-500'
                                 : status === 'current'
-                                ? 'bg-[#818CF8]'
+                                ? 'bg-blue-400'
                                 : status === 'available'
-                                ? 'bg-[#FB923C]'
-                                : 'bg-[#2a2d3a]'
+                                ? 'bg-yellow-400'
+                                : 'bg-gray-300'
                             }`} />
                           </div>
-                          <p className="text-sm text-[#BBBECC] mt-1">{step.description}</p>
+                          <p className={`text-sm mt-1 ${darkMode ? 'text-[#9CA3B5]' : 'text-gray-600'}`}>{step.description}</p>
                         </div>
                       </div>
                     </button>
@@ -306,21 +336,21 @@ export default function OnboardingSidebar({
 
             {/* Fixed Bottom Section - Help & Delete */}
             <div className="space-y-3 flex-shrink-0">
-              <div className="p-4 bg-gradient-to-br from-[#635BFF]/10 via-[#7C3AED]/5 to-[#635BFF]/10 rounded-xl border border-[#635BFF]/30 backdrop-blur-sm">
+              <div className={`p-4 rounded-xl border backdrop-blur-sm ${darkMode ? 'bg-gradient-to-br from-green-900/20 via-emerald-900/20 to-green-900/20 border-green-700' : 'bg-gradient-to-br from-green-50 via-emerald-50 to-green-50 border-green-200'}`}>
                 <div className="flex items-start">
-                  <div className="p-2 bg-gradient-to-r from-[#635BFF] to-[#7C3AED] rounded-lg mr-3 shadow-lg">
-                    <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="p-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-lg mr-3 shadow-lg">
+                    <svg className="h-4 w-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-sm font-semibold text-white mb-1">Onboarding handleiding</h4>
-                    <p className="text-xs text-[#BBBECC] mb-3">
+                    <h4 className={`text-sm font-semibold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Onboarding handleiding</h4>
+                    <p className={`text-xs mb-3 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
                       Vergeten hoe onboarding werkt? Bekijk de stap-voor-stap guide.
                     </p>
                     <Link
                       href="/knowledge-base#restaurant-onboarding"
-                      className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-[#635BFF] to-[#7C3AED] text-white text-xs font-medium rounded-lg hover:opacity-90 transition-all group"
+                      className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black text-xs font-medium rounded-lg hover:opacity-90 transition-all group"
                     >
                       Bekijk handleiding
                       <svg className="h-3 w-3 ml-1.5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -335,7 +365,7 @@ export default function OnboardingSidebar({
               {restaurant && !restaurant.isOnboarded && !restaurant.deleted && (
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="w-full p-2.5 bg-red-500/10 text-red-400 text-xs font-medium rounded-lg hover:bg-red-500/20 transition-colors border border-red-500/30 flex items-center justify-center"
+                  className={`w-full p-2.5 text-xs font-medium rounded-lg transition-colors border flex items-center justify-center ${darkMode ? 'bg-red-900/30 text-red-400 hover:bg-red-900/40 border-red-700' : 'bg-red-50 text-red-600 hover:bg-red-100 border-red-200'}`}
                 >
                   <TrashIcon className="h-4 w-4 mr-2" />
                   Restaurant Verwijderen
@@ -348,30 +378,30 @@ export default function OnboardingSidebar({
         {/* Mobile Sidebar */}
         {isMobileSidebarOpen && (
           <div className="lg:hidden fixed inset-0 z-50 flex">
-            <div className="fixed inset-0 bg-black/50" onClick={() => setIsMobileSidebarOpen(false)} />
-            <div className="relative w-80 bg-[#1c1e27] h-full overflow-y-auto">
+            <div className="fixed inset-0 bg-gray-900/50" onClick={() => setIsMobileSidebarOpen(false)} />
+            <div className={`relative w-80 h-full overflow-y-auto ${darkMode ? 'bg-[#1c1e27]' : 'bg-white'}`}>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-white">Onboarding Steps</h2>
+                  <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Onboarding Steps</h2>
                   <button
                     onClick={() => setIsMobileSidebarOpen(false)}
-                    className="p-2 rounded-lg bg-[#0A0B0F] text-[#BBBECC] hover:text-white transition"
+                    className={`p-2 rounded-lg transition ${darkMode ? 'bg-[#0A0B0F] text-[#BBBECC] hover:text-white' : 'bg-gray-50 text-gray-600 hover:text-gray-700'}`}
                   >
                     <XMarkIcon className="h-5 w-5" />
                   </button>
                 </div>
                 
                 {/* Progress Overview */}
-                <div className="mb-6 bg-[#0A0B0F] rounded-lg p-4 border border-[#2a2d3a]">
+                <div className={`mb-6 rounded-lg p-4 border ${darkMode ? 'bg-[#0A0B0F] border-[#2a2d3a]' : 'bg-gray-50 border-gray-200'}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-[#BBBECC]">Voortgang</span>
-                    <span className="text-xs font-medium text-[#2BE89A]">
+                    <span className={`text-sm font-medium ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>Voortgang</span>
+                    <span className="text-xs font-medium text-green-600">
                       {completedSteps.length}/5
                     </span>
                   </div>
-                  <div className="w-full bg-[#1c1e27] rounded-full h-2">
+                  <div className={`w-full rounded-full h-2 ${darkMode ? 'bg-[#2a2d3a]' : 'bg-white'}`}>
                     <div
-                      className="bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] h-2 rounded-full transition-all duration-300"
+                      className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${(completedSteps.filter(step => step <= 3).length / 3) * 100}%` }}
                     />
                   </div>
@@ -393,37 +423,47 @@ export default function OnboardingSidebar({
                         disabled={!isClickable}
                         className={`w-full text-left p-4 rounded-lg transition-all duration-200 ${
                           status === 'current'
-                            ? 'bg-gradient-to-r from-[#2BE89A]/20 to-[#4FFFB0]/20 border-2 border-[#2BE89A]'
+                            ? darkMode
+                              ? 'bg-gradient-to-r from-green-900/30 to-green-800/30 border-2 border-green-500'
+                              : 'bg-gradient-to-r from-green-500/20 to-green-400/20 border-2 border-green-400'
                             : status === 'completed'
-                            ? 'bg-[#0A0B0F] border border-[#2a2d3a]'
+                            ? darkMode
+                              ? 'bg-[#0A0B0F] border border-green-700'
+                              : 'bg-gray-50 border border-gray-200'
                             : status === 'available'
-                            ? 'bg-[#0A0B0F] border border-[#2a2d3a] cursor-pointer'
-                            : 'bg-[#0A0B0F] border border-[#2a2d3a] opacity-50 cursor-not-allowed'
+                            ? darkMode
+                              ? 'bg-[#0A0B0F] border border-[#2a2d3a] cursor-pointer'
+                              : 'bg-gray-50 border border-gray-200 cursor-pointer'
+                            : darkMode
+                              ? 'bg-[#0A0B0F]/50 border border-[#2a2d3a]/50 opacity-50 cursor-not-allowed'
+                              : 'bg-gray-50 border border-gray-200 opacity-50 cursor-not-allowed'
                         }`}
                       >
                         <div className="flex items-start">
                           <div className={`p-2 rounded-lg mr-3 ${
                             status === 'current'
-                              ? 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]'
+                              ? 'bg-gradient-to-r from-green-500 to-green-400'
                               : status === 'completed'
-                              ? 'bg-[#2BE89A]'
-                              : 'bg-[#1c1e27]'
+                              ? 'bg-green-500'
+                              : darkMode ? 'bg-[#2a2d3a]' : 'bg-white'
                           }`}>
                             {status === 'completed' ? (
-                              <CheckCircleIcon className="h-5 w-5 text-black" />
+                              <CheckCircleIcon className={`h-5 w-5 ${darkMode ? 'text-white' : 'text-black'}`} />
                             ) : (
                               <step.icon className={`h-5 w-5 ${
-                                status === 'current' ? 'text-black' : 'text-[#BBBECC]'
+                                status === 'current' ? darkMode ? 'text-white' : 'text-black' : darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
                               }`} />
                             )}
                           </div>
                           <div className="flex-1">
                             <h3 className={`font-medium ${
-                              status === 'current' || status === 'completed' ? 'text-white' : 'text-[#BBBECC]'
+                              status === 'current' || status === 'completed' 
+                                ? darkMode ? 'text-white' : 'text-gray-900' 
+                                : darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
                             }`}>
                               {step.name}
                             </h3>
-                            <p className="text-sm text-[#BBBECC] mt-1">{step.description}</p>
+                            <p className={`text-sm mt-1 ${darkMode ? 'text-[#9CA3B5]' : 'text-gray-600'}`}>{step.description}</p>
                           </div>
                         </div>
                       </button>
@@ -436,9 +476,11 @@ export default function OnboardingSidebar({
         )}
 
         {/* Main Content */}
-        <div className="flex-1 overflow-y-auto 2xl:ml-80">
-          <div className="p-6 lg:p-8 max-w-5xl mx-auto">
-            {children}
+        <div className={`flex-1 min-h-screen ml-80 ${darkMode ? 'bg-[#0A0B0F]' : ''}`}>
+          <div className="w-full h-full flex items-center justify-center p-6 lg:p-8">
+            <div className="w-full max-w-4xl">
+              {children}
+            </div>
           </div>
         </div>
       </div>
