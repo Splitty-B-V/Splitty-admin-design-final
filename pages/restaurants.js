@@ -18,7 +18,9 @@ import {
   ClockIcon,
   ArrowPathIcon,
   ChevronRightIcon,
-  ArchiveBoxIcon
+  ArchiveBoxIcon,
+  ExclamationTriangleIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid'
 
@@ -33,6 +35,8 @@ export default function Restaurants() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [restaurantToDelete, setRestaurantToDelete] = useState(null)
   const { restaurants, getActiveRestaurants, getDeletedRestaurants, restoreRestaurant, deleteRestaurantPermanently } = useRestaurants()
   
   useEffect(() => {
@@ -78,8 +82,124 @@ export default function Restaurants() {
   const deletedRestaurants = getDeletedRestaurants()
   const onboardingRestaurants = activeRestaurants.filter(r => !r.isOnboarded)
 
+  const handleDeleteClick = (restaurant) => {
+    setRestaurantToDelete(restaurant)
+    setDeleteModalOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (restaurantToDelete) {
+      deleteRestaurantPermanently(restaurantToDelete.id)
+      setDeleteModalOpen(false)
+      setRestaurantToDelete(null)
+      setDeleteConfirmText('')
+    }
+  }
+
+  const [deleteConfirmText, setDeleteConfirmText] = useState('')
+
+  const DeleteConfirmationModal = () => {
+    if (!deleteModalOpen || !restaurantToDelete) return null
+
+    const canDelete = deleteConfirmText === restaurantToDelete.name
+
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div 
+            className="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" 
+            onClick={() => setDeleteModalOpen(false)}
+          />
+          
+          <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+          
+          <div className={`inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full ${
+            darkMode ? 'bg-[#1c1e27] border border-red-500' : 'bg-white'
+          }`}>
+            <div className="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
+                  <h3 className={`text-lg leading-6 font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    Permanent verwijderen
+                  </h3>
+                  <div className="mt-2">
+                    <p className={`text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`}>
+                      Je staat op het punt om <span className="font-semibold">{restaurantToDelete.name}</span> permanent te verwijderen.
+                    </p>
+                    <div className={`mt-3 p-3 rounded-lg ${darkMode ? 'bg-red-900/20 border border-red-500/50' : 'bg-red-50 border border-red-200'}`}>
+                      <p className={`text-sm font-semibold ${darkMode ? 'text-red-400' : 'text-red-800'}`}>
+                        ⚠️ Let op: Deze actie kan niet ongedaan worden gemaakt
+                      </p>
+                      <p className={`text-sm mt-2 ${darkMode ? 'text-red-300' : 'text-red-700'}`}>
+                        Als je dit restaurant nu verwijdert:
+                      </p>
+                      <ul className={`text-sm mt-2 ml-4 list-disc ${darkMode ? 'text-red-300' : 'text-red-700'}`}>
+                        <li>Alle restaurantgegevens worden permanent verwijderd</li>
+                        <li>Alle transactiegeschiedenis gaat verloren</li>
+                        <li>Alle gebruikersaccounts worden verwijderd</li>
+                        <li>Deze actie kan niet teruggedraaid worden</li>
+                      </ul>
+                    </div>
+                    <div className="mt-4">
+                      <label className={`block text-sm font-medium ${darkMode ? 'text-[#BBBECC]' : 'text-gray-700'} mb-2`}>
+                        Type de naam van het restaurant om te bevestigen: <span className="font-semibold">{restaurantToDelete.name}</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={deleteConfirmText}
+                        onChange={(e) => setDeleteConfirmText(e.target.value)}
+                        placeholder="Vul de restaurantnaam in"
+                        className={`w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-red-500'
+                            : 'bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-red-500'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-50'}`}>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={!canDelete}
+                className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-all ${
+                  canDelete 
+                    ? 'bg-red-600 hover:bg-red-700 cursor-pointer' 
+                    : 'bg-gray-400 cursor-not-allowed opacity-50'
+                }`}
+              >
+                Permanent verwijderen
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteModalOpen(false)
+                  setDeleteConfirmText('')
+                }}
+                className={`mt-3 w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm ${
+                  darkMode 
+                    ? 'border-gray-600 bg-[#1c1e27] text-gray-300 hover:bg-[#2a2d3a]' 
+                    : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Annuleren
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <Layout>
+      <DeleteConfirmationModal />
       <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
         <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
@@ -169,20 +289,34 @@ export default function Restaurants() {
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex space-x-2 p-1.5 bg-gradient-to-r from-gray-100 to-gray-50 rounded-xl border border-gray-200 shadow-sm">
+            <div className={`flex space-x-2 p-1.5 rounded-xl shadow-sm ${
+              darkMode 
+                ? 'bg-gradient-to-r from-[#1c1e27] to-[#2a2d3a] border border-[#2a2d3a]' 
+                : 'bg-gradient-to-r from-gray-100 to-gray-50 border border-gray-200'
+            }`}>
               <button
                 onClick={() => setStatusFilter('all')}
                 className={`flex-1 py-2.5 px-5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   statusFilter === 'all'
-                    ? 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-white/60 hover:shadow-sm'
+                    ? darkMode
+                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg transform scale-[1.02]'
+                      : 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
+                    : darkMode
+                      ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-gray-400 hover:text-white hover:border-gray-600 hover:bg-[#1c1e27] hover:shadow-md cursor-pointer'
+                      : 'bg-white/70 border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-white hover:shadow-md hover:border-gray-300 cursor-pointer'
                 }`}
               >
                 <span className="flex items-center justify-center gap-2">
-                  <BuildingStorefrontIcon className={`h-4 w-4 ${statusFilter === 'all' ? 'text-green-500' : ''}`} />
+                  <BuildingStorefrontIcon className={`h-4 w-4 ${
+                    statusFilter === 'all' 
+                      ? darkMode ? 'text-white' : 'text-green-500'
+                      : ''
+                  }`} />
                   Alle Restaurants 
                   <span className={`inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full ${
-                    statusFilter === 'all' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                    statusFilter === 'all' 
+                      ? darkMode ? 'bg-green-900/50 text-white' : 'bg-green-100 text-green-600'
+                      : darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
                   }`}>
                     {activeRestaurants.length}
                   </span>
@@ -192,15 +326,25 @@ export default function Restaurants() {
                 onClick={() => setStatusFilter('onboarding')}
                 className={`flex-1 py-2.5 px-5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   statusFilter === 'onboarding'
-                    ? 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-white/60 hover:shadow-sm'
+                    ? darkMode
+                      ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-lg transform scale-[1.02]'
+                      : 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
+                    : darkMode
+                      ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-gray-400 hover:text-white hover:border-gray-600 hover:bg-[#1c1e27] hover:shadow-md cursor-pointer'
+                      : 'bg-white/70 border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-white hover:shadow-md hover:border-gray-300 cursor-pointer'
                 }`}
               >
                 <span className="flex items-center justify-center gap-2">
-                  <ArrowPathIcon className={`h-4 w-4 ${statusFilter === 'onboarding' ? 'text-yellow-500 animate-spin' : ''}`} />
+                  <ArrowPathIcon className={`h-4 w-4 ${
+                    statusFilter === 'onboarding' 
+                      ? darkMode ? 'text-white animate-spin' : 'text-yellow-500 animate-spin'
+                      : ''
+                  }`} />
                   Onboarding
                   <span className={`inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full ${
-                    statusFilter === 'onboarding' ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-600'
+                    statusFilter === 'onboarding' 
+                      ? darkMode ? 'bg-yellow-900/50 text-white' : 'bg-yellow-100 text-yellow-600'
+                      : darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
                   }`}>
                     {onboardingRestaurants.length}
                   </span>
@@ -210,15 +354,25 @@ export default function Restaurants() {
                 onClick={() => setStatusFilter('deleted')}
                 className={`flex-1 py-2.5 px-5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   statusFilter === 'deleted'
-                    ? 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-white/60 hover:shadow-sm'
+                    ? darkMode
+                      ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg transform scale-[1.02]'
+                      : 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
+                    : darkMode
+                      ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-gray-400 hover:text-white hover:border-gray-600 hover:bg-[#1c1e27] hover:shadow-md cursor-pointer'
+                      : 'bg-white/70 border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-white hover:shadow-md hover:border-gray-300 cursor-pointer'
                 }`}
               >
                 <span className="flex items-center justify-center gap-2">
-                  <ArchiveBoxIcon className={`h-4 w-4 ${statusFilter === 'deleted' ? 'text-red-500' : ''}`} />
+                  <ArchiveBoxIcon className={`h-4 w-4 ${
+                    statusFilter === 'deleted' 
+                      ? darkMode ? 'text-white' : 'text-red-500'
+                      : ''
+                  }`} />
                   Gearchiveerd
                   <span className={`inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full ${
-                    statusFilter === 'deleted' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'
+                    statusFilter === 'deleted' 
+                      ? darkMode ? 'bg-red-900/50 text-white' : 'bg-red-100 text-red-600'
+                      : darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
                   }`}>
                     {deletedRestaurants.length}
                   </span>
@@ -328,9 +482,17 @@ export default function Restaurants() {
                       </h3>
                       <div className="flex items-center flex-wrap gap-2">
                         {restaurant.deleted ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-700 border border-red-200">
-                            Gearchiveerd
-                          </span>
+                          <>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                              <ArchiveBoxIcon className="h-3 w-3 mr-1" />
+                              Gearchiveerd
+                            </span>
+                            {!restaurant.isOnboarded && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
+                                Onboarding Incompleet
+                              </span>
+                            )}
+                          </>
                         ) : !restaurant.isOnboarded ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
                             Setup Vereist
@@ -453,9 +615,7 @@ export default function Restaurants() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
-                            if (confirm(`Weet je zeker dat je "${restaurant.name}" permanent wilt verwijderen?`)) {
-                              deleteRestaurantPermanently(restaurant.id)
-                            }
+                            handleDeleteClick(restaurant)
                           }}
                           className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                             darkMode 

@@ -10,10 +10,12 @@ import {
   BanknotesIcon,
   CalendarIcon,
   BuildingLibraryIcon,
+  BuildingStorefrontIcon,
   CheckCircleIcon,
   ClockIcon,
   CurrencyEuroIcon,
   ChartBarIcon,
+  ChevronRightIcon,
 } from '@heroicons/react/24/outline'
 
 export default function Payouts() {
@@ -246,101 +248,107 @@ export default function Payouts() {
               {filteredPayouts.map((payout) => (
                 <div
                   key={payout.id}
-                  className={`rounded-xl overflow-hidden transition-all duration-200 group ${
+                  className={`rounded-lg transition-all ${
                     darkMode
-                      ? 'bg-[#1c1e27] border border-[#2a2d3a] hover:border-[#2BE89A]/30'
-                      : 'bg-white shadow-sm hover:shadow-lg'
+                      ? 'bg-[#1c1e27] border border-[#2a2d3a] hover:border-[#3a3d4a]'
+                      : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-sm'
                   }`}
                 >
                   <div className="p-6">
+                    {/* Header */}
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className={`text-base font-semibold transition-colors ${
-                          darkMode 
-                            ? 'text-white group-hover:text-[#2BE89A]'
-                            : 'text-[#111827] group-hover:text-green-600'
-                        }`}>
+                        <h3 className={`text-base font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           {payout.restaurant}
                         </h3>
-                        <p className={`text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{payout.id}</p>
+                        <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {payout.id}
+                        </p>
                       </div>
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                          darkMode
-                            ? payout.status === 'paid'
-                              ? 'bg-[#2BE89A]/20 text-[#2BE89A]'
-                              : 'bg-yellow-500/20 text-yellow-400'
-                            : payout.status === 'paid'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-yellow-100 text-yellow-700'
-                        }`}
-                      >
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
+                        payout.status === 'paid'
+                          ? darkMode 
+                            ? 'bg-green-500/10 text-green-400'
+                            : 'bg-green-50 text-green-700'
+                          : darkMode
+                            ? 'bg-yellow-500/10 text-yellow-400'
+                            : 'bg-yellow-50 text-yellow-700'
+                      }`}>
                         {payout.status === 'paid' ? (
-                          <CheckCircleIcon className="h-4 w-4 mr-1" />
+                          <>
+                            <CheckCircleIcon className="h-3.5 w-3.5 mr-1" />
+                            Uitbetaald
+                          </>
                         ) : (
-                          <ClockIcon className="h-4 w-4 mr-1" />
+                          <>
+                            <ClockIcon className="h-3.5 w-3.5 mr-1" />
+                            In Behandeling
+                          </>
                         )}
-                        {payout.status === 'paid' ? 'Uitbetaald' : 'In Behandeling'}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <div className={`rounded-lg p-3 ${
-                        darkMode 
-                          ? 'bg-[#0A0B0F] border border-[#2a2d3a]'
-                          : 'bg-gray-50 border border-gray-200'
-                      }`}>
-                        <p className={`text-xs mb-1 uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>BEDRAG</p>
-                        <p className={`text-xl font-bold ${darkMode ? 'text-[#2BE89A]' : 'text-green-600'}`}>{formatCurrency(payout.amount)}</p>
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div>
+                        <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          Bedrag
+                        </p>
+                        <p className={`text-lg font-semibold mt-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                          {formatCurrency(payout.amount)}
+                        </p>
                       </div>
-                      <div className={`rounded-lg p-3 ${
-                        darkMode 
-                          ? 'bg-[#0A0B0F] border border-[#2a2d3a]'
-                          : 'bg-gray-50 border border-gray-200'
-                      }`}>
-                        <p className={`text-xs mb-1 uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>PERIODE</p>
-                        <p className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-[#111827]'}`}>{payout.period}</p>
+                      
+                      <div>
+                        <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          Periode
+                        </p>
+                        <p className={`text-sm font-medium mt-1 ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>
+                          {payout.period}
+                        </p>
                       </div>
-                      <div className={`rounded-lg p-3 ${
-                        darkMode 
-                          ? 'bg-[#0A0B0F] border border-[#2a2d3a]'
-                          : 'bg-gray-50 border border-gray-200'
-                      }`}>
-                        <p className={`text-xs mb-1 uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>BESTELLINGEN</p>
-                        <p className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-[#111827]'}`}>{payout.ordersCount} bestellingen</p>
+                      
+                      <div>
+                        <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          Bestellingen
+                        </p>
+                        <p className={`text-sm font-medium mt-1 ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>
+                          {payout.ordersCount}
+                        </p>
                       </div>
-                      <div className={`rounded-lg p-3 ${
-                        darkMode 
-                          ? 'bg-[#0A0B0F] border border-[#2a2d3a]'
-                          : 'bg-gray-50 border border-gray-200'
-                      }`}>
-                        <p className={`text-xs mb-1 uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>BANKREKENING</p>
-                        <p className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-[#111827]'}`}>{payout.bankAccount}</p>
+                      
+                      <div>
+                        <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          Bankrekening
+                        </p>
+                        <p className={`text-sm font-medium mt-1 ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>
+                          {payout.bankAccount}
+                        </p>
                       </div>
                     </div>
 
+                    {/* Footer */}
                     <div className={`mt-4 pt-4 border-t flex items-center justify-between ${
                       darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'
                     }`}>
-                      <div className="flex items-center space-x-4 text-sm">
-                        <div className={`flex items-center ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
-                          <CalendarIcon className="h-4 w-4 mr-1" />
+                      <div className="flex items-center gap-4 text-xs">
+                        <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
                           Aangemaakt: {formatDate(payout.created)}
-                        </div>
-                        <div className={`flex items-center ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
-                          <BanknotesIcon className="h-4 w-4 mr-1" />
-                          Aankomst: {formatDate(payout.arrival)}
-                        </div>
+                        </span>
+                        <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+                          Verwacht: {formatDate(payout.arrival)}
+                        </span>
                       </div>
+                      
                       <Link
                         href={`/payments/payouts/${payout.id}`}
                         className={`text-sm font-medium transition-colors ${
                           darkMode 
-                            ? 'text-[#2BE89A] hover:text-[#4FFFB0]'
+                            ? 'text-green-400 hover:text-green-300'
                             : 'text-green-600 hover:text-green-700'
                         }`}
                       >
-                        Bekijk Details
+                        Details →
                       </Link>
                     </div>
                   </div>

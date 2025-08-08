@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Layout from '../../components/Layout'
 import { useUsers } from '../../contexts/UsersContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import {
   ArrowLeftIcon,
   UserPlusIcon,
@@ -16,6 +17,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function NewUser() {
+  const { darkMode } = useTheme()
   const router = useRouter()
   const { addCompanyUser } = useUsers()
   const [formData, setFormData] = useState({
@@ -111,38 +113,62 @@ export default function NewUser() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0A0B0F]">
-        <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+        <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-4xl mx-auto space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
               <Link
                 href="/users"
-                className="inline-flex items-center text-[#BBBECC] hover:text-white transition"
+                className={`inline-flex items-center px-4 py-2 rounded-lg transition-all text-sm font-medium mb-4 group ${
+                  darkMode 
+                    ? 'bg-[#1c1e27] border border-[#2a2d3a] text-[#BBBECC] hover:text-white hover:bg-[#252833] hover:border-green-500/50'
+                    : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-700 hover:bg-gray-100 hover:border-green-300'
+                }`}
               >
-                <ArrowLeftIcon className="h-5 w-5 mr-2" />
+                <ArrowLeftIcon className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
                 Terug naar team overzicht
               </Link>
             </div>
 
             {/* Form Card */}
-            <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden">
-              <div className="px-6 py-4 border-b border-[#2a2d3a]">
+            <div className={`rounded-xl overflow-hidden ${
+              darkMode 
+                ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                : 'bg-white shadow-sm'
+            }`}>
+              <div className={`px-6 py-4 border-b ${
+                darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'
+              }`}>
                 <div className="flex items-center">
-                  <div className="p-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-lg">
-                    <UserPlusIcon className="h-6 w-6 text-white" />
+                  <div className={`p-2 rounded-lg ${
+                    darkMode 
+                      ? 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]'
+                      : 'bg-green-100'
+                  }`}>
+                    <UserPlusIcon className={`h-6 w-6 ${
+                      darkMode ? 'text-white' : 'text-green-600'
+                    }`} />
                   </div>
-                  <h1 className="text-xl font-semibold text-white ml-3">Nieuwe Medewerker Toevoegen</h1>
+                  <h1 className={`text-xl font-semibold ml-3 ${
+                    darkMode ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    Nieuwe Medewerker Toevoegen
+                  </h1>
                 </div>
               </div>
 
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 {/* Basic Information */}
                 <div className="space-y-4">
-                  <h2 className="text-lg font-semibold text-white">Persoonlijke Gegevens</h2>
+                  <h2 className={`text-lg font-semibold ${
+                    darkMode ? 'text-white' : 'text-gray-900'
+                  }`}>Persoonlijke Gegevens</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="first_name" className="block text-sm font-medium text-[#BBBECC] mb-2">
+                      <label htmlFor="first_name" className={`block text-sm font-medium mb-2 ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                      }`}>
                         Voornaam
                       </label>
                       <input
@@ -150,7 +176,11 @@ export default function NewUser() {
                         name="first_name"
                         id="first_name"
                         required
-                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
+                            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
+                        }`}
                         placeholder="John"
                         value={formData.first_name}
                         onChange={handleInputChange}
@@ -158,7 +188,9 @@ export default function NewUser() {
                     </div>
 
                     <div>
-                      <label htmlFor="last_name" className="block text-sm font-medium text-[#BBBECC] mb-2">
+                      <label htmlFor="last_name" className={`block text-sm font-medium mb-2 ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                      }`}>
                         Achternaam
                       </label>
                       <input
@@ -166,7 +198,11 @@ export default function NewUser() {
                         name="last_name"
                         id="last_name"
                         required
-                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
+                            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
+                        }`}
                         placeholder="Doe"
                         value={formData.last_name}
                         onChange={handleInputChange}
@@ -174,7 +210,9 @@ export default function NewUser() {
                     </div>
 
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-[#BBBECC] mb-2">
+                      <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                      }`}>
                         E-mailadres
                       </label>
                       <input
@@ -182,21 +220,31 @@ export default function NewUser() {
                         name="email"
                         id="email"
                         required
-                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
+                            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
+                        }`}
                         placeholder="john.doe@example.com"
                         value={formData.email}
                         onChange={handleInputChange}
                       />
                     </div>
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-[#BBBECC] mb-2">
+                      <label htmlFor="phone" className={`block text-sm font-medium mb-2 ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                      }`}>
                         Telefoonnummer
                       </label>
                       <input
                         type="tel"
                         name="phone"
                         id="phone"
-                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
+                            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
+                        }`}
                         placeholder="+31 6 12345678"
                         value={formData.phone}
                         onChange={handleInputChange}
@@ -207,13 +255,19 @@ export default function NewUser() {
 
                 {/* Password Section */}
                 <div className="space-y-4">
-                  <h2 className="text-lg font-semibold text-white flex items-center">
-                    <LockClosedIcon className="h-5 w-5 mr-2 text-[#BBBECC]" />
+                  <h2 className={`text-lg font-semibold flex items-center ${
+                    darkMode ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    <LockClosedIcon className={`h-5 w-5 mr-2 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                    }`} />
                     Beveiliging
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="password" className="block text-sm font-medium text-[#BBBECC] mb-2">
+                      <label htmlFor="password" className={`block text-sm font-medium mb-2 ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                      }`}>
                         Wachtwoord
                       </label>
                       <input
@@ -222,7 +276,11 @@ export default function NewUser() {
                         id="password"
                         required
                         minLength="8"
-                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
+                            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
+                        }`}
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={handleInputChange}
@@ -230,12 +288,16 @@ export default function NewUser() {
                       {formData.password && (
                         <div className="mt-2">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs text-[#BBBECC]">Wachtwoord sterkte</span>
+                            <span className={`text-xs ${
+                              darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                            }`}>Wachtwoord sterkte</span>
                             <span className={`text-xs font-medium ${getPasswordStrengthText().color.replace('bg-', 'text-')}`}>
                               {getPasswordStrengthText().text}
                             </span>
                           </div>
-                          <div className="w-full bg-[#0A0B0F] rounded-full h-2">
+                          <div className={`w-full rounded-full h-2 ${
+                            darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-200'
+                          }`}>
                             <div 
                               className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrengthText().color}`}
                               style={{ width: `${(passwordStrength / 4) * 100}%` }}
@@ -246,14 +308,20 @@ export default function NewUser() {
                     </div>
 
                     <div>
-                      <label htmlFor="confirm_password" className="block text-sm font-medium text-[#BBBECC] mb-2">
+                      <label htmlFor="confirm_password" className={`block text-sm font-medium mb-2 ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                      }`}>
                         Bevestig Wachtwoord
                       </label>
                       <input
                         type="password"
                         id="confirm_password"
                         required
-                        className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                        className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
+                          darkMode
+                            ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
+                            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
+                        }`}
                         placeholder="••••••••"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
@@ -276,25 +344,33 @@ export default function NewUser() {
 
                 {/* Role & Restaurant */}
                 <div className="space-y-4">
-                  <h2 className="text-lg font-semibold text-white">Rol & Toegang</h2>
+                  <h2 className={`text-lg font-semibold ${
+                    darkMode ? 'text-white' : 'text-gray-900'
+                  }`}>Rol & Toegang</h2>
                   
                   {/* Role Selection */}
                   <div>
-                    <label className="block text-sm font-medium text-[#BBBECC] mb-3">Selecteer Rol</label>
+                    <label className={`block text-sm font-medium mb-3 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                    }`}>Selecteer Rol</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {[
-                        { value: 'ceo', label: 'CEO', desc: 'Volledige toegang tot alle functies', icon: ShieldCheckIcon, color: 'from-[#FF6B6B] to-[#FF8E53]' },
-                        { value: 'admin', label: 'Administrator', desc: 'Systeem beheer en configuratie', icon: ShieldCheckIcon, color: 'from-[#667EEA] to-[#764BA2]' },
-                        { value: 'account_manager', label: 'Account Manager', desc: 'Restaurant relaties beheren', icon: UserGroupIcon, color: 'from-[#4ECDC4] to-[#44A08D]' },
-                        { value: 'support', label: 'Support', desc: 'Klantondersteuning', icon: UserIcon, color: 'from-[#2BE89A] to-[#4FFFB0]' },
-                        { value: 'developer', label: 'Developer', desc: 'Technische ontwikkeling', icon: CodeBracketIcon, color: 'from-[#6190E8] to-[#A7BFE8]' },
+                        { value: 'ceo', label: 'CEO', desc: 'Volledige toegang tot alle functies', icon: ShieldCheckIcon },
+                        { value: 'admin', label: 'Administrator', desc: 'Systeem beheer en configuratie', icon: ShieldCheckIcon },
+                        { value: 'account_manager', label: 'Account Manager', desc: 'Restaurant relaties beheren', icon: UserGroupIcon },
+                        { value: 'support', label: 'Support', desc: 'Klantondersteuning', icon: UserIcon },
+                        { value: 'developer', label: 'Developer', desc: 'Technische ontwikkeling', icon: CodeBracketIcon },
                       ].map((role) => (
                         <label
                           key={role.value}
                           className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none transition-all ${
                             formData.role === role.value
-                              ? 'bg-[#0A0B0F] border-[#2BE89A]'
-                              : 'bg-[#0A0B0F] border-[#2a2d3a] hover:border-[#2BE89A]/50'
+                              ? darkMode 
+                                ? 'bg-[#0A0B0F] border-green-500'
+                                : 'bg-green-50 border-green-500'
+                              : darkMode
+                                ? 'bg-[#0A0B0F] border-[#2a2d3a] hover:border-[#2BE89A]/50'
+                                : 'bg-white border-gray-200 hover:border-green-300'
                           }`}
                         >
                           <input
@@ -307,15 +383,29 @@ export default function NewUser() {
                           />
                           <div className="flex flex-col w-full">
                             <div className="flex items-center mb-2">
-                              <div className={`p-2 bg-gradient-to-r ${role.color} rounded-lg`}>
-                                <role.icon className="h-5 w-5 text-white" />
+                              <div className={`p-2 rounded-lg ${
+                                darkMode 
+                                  ? 'bg-gray-700'
+                                  : 'bg-gray-100'
+                              }`}>
+                                <role.icon className={`h-5 w-5 ${
+                                  formData.role === role.value
+                                    ? 'text-green-500'
+                                    : darkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`} />
                               </div>
-                              <span className="ml-3 text-sm font-medium text-white">{role.label}</span>
+                              <span className={`ml-3 text-sm font-medium ${
+                                darkMode ? 'text-white' : 'text-gray-900'
+                              }`}>{role.label}</span>
                             </div>
-                            <p className="text-xs text-[#BBBECC]">{role.desc}</p>
+                            <p className={`text-xs ${
+                              darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                            }`}>{role.desc}</p>
                           </div>
                           {formData.role === role.value && (
-                            <CheckCircleIcon className="absolute top-4 right-4 h-5 w-5 text-[#2BE89A]" />
+                            <CheckCircleIcon className={`absolute top-4 right-4 h-5 w-5 ${
+                              darkMode ? 'text-[#2BE89A]' : 'text-green-500'
+                            }`} />
                           )}
                         </label>
                       ))}
@@ -324,13 +414,19 @@ export default function NewUser() {
 
                   {/* Department Selection */}
                   <div>
-                    <label htmlFor="department" className="block text-sm font-medium text-[#BBBECC] mb-2">
+                    <label htmlFor="department" className={`block text-sm font-medium mb-2 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                    }`}>
                       Afdeling
                     </label>
                     <select
                       id="department"
                       name="department"
-                      className="w-full px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
+                        darkMode
+                          ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white focus:ring-[#2BE89A] focus:border-transparent'
+                          : 'bg-white border-gray-200 text-gray-900 focus:ring-green-500 focus:border-transparent'
+                      }`}
                       value={formData.department}
                       onChange={handleInputChange}
                       required
@@ -345,35 +441,57 @@ export default function NewUser() {
                   </div>
 
                   {/* Active Status */}
-                  <div className="bg-[#0A0B0F] rounded-lg p-4">
+                  <div className={`rounded-lg p-4 ${
+                    darkMode 
+                      ? 'bg-[#0A0B0F]'
+                      : 'bg-gray-50'
+                  }`}>
                     <div className="flex items-center">
                       <input
                         id="is_active"
                         name="is_active"
                         type="checkbox"
-                        className="h-4 w-4 text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] rounded bg-[#0A0B0F]"
+                        className={`h-4 w-4 rounded focus:ring-2 ${
+                          darkMode
+                            ? 'text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] bg-[#0A0B0F]'
+                            : 'text-green-600 focus:ring-green-500 border-gray-300 bg-white'
+                        }`}
                         checked={formData.is_active}
                         onChange={handleInputChange}
                       />
                       <label htmlFor="is_active" className="ml-3">
-                        <span className="text-sm font-medium text-white">Actieve medewerker</span>
-                        <p className="text-xs text-[#BBBECC]">Inactieve medewerkers kunnen niet inloggen</p>
+                        <span className={`text-sm font-medium ${
+                          darkMode ? 'text-white' : 'text-gray-900'
+                        }`}>Actieve medewerker</span>
+                        <p className={`text-xs ${
+                          darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                        }`}>Inactieve medewerkers kunnen niet inloggen</p>
                       </label>
                     </div>
                   </div>
                 </div>
 
                 {/* Submit Buttons */}
-                <div className="flex justify-between pt-6 border-t border-[#2a2d3a]">
+                <div className={`flex justify-between pt-6 border-t ${
+                  darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'
+                }`}>
                   <Link
                     href="/users"
-                    className="px-6 py-3 bg-[#0A0B0F] border border-[#2a2d3a] text-white font-medium rounded-lg hover:bg-[#1a1c25] transition"
+                    className={`px-6 py-2.5 font-medium rounded-lg transition ${
+                      darkMode
+                        ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white hover:bg-[#1a1c25]'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                    }`}
                   >
                     Annuleren
                   </Link>
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition shadow-lg"
+                    className={`px-6 py-2.5 font-medium rounded-lg transition ${
+                      darkMode
+                        ? 'bg-green-500 text-white hover:bg-green-600'
+                        : 'bg-green-600 text-white hover:bg-green-700'
+                    }`}
                   >
                     Medewerker Toevoegen
                   </button>

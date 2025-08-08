@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Layout from '../components/Layout'
 import Breadcrumb from '../components/Breadcrumb'
+import { useTheme } from '../contexts/ThemeContext'
 import {
   ChatBubbleLeftRightIcon,
   EnvelopeIcon,
@@ -18,6 +19,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function Support() {
+  const { darkMode } = useTheme()
   const [activeChannel, setActiveChannel] = useState('all')
   const [selectedConversation, setSelectedConversation] = useState(null)
   const [messageInput, setMessageInput] = useState('')
@@ -120,86 +122,139 @@ export default function Support() {
 
   const getChannelIcon = (channelId) => {
     const channel = channels.find(c => c.id === channelId)
-    return channel ? <channel.icon className={`h-4 w-4 ${channel.color}`} /> : null
+    if (!channel) return null
+    const colorClass = darkMode 
+      ? channel.color 
+      : channel.color.replace('text-green-400', 'text-green-600')
+        .replace('text-blue-400', 'text-blue-600')
+        .replace('text-purple-400', 'text-purple-600')
+        .replace('text-yellow-400', 'text-yellow-600')
+    return <channel.icon className={`h-4 w-4 ${colorClass}`} />
   }
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'open': return 'text-yellow-400'
-      case 'resolved': return 'text-green-400'
-      case 'pending': return 'text-gray-400'
-      default: return 'text-gray-400'
+      case 'open': return darkMode ? 'text-yellow-400' : 'text-yellow-600'
+      case 'resolved': return darkMode ? 'text-green-400' : 'text-green-600'
+      case 'pending': return darkMode ? 'text-gray-400' : 'text-gray-500'
+      default: return darkMode ? 'text-gray-400' : 'text-gray-500'
     }
   }
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'bg-red-500/20 text-red-400 border-red-500/30'
-      case 'medium': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-      case 'low': return 'bg-green-500/20 text-green-400 border-green-500/30'
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+      case 'high': return darkMode 
+        ? 'bg-red-500/10 text-red-400 border-red-500/20'
+        : 'bg-red-50 text-red-700 border-red-200'
+      case 'medium': return darkMode
+        ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+        : 'bg-yellow-50 text-yellow-700 border-yellow-200'
+      case 'low': return darkMode
+        ? 'bg-green-500/10 text-green-400 border-green-500/20'
+        : 'bg-green-50 text-green-700 border-green-200'
+      default: return darkMode
+        ? 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+        : 'bg-gray-100 text-gray-700 border-gray-300'
     }
   }
 
   return (
     <Layout>
-      <div className="flex" style={{ height: 'calc(100vh - 197px)' }}>
+      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+        <div className="flex relative" style={{ height: 'calc(100vh - 72px)' }}>
           {/* Sidebar - Channels and Conversations */}
-          <div className="w-96 bg-[#0A0B0F] border-r border-[#1c1e27] flex flex-col">
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-[#1c1e27]">
-              <h1 className="text-2xl font-bold text-white mb-4">Support Center</h1>
-              
-              {/* Search */}
-              <div className="relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#BBBECC]" />
-                <input
-                  type="text"
-                  placeholder="Search conversations..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* Channels */}
-            <div className="px-4 py-3 border-b border-[#1c1e27]">
-              <div className="space-y-1">
-                {channels.map((channel) => (
-                  <button
-                    key={channel.id}
-                    onClick={() => setActiveChannel(channel.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 ${
-                      activeChannel === channel.id
-                        ? 'bg-[#2BE89A]/10 text-[#2BE89A]'
-                        : 'text-[#BBBECC] hover:bg-[#1c1e27] hover:text-white'
+          <div className={`w-96 flex flex-col border-r flex-shrink-0 h-full overflow-hidden ${
+            darkMode 
+              ? 'bg-[#0A0B0F] border-[#1c1e27]'
+              : 'bg-white border-gray-200'
+          }`}>
+            {/* Fixed Header and Channels Container */}
+            <div className="flex-shrink-0">
+              {/* Header */}
+              <div className={`px-6 py-4 border-b ${
+                darkMode ? 'border-[#1c1e27]' : 'border-gray-200'
+              }`}>
+                <h1 className={`text-xl font-semibold mb-4 ${
+                  darkMode ? 'text-white' : 'text-gray-900'
+                }`}>Support Center</h1>
+                
+                {/* Search */}
+                <div className="relative">
+                  <MagnifyingGlassIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
+                    darkMode ? 'text-[#BBBECC]' : 'text-gray-400'
+                  }`} />
+                  <input
+                    type="text"
+                    placeholder="Search conversations..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition ${
+                      darkMode
+                        ? 'bg-[#1c1e27] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
+                        : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
                     }`}
-                  >
-                    <div className="flex items-center">
-                      <channel.icon className={`h-5 w-5 mr-3 ${channel.color}`} />
-                      <span className="text-sm font-medium">{channel.name}</span>
-                    </div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      activeChannel === channel.id
-                        ? 'bg-[#2BE89A]/20 text-[#2BE89A]'
-                        : 'bg-[#1c1e27] text-[#BBBECC]'
-                    }`}>
-                      {channel.count}
-                    </span>
-                  </button>
-                ))}
+                  />
+                </div>
+              </div>
+
+              {/* Channels */}
+              <div className={`px-4 py-3 border-b ${
+                darkMode ? 'border-[#1c1e27]' : 'border-gray-200'
+              }`}>
+                <div className="space-y-1">
+                  {channels.map((channel) => (
+                    <button
+                      key={channel.id}
+                      onClick={() => setActiveChannel(channel.id)}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all ${
+                        activeChannel === channel.id
+                          ? darkMode
+                            ? 'bg-green-500/10 text-green-400'
+                            : 'bg-green-50 text-green-600'
+                          : darkMode
+                            ? 'text-[#BBBECC] hover:bg-[#1c1e27] hover:text-white'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                    >
+                      <div className="flex items-center">
+                        <channel.icon className={`h-5 w-5 mr-3 ${
+                          activeChannel === channel.id
+                            ? darkMode ? 'text-green-400' : 'text-green-600'
+                            : darkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`} />
+                        <span className="text-sm font-medium">{channel.name}</span>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        activeChannel === channel.id
+                          ? darkMode
+                            ? 'bg-green-500/20 text-green-400'
+                            : 'bg-green-100 text-green-700'
+                          : darkMode
+                            ? 'bg-[#1c1e27] text-[#BBBECC]'
+                            : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {channel.count}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Conversations List */}
+            {/* Scrollable Conversations List */}
             <div className="flex-1 overflow-y-auto">
               {filteredConversations.map((conversation) => (
                 <button
                   key={conversation.id}
                   onClick={() => setSelectedConversation(conversation)}
-                  className={`w-full px-4 py-4 border-b border-[#1c1e27] hover:bg-[#1c1e27] transition-colors duration-200 ${
-                    selectedConversation?.id === conversation.id ? 'bg-[#1c1e27]' : ''
+                  className={`w-full px-4 py-4 border-b transition-colors ${
+                    selectedConversation?.id === conversation.id 
+                      ? darkMode ? 'bg-[#1c1e27]' : 'bg-gray-50'
+                      : ''
+                  } ${
+                    darkMode 
+                      ? 'border-[#1c1e27] hover:bg-[#1c1e27]'
+                      : 'border-gray-100 hover:bg-gray-50'
                   }`}
                 >
                   <div className="flex items-start">
@@ -211,33 +266,47 @@ export default function Support() {
                           alt={conversation.customer.name}
                         />
                       ) : (
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-bold">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${
+                          darkMode
+                            ? 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black'
+                            : 'bg-green-100 text-green-700'
+                        }`}>
                           {conversation.customer.name.split(' ').map(n => n[0]).join('')}
                         </div>
                       )}
                     </div>
                     <div className="ml-3 flex-1 text-left">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-white">
+                        <p className={`text-sm font-medium ${
+                          darkMode ? 'text-white' : 'text-gray-900'
+                        }`}>
                           {conversation.customer.name}
                         </p>
                         <div className="flex items-center space-x-2">
                           {getChannelIcon(conversation.channel)}
-                          <span className="text-xs text-[#BBBECC]">{conversation.timestamp}</span>
+                          <span className={`text-xs ${
+                            darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                          }`}>{conversation.timestamp}</span>
                         </div>
                       </div>
-                      <p className={`text-sm mt-1 ${conversation.unread ? 'text-white font-medium' : 'text-[#BBBECC]'}`}>
+                      <p className={`text-sm mt-1 ${
+                        conversation.unread 
+                          ? darkMode ? 'text-white font-medium' : 'text-gray-900 font-medium'
+                          : darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
+                      }`}>
                         {conversation.lastMessage}
                       </p>
                       <div className="flex items-center mt-2 space-x-2">
                         <span className={`text-xs ${getStatusColor(conversation.status)}`}>
                           {conversation.status}
                         </span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full border ${getPriorityColor(conversation.priority)}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-md border ${getPriorityColor(conversation.priority)}`}>
                           {conversation.priority}
                         </span>
                         {conversation.unread && (
-                          <div className="h-2 w-2 bg-[#2BE89A] rounded-full"></div>
+                          <div className={`h-2 w-2 rounded-full ${
+                            darkMode ? 'bg-[#2BE89A]' : 'bg-green-500'
+                          }`}></div>
                         )}
                       </div>
                     </div>
@@ -248,11 +317,17 @@ export default function Support() {
           </div>
 
           {/* Main Content - Conversation View */}
-          <div className="flex-1 flex flex-col bg-[#0A0B0F]">
+          <div className={`flex-1 flex flex-col overflow-y-auto ${
+            darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-50'
+          }`}>
             {selectedConversation ? (
               <>
                 {/* Conversation Header */}
-                <div className="px-6 py-4 border-b border-[#1c1e27] bg-[#0A0B0F]">
+                <div className={`px-6 py-4 border-b ${
+                  darkMode 
+                    ? 'border-[#1c1e27] bg-[#0A0B0F]'
+                    : 'border-gray-200 bg-white'
+                }`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       {selectedConversation.customer.avatar ? (
@@ -262,13 +337,21 @@ export default function Support() {
                           alt={selectedConversation.customer.name}
                         />
                       ) : (
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-bold">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${
+                          darkMode
+                            ? 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black'
+                            : 'bg-green-100 text-green-700'
+                        }`}>
                           {selectedConversation.customer.name.split(' ').map(n => n[0]).join('')}
                         </div>
                       )}
                       <div className="ml-4">
-                        <h2 className="text-lg font-semibold text-white">{selectedConversation.customer.name}</h2>
-                        <div className="flex items-center space-x-3 text-sm text-[#BBBECC]">
+                        <h2 className={`text-lg font-semibold ${
+                          darkMode ? 'text-white' : 'text-gray-900'
+                        }`}>{selectedConversation.customer.name}</h2>
+                        <div className={`flex items-center space-x-3 text-sm ${
+                          darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                        }`}>
                           <span className="flex items-center">
                             {getChannelIcon(selectedConversation.channel)}
                             <span className="ml-1 capitalize">{selectedConversation.channel}</span>
@@ -281,10 +364,18 @@ export default function Support() {
                     
                     {/* Actions */}
                     <div className="flex items-center space-x-3">
-                      <button className="px-4 py-2 bg-[#1c1e27] text-white rounded-lg hover:bg-[#252833] transition-colors duration-200">
+                      <button className={`px-4 py-2 rounded-lg transition-colors ${
+                        darkMode
+                          ? 'bg-[#1c1e27] text-white hover:bg-[#252833]'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}>
                         Assign
                       </button>
-                      <button className="px-4 py-2 bg-[#1c1e27] text-white rounded-lg hover:bg-[#252833] transition-colors duration-200">
+                      <button className={`px-4 py-2 rounded-lg transition-colors ${
+                        darkMode
+                          ? 'bg-green-500 text-white hover:bg-green-600'
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}>
                         Mark Resolved
                       </button>
                     </div>
@@ -300,18 +391,28 @@ export default function Support() {
                     >
                       <div className={`max-w-lg px-4 py-3 rounded-lg ${
                         message.sender === 'support'
-                          ? 'bg-gradient-to-r from-[#2BE89A]/20 to-[#4FFFB0]/20 text-white border border-[#2BE89A]/30'
-                          : 'bg-[#1c1e27] text-white'
+                          ? darkMode
+                            ? 'bg-green-500/10 text-white border border-green-500/20'
+                            : 'bg-green-50 text-gray-900 border border-green-200'
+                          : darkMode
+                            ? 'bg-[#1c1e27] text-white'
+                            : 'bg-white text-gray-900 border border-gray-200'
                       }`}>
                         <p className="text-sm">{message.text}</p>
-                        <p className="text-xs text-[#BBBECC] mt-1">{message.timestamp}</p>
+                        <p className={`text-xs mt-1 ${
+                          darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                        }`}>{message.timestamp}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
                 {/* Message Input */}
-                <div className="px-6 py-4 border-t border-[#1c1e27] bg-[#0A0B0F]">
+                <div className={`px-6 py-4 border-t ${
+                  darkMode 
+                    ? 'border-[#1c1e27] bg-[#0A0B0F]'
+                    : 'border-gray-200 bg-white'
+                }`}>
                   <div className="flex items-center space-x-3">
                     <input
                       type="text"
@@ -319,11 +420,19 @@ export default function Support() {
                       onChange={(e) => setMessageInput(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type your message..."
-                      className="flex-1 px-4 py-3 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className={`flex-1 px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
+                        darkMode
+                          ? 'bg-[#1c1e27] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
+                          : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
+                      }`}
                     />
                     <button
                       onClick={handleSendMessage}
-                      className="px-6 py-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition-opacity duration-200"
+                      className={`px-6 py-2.5 font-medium rounded-lg transition ${
+                        darkMode
+                          ? 'bg-green-500 text-white hover:bg-green-600'
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
                     >
                       <PaperAirplaneIcon className="h-5 w-5" />
                     </button>
@@ -334,9 +443,15 @@ export default function Support() {
               <div className="flex-1 flex flex-col">
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
-                    <ChatBubbleLeftRightIcon className="h-16 w-16 text-[#BBBECC] mx-auto mb-4" />
-                    <h3 className="text-xl font-medium text-white mb-2">Select a conversation</h3>
-                    <p className="text-[#BBBECC]">Choose a conversation from the list to start messaging</p>
+                    <ChatBubbleLeftRightIcon className={`h-16 w-16 mx-auto mb-4 ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-gray-400'
+                    }`} />
+                    <h3 className={`text-xl font-medium mb-2 ${
+                      darkMode ? 'text-white' : 'text-gray-900'
+                    }`}>Select a conversation</h3>
+                    <p className={darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}>
+                      Choose a conversation from the list to start messaging
+                    </p>
                   </div>
                 </div>
               </div>
@@ -345,34 +460,58 @@ export default function Support() {
 
           {/* Right Sidebar - Customer Info (Future Enhancement) */}
           {selectedConversation && (
-            <div className="w-80 bg-[#0A0B0F] border-l border-[#1c1e27] p-6">
-              <h3 className="text-lg font-semibold text-white mb-6">Customer Information</h3>
+            <div className={`w-80 border-l p-6 flex-shrink-0 overflow-y-auto ${
+              darkMode
+                ? 'bg-[#0A0B0F] border-[#1c1e27]'
+                : 'bg-white border-gray-200'
+            }`}>
+              <h3 className={`text-lg font-semibold mb-6 ${
+                darkMode ? 'text-white' : 'text-gray-900'
+              }`}>Customer Information</h3>
               
               <div className="space-y-6">
                 {/* Customer Details */}
                 <div>
-                  <h4 className="text-sm font-medium text-[#BBBECC] mb-2">Restaurant Details</h4>
+                  <h4 className={`text-sm font-medium mb-2 ${
+                    darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                  }`}>Restaurant Details</h4>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-xs text-[#BBBECC]">Name</p>
-                      <p className="text-sm text-white">{selectedConversation.customer.name}</p>
+                      <p className={`text-xs ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      }`}>Name</p>
+                      <p className={`text-sm ${
+                        darkMode ? 'text-white' : 'text-gray-900'
+                      }`}>{selectedConversation.customer.name}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#BBBECC]">Account Status</p>
-                      <p className="text-sm text-green-400">Active</p>
+                      <p className={`text-xs ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      }`}>Account Status</p>
+                      <p className={`text-sm ${
+                        darkMode ? 'text-green-400' : 'text-green-600'
+                      }`}>Active</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#BBBECC]">Member Since</p>
-                      <p className="text-sm text-white">Jan 15, 2024</p>
+                      <p className={`text-xs ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      }`}>Member Since</p>
+                      <p className={`text-sm ${
+                        darkMode ? 'text-white' : 'text-gray-900'
+                      }`}>Jan 15, 2024</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Recent Activity */}
                 <div>
-                  <h4 className="text-sm font-medium text-[#BBBECC] mb-2">Recent Support History</h4>
+                  <h4 className={`text-sm font-medium mb-2 ${
+                    darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                  }`}>Recent Support History</h4>
                   <div className="space-y-2">
-                    <div className="text-xs text-[#BBBECC]">
+                    <div className={`text-xs ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                    }`}>
                       <p>• Payment issue resolved - 2 days ago</p>
                       <p>• API key regenerated - 1 week ago</p>
                       <p>• Onboarding completed - 2 weeks ago</p>
@@ -382,15 +521,29 @@ export default function Support() {
 
                 {/* Quick Actions */}
                 <div>
-                  <h4 className="text-sm font-medium text-[#BBBECC] mb-2">Quick Actions</h4>
+                  <h4 className={`text-sm font-medium mb-2 ${
+                    darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                  }`}>Quick Actions</h4>
                   <div className="space-y-2">
-                    <button className="w-full px-4 py-2 bg-[#1c1e27] text-white rounded-lg hover:bg-[#252833] transition-colors duration-200 text-sm">
+                    <button className={`w-full px-4 py-2 rounded-lg transition-colors text-sm ${
+                      darkMode
+                        ? 'bg-[#1c1e27] text-white hover:bg-[#252833]'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}>
                       View Restaurant Profile
                     </button>
-                    <button className="w-full px-4 py-2 bg-[#1c1e27] text-white rounded-lg hover:bg-[#252833] transition-colors duration-200 text-sm">
+                    <button className={`w-full px-4 py-2 rounded-lg transition-colors text-sm ${
+                      darkMode
+                        ? 'bg-[#1c1e27] text-white hover:bg-[#252833]'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}>
                       View Payment History
                     </button>
-                    <button className="w-full px-4 py-2 bg-[#1c1e27] text-white rounded-lg hover:bg-[#252833] transition-colors duration-200 text-sm">
+                    <button className={`w-full px-4 py-2 rounded-lg transition-colors text-sm ${
+                      darkMode
+                        ? 'bg-[#1c1e27] text-white hover:bg-[#252833]'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}>
                       Check API Status
                     </button>
                   </div>
@@ -399,6 +552,7 @@ export default function Support() {
             </div>
           )}
         </div>
+      </div>
     </Layout>
   )
 }

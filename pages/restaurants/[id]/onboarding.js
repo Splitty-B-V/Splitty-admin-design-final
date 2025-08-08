@@ -74,12 +74,17 @@ export default function RestaurantOnboarding() {
   // Personnel form states
   const [showPersonForm, setShowPersonForm] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
+  const [emailError, setEmailError] = useState('')
+  const [phoneError, setPhoneError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
   const [newPerson, setNewPerson] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     password: '',
+    passwordConfirm: '',
     role: 'staff'
   })
 
@@ -244,6 +249,58 @@ export default function RestaurantOnboarding() {
   }
 
   const handleAddPerson = () => {
+    // Reset errors
+    setEmailError('');
+    setPhoneError('');
+    setPasswordError('');
+    
+    // Check if passwords match
+    if (newPerson.password !== newPerson.passwordConfirm) {
+      setPasswordError('Wachtwoorden komen niet overeen');
+      return;
+    }
+    
+    // Check if password is strong enough
+    if (newPerson.password.length < 8) {
+      setPasswordError('Wachtwoord moet minimaal 8 karakters bevatten');
+      return;
+    }
+    
+    // Check if email is already in use
+    const emailExists = personnelData.some(p => p.email.toLowerCase() === newPerson.email.toLowerCase());
+    if (emailExists) {
+      setEmailError('Dit e-mailadres is al in gebruik');
+      return;
+    }
+    
+    // Check if phone is already in use (if provided)
+    if (newPerson.phone) {
+      const phoneExists = personnelData.some(p => p.phone && p.phone === newPerson.phone);
+      if (phoneExists) {
+        setPhoneError('Dit telefoonnummer is al in gebruik');
+        return;
+      }
+    }
+    
+    // Get all existing users from database to check globally
+    const db = typeof window !== 'undefined' ? require('../../../utils/database').default : null;
+    if (db) {
+      const allUsers = db.getUsers() || [];
+      const globalEmailExists = allUsers.some(u => u.email.toLowerCase() === newPerson.email.toLowerCase());
+      if (globalEmailExists) {
+        setEmailError('Dit e-mailadres is al geregistreerd in het systeem');
+        return;
+      }
+      
+      if (newPerson.phone) {
+        const globalPhoneExists = allUsers.some(u => u.phone && u.phone === newPerson.phone);
+        if (globalPhoneExists) {
+          setPhoneError('Dit telefoonnummer is al geregistreerd in het systeem');
+          return;
+        }
+      }
+    }
+    
     if (newPerson.firstName && newPerson.lastName && newPerson.email && newPerson.password) {
       const updatedPersonnelData = [...personnelData, { ...newPerson, id: Date.now() }];
       setPersonnelData(updatedPersonnelData);
@@ -253,9 +310,13 @@ export default function RestaurantOnboarding() {
         email: '',
         phone: '',
         password: '',
+        passwordConfirm: '',
         role: 'staff'
       });
       setShowPersonForm(false);
+      setEmailError('');
+      setPhoneError('');
+      setPasswordError('');
       
       // If this is a manager, mark step 1 as completed
       let newCompletedSteps = [...completedSteps];
@@ -395,7 +456,23 @@ export default function RestaurantOnboarding() {
                   <div className="flex items-center justify-between mb-6">
                     <h4 className="text-lg font-semibold text-gray-900">Nieuwe gebruiker toevoegen</h4>
                     <button
-                      onClick={() => setShowPersonForm(false)}
+                      onClick={() => {
+                        setShowPersonForm(false);
+                        setNewPerson({
+                          firstName: '',
+                          lastName: '',
+                          email: '',
+                          phone: '',
+                          password: '',
+                          passwordConfirm: '',
+                          role: 'staff'
+                        });
+                        setEmailError('');
+                        setPhoneError('');
+                        setPasswordError('');
+                        setShowPassword(false);
+                        setShowPasswordConfirm(false);
+                      }}
                       className="text-gray-600 hover:text-gray-900 transition p-2"
                     >
                       <XMarkIcon className="h-5 w-5" />
@@ -431,10 +508,18 @@ export default function RestaurantOnboarding() {
                       <input
                         type="email"
                         value={newPerson.email}
-                        onChange={(e) => setNewPerson({...newPerson, email: e.target.value})}
-                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        onChange={(e) => {
+                          setNewPerson({...newPerson, email: e.target.value});
+                          setEmailError('');
+                        }}
+                        className={`w-full px-4 py-3 bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent ${
+                          emailError ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500'
+                        }`}
                         placeholder="jan@restaurant.nl"
                       />
+                      {emailError && (
+                        <p className="mt-1 text-sm text-red-600">{emailError}</p>
+                      )}
                     </div>
 
                     <div>
@@ -442,10 +527,18 @@ export default function RestaurantOnboarding() {
                       <input
                         type="tel"
                         value={newPerson.phone}
-                        onChange={(e) => setNewPerson({...newPerson, phone: e.target.value})}
-                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        onChange={(e) => {
+                          setNewPerson({...newPerson, phone: e.target.value});
+                          setPhoneError('');
+                        }}
+                        className={`w-full px-4 py-3 bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent ${
+                          phoneError ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500'
+                        }`}
                         placeholder="+31 6 12345678"
                       />
+                      {phoneError && (
+                        <p className="mt-1 text-sm text-red-600">{phoneError}</p>
+                      )}
                     </div>
 
                     <div>
@@ -454,9 +547,14 @@ export default function RestaurantOnboarding() {
                         <input
                           type={showPassword ? "text" : "password"}
                           value={newPerson.password}
-                          onChange={(e) => setNewPerson({...newPerson, password: e.target.value})}
-                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12"
-                          placeholder="••••••••"
+                          onChange={(e) => {
+                            setNewPerson({...newPerson, password: e.target.value});
+                            setPasswordError('');
+                          }}
+                          className={`w-full px-4 py-3 bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent pr-12 ${
+                            passwordError ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500'
+                          }`}
+                          placeholder="Minimaal 8 karakters"
                         />
                         <button
                           type="button"
@@ -464,6 +562,34 @@ export default function RestaurantOnboarding() {
                           className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-900"
                         >
                           {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+                        </button>
+                      </div>
+                      {passwordError && (
+                        <p className="mt-1 text-sm text-red-600">{passwordError}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-2">Bevestig Wachtwoord</label>
+                      <div className="relative">
+                        <input
+                          type={showPasswordConfirm ? "text" : "password"}
+                          value={newPerson.passwordConfirm}
+                          onChange={(e) => {
+                            setNewPerson({...newPerson, passwordConfirm: e.target.value});
+                            setPasswordError('');
+                          }}
+                          className={`w-full px-4 py-3 bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent pr-12 ${
+                            passwordError ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500'
+                          }`}
+                          placeholder="Herhaal wachtwoord"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-900"
+                        >
+                          {showPasswordConfirm ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                         </button>
                       </div>
                     </div>
@@ -502,7 +628,7 @@ export default function RestaurantOnboarding() {
 
                     <button
                       onClick={handleAddPerson}
-                      disabled={!newPerson.firstName || !newPerson.lastName || !newPerson.email || !newPerson.password}
+                      disabled={!newPerson.firstName || !newPerson.lastName || !newPerson.email || !newPerson.password || !newPerson.passwordConfirm}
                       className="w-full px-6 py-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-semibold rounded-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Gebruiker Toevoegen

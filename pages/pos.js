@@ -13,7 +13,13 @@ import {
   ArrowPathIcon,
   CpuChipIcon,
   ExclamationTriangleIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  BellAlertIcon,
+  SignalSlashIcon,
+  SignalIcon,
+  BoltIcon,
+  XMarkIcon,
+  MapPinIcon
 } from '@heroicons/react/24/outline'
 
 export default function POSIntegration() {
@@ -21,11 +27,14 @@ export default function POSIntegration() {
   const { restaurants } = useRestaurants()
   const [posStatuses, setPosStatuses] = useState({})
   const [refreshing, setRefreshing] = useState(false)
+  const [notifications, setNotifications] = useState([])
+  const [showNotifications, setShowNotifications] = useState(true)
 
   // Load POS data from localStorage for each restaurant
   useEffect(() => {
     const loadPosStatuses = () => {
       const statuses = {}
+      const newNotifications = []
       
       restaurants.forEach(restaurant => {
         if (!restaurant.deleted) {
@@ -34,16 +43,50 @@ export default function POSIntegration() {
             try {
               const parsed = JSON.parse(onboardingData)
               if (parsed.posData && parsed.posData.posType) {
+                // Simulate occasional connection issues for demo
+                const randomStatus = Math.random()
+                const isConnected = randomStatus > 0.2 // 80% chance of being connected
+                const isActive = isConnected && randomStatus > 0.3 // 70% chance of being active if connected
+                
                 statuses[restaurant.id] = {
-                  connected: true,
+                  connected: isConnected,
                   posType: parsed.posData.posType,
                   username: parsed.posData.username,
                   environment: parsed.posData.environment || 'production',
-                  isActive: parsed.posData.isActive !== false,
-                  lastSync: new Date().toISOString(),
+                  isActive: isActive,
+                  lastSync: isConnected ? new Date().toISOString() : new Date(Date.now() - 3600000).toISOString(),
+                }
+                
+                // Generate notifications for issues
+                if (!isConnected) {
+                  newNotifications.push({
+                    id: `${restaurant.id}-disconnected`,
+                    type: 'error',
+                    title: 'POS Verbinding Verloren',
+                    message: `${restaurant.name} - POS systeem is niet bereikbaar`,
+                    restaurantId: restaurant.id,
+                    timestamp: new Date().toISOString()
+                  })
+                } else if (!isActive) {
+                  newNotifications.push({
+                    id: `${restaurant.id}-inactive`,
+                    type: 'warning',
+                    title: 'POS Inactief',
+                    message: `${restaurant.name} - POS systeem is inactief`,
+                    restaurantId: restaurant.id,
+                    timestamp: new Date().toISOString()
+                  })
                 }
               } else {
                 statuses[restaurant.id] = { connected: false }
+                newNotifications.push({
+                  id: `${restaurant.id}-not-configured`,
+                  type: 'info',
+                  title: 'POS Niet Geconfigureerd',
+                  message: `${restaurant.name} - POS integratie moet nog worden ingesteld`,
+                  restaurantId: restaurant.id,
+                  timestamp: new Date().toISOString()
+                })
               }
             } catch (e) {
               statuses[restaurant.id] = { connected: false }
@@ -55,11 +98,12 @@ export default function POSIntegration() {
       })
       
       setPosStatuses(statuses)
+      setNotifications(newNotifications)
     }
 
     loadPosStatuses()
     
-    const interval = setInterval(loadPosStatuses, 5000)
+    const interval = setInterval(loadPosStatuses, 10000) // Check every 10 seconds
     
     return () => clearInterval(interval)
   }, [restaurants])
@@ -195,6 +239,60 @@ export default function POSIntegration() {
               </div>
             </div>
 
+            {/* Notifications Section - Simplified */}
+            {notifications.filter(n => n.type === 'error').length > 0 && showNotifications && (
+              <div className={`rounded-lg ${
+                darkMode 
+                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                  : 'bg-white border border-gray-200'
+              }`}>
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <ExclamationTriangleIcon className={`h-5 w-5 mr-2 ${
+                        darkMode ? 'text-yellow-400' : 'text-yellow-500'
+                      }`} />
+                      <h3 className={`text-sm font-medium ${
+                        darkMode ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        Aandacht vereist ({notifications.filter(n => n.type === 'error').length})
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => setShowNotifications(false)}
+                      className={`p-1 rounded transition-colors ${
+                        darkMode ? 'hover:bg-[#2a2d3a]' : 'hover:bg-gray-100'
+                      }`}
+                    >
+                      <XMarkIcon className={`h-4 w-4 ${
+                        darkMode ? 'text-gray-400' : 'text-gray-500'
+                      }`} />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {notifications.filter(n => n.type === 'error').slice(0, 3).map((notification) => (
+                      <div
+                        key={notification.id}
+                        className="flex items-center justify-between"
+                      >
+                        <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          {notification.message}
+                        </p>
+                        <Link
+                          href={`/restaurants/${notification.restaurantId}/onboarding?step=3`}
+                          className={`text-sm ${
+                            darkMode ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-700'
+                          }`}
+                        >
+                          Configureer →
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Restaurant POS Status List */}
             <div className={`rounded-xl overflow-hidden ${
               darkMode 
@@ -211,97 +309,105 @@ export default function POSIntegration() {
                 </h2>
               </div>
 
-              <div className={`divide-y ${darkMode ? 'divide-[#2a2d3a]' : 'divide-gray-200'}`}>
+              <div className="p-4 space-y-3">
                 {activeRestaurants.map((restaurant) => {
                   const posStatus = posStatuses[restaurant.id]
+                  const isConnected = posStatus && posStatus.connected
+                  const isActive = posStatus && posStatus.isActive
+                  
                   return (
                     <div 
                       key={restaurant.id} 
-                      className={`p-6 transition-all ${
-                        darkMode ? 'hover:bg-[#0A0B0F]' : 'hover:bg-gray-50'
+                      className={`p-5 rounded-lg transition-all ${
+                        !isConnected
+                          ? darkMode 
+                            ? 'bg-[#0A0B0F] border border-red-500/20 hover:border-red-500/30'
+                            : 'bg-white border border-red-200 hover:border-red-300'
+                          : darkMode 
+                            ? 'bg-[#0A0B0F] border border-[#2a2d3a] hover:border-[#3a3d4a]'
+                            : 'bg-white border border-gray-200 hover:border-gray-300'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <div className="h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 bg-white relative">
+                          {/* Restaurant Logo */}
+                          <div className="h-10 w-10 rounded-lg overflow-hidden flex-shrink-0 bg-white">
                             {restaurant.logo ? (
                               <img
                                 src={restaurant.logo}
                                 alt={restaurant.name}
-                                className="h-full w-full object-contain p-1"
+                                className="h-full w-full object-contain p-0.5"
                               />
                             ) : (
-                              <div className="h-full w-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-lg">
-                                {restaurant.name.charAt(0)}
+                              <div className={`h-full w-full flex items-center justify-center ${
+                                darkMode ? 'bg-gray-700' : 'bg-gray-200'
+                              }`}>
+                                <BuildingStorefrontIcon className={`h-5 w-5 ${
+                                  darkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`} />
                               </div>
                             )}
                           </div>
                           
                           <div className="min-w-0 flex-1">
-                            <h3 className={`text-base font-semibold ${
-                              darkMode ? 'text-white' : 'text-[#111827]'
-                            }`}>
-                              {restaurant.name}
-                            </h3>
-                            <div className="mt-1 flex items-center space-x-4 text-sm">
-                              <span className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>
-                                {restaurant.location}
-                              </span>
+                            <div className="flex items-center gap-3">
+                              <h3 className={`text-sm font-medium ${
+                                darkMode ? 'text-white' : 'text-gray-900'
+                              }`}>
+                                {restaurant.name}
+                              </h3>
                               {posStatus && posStatus.connected && (
-                                <>
-                                  <span className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>
-                                    {posStatus.posType}
-                                  </span>
-                                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                    posStatus.environment === 'production'
-                                      ? 'bg-green-100 text-green-700'
-                                      : 'bg-yellow-100 text-yellow-700'
-                                  }`}>
-                                    {posStatus.environment === 'production' ? 'Productie' : posStatus.environment}
-                                  </span>
-                                </>
+                                <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                  {posStatus.posType}
+                                </span>
                               )}
                             </div>
+                            <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                              {restaurant.location}
+                            </p>
                           </div>
                         </div>
                         
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center">
-                            {posStatus && posStatus.connected ? (
-                              posStatus.isActive ? (
-                                <>
-                                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
-                                  <span className="text-sm font-medium text-green-600">Actief</span>
-                                </>
-                              ) : (
-                                <>
-                                  <ClockIcon className="h-5 w-5 text-yellow-500 mr-2" />
-                                  <span className="text-sm font-medium text-yellow-600">Inactief</span>
-                                </>
-                              )
+                        <div className="flex items-center space-x-3">
+                          {/* Status */}
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
+                            isConnected && isActive
+                              ? darkMode ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-700'
+                              : !isConnected
+                              ? darkMode ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-600'
+                              : darkMode ? 'bg-yellow-500/10 text-yellow-400' : 'bg-yellow-50 text-yellow-700'
+                          }`}>
+                            {isConnected && isActive ? (
+                              <>
+                                <CheckCircleIcon className="h-3.5 w-3.5 mr-1" />
+                                Actief
+                              </>
+                            ) : !isConnected ? (
+                              <>
+                                <XCircleIcon className="h-3.5 w-3.5 mr-1" />
+                                Niet verbonden
+                              </>
                             ) : (
                               <>
-                                <XCircleIcon className="h-5 w-5 text-red-500 mr-2" />
-                                <span className="text-sm font-medium text-red-600">Niet Verbonden</span>
+                                <ClockIcon className="h-3.5 w-3.5 mr-1" />
+                                Inactief
                               </>
                             )}
-                          </div>
+                          </span>
                           
+                          {/* Action */}
                           <Link
-                            href={posStatus && posStatus.connected 
+                            href={isConnected 
                               ? `/restaurants/${restaurant.id}` 
                               : `/restaurants/${restaurant.id}/onboarding?step=3`
                             }
-                            className={`inline-flex items-center px-4 py-2 rounded-lg transition-all text-sm font-medium ${
-                              posStatus && posStatus.connected
-                                ? darkMode
-                                  ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white hover:bg-[#1a1c25]'
-                                  : 'bg-white border border-gray-200 text-[#6B7280] hover:bg-gray-50'
-                                : 'bg-green-500 text-white hover:bg-green-600'
+                            className={`text-sm font-medium ${
+                              !isConnected
+                                ? darkMode ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-700'
+                                : darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-700'
                             }`}
                           >
-                            {posStatus && posStatus.connected ? 'Bekijk Details' : 'Configureer POS'}
-                            <ChevronRightIcon className="ml-1 h-4 w-4" />
+                            {!isConnected ? 'Configureer →' : 'Details →'}
                           </Link>
                         </div>
                       </div>

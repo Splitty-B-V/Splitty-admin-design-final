@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useTheme } from '../contexts/ThemeContext'
+import { useRestaurants } from '../contexts/RestaurantsContext'
 import {
   HomeIcon,
   BuildingStorefrontIcon,
@@ -29,7 +30,58 @@ import {
   GlobeAltIcon,
   ArrowsRightLeftIcon,
   Bars2Icon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline'
+
+// POS Status Indicator Component
+const POSStatusIndicator = () => {
+  const [hasIssues, setHasIssues] = useState(false)
+  const { restaurants } = useRestaurants()
+  
+  useEffect(() => {
+    const checkPOSStatus = () => {
+      let issuesFound = false
+      
+      if (restaurants) {
+        restaurants.forEach(restaurant => {
+          if (!restaurant.deleted) {
+            const onboardingData = localStorage.getItem(`onboarding_${restaurant.id}`)
+            if (onboardingData) {
+              try {
+                const parsed = JSON.parse(onboardingData)
+                if (!parsed.posData || !parsed.posData.posType) {
+                  issuesFound = true
+                }
+              } catch (e) {
+                issuesFound = true
+              }
+            } else {
+              issuesFound = true
+            }
+          }
+        })
+      }
+      
+      setHasIssues(issuesFound)
+    }
+    
+    checkPOSStatus()
+    const interval = setInterval(checkPOSStatus, 30000) // Check every 30 seconds
+    
+    return () => clearInterval(interval)
+  }, [restaurants])
+  
+  if (!hasIssues) return null
+  
+  return (
+    <span className="inline-flex items-center ml-auto">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+      </span>
+    </span>
+  )
+}
 
 const allNavigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, roles: ['ceo', 'admin', 'account_manager', 'support', 'developer'] },
@@ -444,8 +496,11 @@ export default function Layout({ children }) {
                                 <div className="w-4 mr-2" /> {/* Spacer for chevron */}
                                 <div className="w-5" /> {/* Spacer for icon */}
                               </div>
-                              <span className="flex-1 ml-3">
-                                {subItem.name}
+                              <span className="flex-1 ml-3 flex items-center justify-between">
+                                <span>{subItem.name}</span>
+                                {subItem.href === '/pos' && (
+                                  <POSStatusIndicator />
+                                )}
                               </span>
                             </Link>
                           </div>

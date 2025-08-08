@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Layout from '../components/Layout'
 import Breadcrumb from '../components/Breadcrumb'
 import { useUsers } from '../contexts/UsersContext'
+import { useTheme } from '../contexts/ThemeContext'
 import {
   MagnifyingGlassIcon,
   UserPlusIcon,
@@ -20,6 +21,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function Users() {
+  const { darkMode } = useTheme()
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -66,39 +68,7 @@ export default function Users() {
     }).format(date)
   }
 
-  const getRoleIcon = (role) => {
-    switch (role) {
-      case 'ceo':
-        return <ShieldCheckIcon className="h-4 w-4" />
-      case 'admin':
-        return <ShieldCheckIcon className="h-4 w-4" />
-      case 'account_manager':
-        return <UserGroupIcon className="h-4 w-4" />
-      case 'support':
-        return <UserIcon className="h-4 w-4" />
-      case 'developer':
-        return <UserIcon className="h-4 w-4" />
-      default:
-        return <UserIcon className="h-4 w-4" />
-    }
-  }
-
-  const getRoleBadgeStyle = (role) => {
-    switch (role) {
-      case 'ceo':
-        return 'bg-[#FF6B6B]/20 text-[#FF6B6B] border border-[#FF6B6B]/30'
-      case 'admin':
-        return 'bg-[#667EEA]/20 text-[#667EEA] border border-[#667EEA]/30'
-      case 'account_manager':
-        return 'bg-[#4ECDC4]/20 text-[#4ECDC4] border border-[#4ECDC4]/30'
-      case 'support':
-        return 'bg-[#2BE89A]/20 text-[#2BE89A] border border-[#2BE89A]/30'
-      case 'developer':
-        return 'bg-[#6190E8]/20 text-[#6190E8] border border-[#6190E8]/30'
-      default:
-        return 'bg-[#4B5563]/20 text-[#4B5563] border border-[#4B5563]/30'
-    }
-  }
+  // Removed icon and style functions as we're using inline styles now
 
   const getRoleLabel = (role) => {
     switch (role) {
@@ -146,115 +116,172 @@ export default function Users() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0A0B0F]">
-        <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+        <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Breadcrumb */}
-            <Breadcrumb items={[{ name: 'Gebruikers' }]} />
+            <Breadcrumb items={[{ name: 'Splitty Team' }]} />
 
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-white">Splitty Team</h1>
-                <p className="text-[#BBBECC] mt-1">Beheer alle medewerkers en hun toegangsrechten</p>
+                <h1 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} mb-1`}>
+                  Splitty Team
+                </h1>
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Beheer alle medewerkers en hun toegangsrechten
+                </p>
               </div>
               <Link
                 href="/users/new"
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition shadow-lg"
+                className={`inline-flex items-center px-4 py-2.5 rounded-lg font-medium transition-colors ${
+                  darkMode 
+                    ? 'bg-green-500 text-white hover:bg-green-600'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                }`}
               >
-                <UserPlusIcon className="h-5 w-5 mr-2" />
-                Gebruiker Toevoegen
+                <UserPlusIcon className="h-4 w-4 mr-2" />
+                Nieuwe Medewerker
               </Link>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {stats.map((stat, index) => (
-                <div key={index} className="bg-[#1c1e27] rounded-xl p-5 border border-[#2a2d3a]">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[#BBBECC] text-sm">{stat.label}</p>
-                      <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
-                    </div>
-                    <div className={`p-3 bg-gradient-to-r ${stat.color} rounded-lg`}>
-                      <stat.icon className="h-6 w-6 text-white" />
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className={`p-5 rounded-lg ${
+                darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white border border-gray-200'
+              }`}>
+                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Totaal Team
+                </p>
+                <p className={`text-2xl font-semibold mt-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {companyUsers.length}
+                </p>
+              </div>
+              
+              <div className={`p-5 rounded-lg ${
+                darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white border border-gray-200'
+              }`}>
+                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Actief
+                </p>
+                <p className={`text-2xl font-semibold mt-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {companyUsers.filter(u => u.status === 'active').length}
+                </p>
+              </div>
+              
+              <div className={`p-5 rounded-lg ${
+                darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white border border-gray-200'
+              }`}>
+                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Administrators
+                </p>
+                <p className={`text-2xl font-semibold mt-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {companyUsers.filter(u => u.role === 'admin' || u.role === 'ceo').length}
+                </p>
+              </div>
+              
+              <div className={`p-5 rounded-lg ${
+                darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white border border-gray-200'
+              }`}>
+                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Support Team
+                </p>
+                <p className={`text-2xl font-semibold mt-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {companyUsers.filter(u => u.role === 'support' || u.role === 'account_manager').length}
+                </p>
+              </div>
             </div>
 
-            {/* Filters */}
-            <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
-              <div className="flex flex-col lg:flex-row gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MagnifyingGlassIcon className="h-5 w-5 text-[#BBBECC]" />
-                    </div>
-                    <input
-                      type="text"
-                      name="search"
-                      id="search"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="block w-full pl-10 pr-3 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
-                      placeholder="Zoek op naam, email of afdeling..."
-                    />
-                  </div>
+            {/* Search and Filters */}
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <MagnifyingGlassIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
+                    darkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`} />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg border transition-colors ${
+                      darkMode
+                        ? 'bg-[#1c1e27] border-[#2a2d3a] text-white placeholder-gray-500 focus:border-green-500'
+                        : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-green-600'
+                    } focus:outline-none`}
+                    placeholder="Zoek op naam, email of afdeling..."
+                  />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <FunnelIcon className="h-5 w-5 text-[#BBBECC]" />
-                  <div className="flex space-x-3">
-                    <select
-                      id="role"
-                      name="role"
-                      value={roleFilter}
-                      onChange={(e) => setRoleFilter(e.target.value)}
-                      className="bg-[#0A0B0F] border border-[#2a2d3a] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2BE89A]"
-                    >
-                      <option value="all">Alle Rollen</option>
-                      <option value="ceo">CEO</option>
-                      <option value="admin">Administrator</option>
-                      <option value="account_manager">Account Manager</option>
-                      <option value="support">Support</option>
-                      <option value="developer">Developer</option>
-                    </select>
-                    <select
-                      id="status"
-                      name="status"
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="bg-[#0A0B0F] border border-[#2a2d3a] text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2BE89A]"
-                    >
-                      <option value="all">Alle Status</option>
-                      <option value="active">Actief</option>
-                      <option value="inactive">Inactief</option>
-                    </select>
-                  </div>
-                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  className={`px-4 py-2.5 rounded-lg border transition-colors ${
+                    darkMode
+                      ? 'bg-[#1c1e27] border-[#2a2d3a] text-white'
+                      : 'bg-white border-gray-200 text-gray-900'
+                  } focus:outline-none`}
+                >
+                  <option value="all">Alle Rollen</option>
+                  <option value="ceo">CEO</option>
+                  <option value="admin">Administrator</option>
+                  <option value="account_manager">Account Manager</option>
+                  <option value="support">Support</option>
+                  <option value="developer">Developer</option>
+                </select>
+                
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className={`px-4 py-2.5 rounded-lg border transition-colors ${
+                    darkMode
+                      ? 'bg-[#1c1e27] border-[#2a2d3a] text-white'
+                      : 'bg-white border-gray-200 text-gray-900'
+                  } focus:outline-none`}
+                >
+                  <option value="all">Alle Status</option>
+                  <option value="active">Actief</option>
+                  <option value="inactive">Inactief</option>
+                </select>
               </div>
             </div>
 
             {/* Users Table */}
-            <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden">
+            <div className={`rounded-xl overflow-hidden ${
+              darkMode 
+                ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                : 'bg-white shadow-sm'
+            }`}>
               <div className="overflow-x-auto">
                 <table className="min-w-full">
-                  <thead className="bg-[#0A0B0F] border-b border-[#2a2d3a]">
+                  <thead className={`border-b ${
+                    darkMode ? 'bg-[#0A0B0F] border-[#2a2d3a]' : 'bg-gray-50 border-gray-200'
+                  }`}>
                     <tr>
-                      <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      }`}>
                         Gebruiker
                       </th>
-                      <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      }`}>
                         Afdeling
                       </th>
-                      <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      }`}>
                         Rol
                       </th>
-                      <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      }`}>
                         Status
                       </th>
-                      <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
+                        darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      }`}>
                         Laatste Login
                       </th>
                       <th scope="col" className="relative px-6 py-4">
@@ -262,21 +289,35 @@ export default function Users() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#2a2d3a]">
+                  <tbody className={`divide-y ${
+                    darkMode ? 'divide-[#2a2d3a]' : 'divide-gray-200'
+                  }`}>
                     {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-[#0A0B0F] transition-colors">
+                      <tr key={user.id} className={`transition-colors ${
+                        darkMode ? 'hover:bg-[#0A0B0F]' : 'hover:bg-gray-50'
+                      }`}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-semibold">
+                            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${
+                              darkMode 
+                                ? 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black'
+                                : 'bg-green-100 text-green-700'
+                            }`}>
                               {user.name.split(' ').map(n => n[0]).join('')}
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-white">{user.name}</div>
-                              <div className="text-sm text-[#BBBECC] flex items-center mt-1">
+                              <div className={`text-sm font-medium ${
+                                darkMode ? 'text-white' : 'text-gray-900'
+                              }`}>{user.name}</div>
+                              <div className={`text-sm flex items-center mt-1 ${
+                                darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                              }`}>
                                 <EnvelopeIcon className="h-3.5 w-3.5 mr-1" />
                                 {user.email}
                               </div>
-                              <div className="text-sm text-[#BBBECC] flex items-center mt-0.5">
+                              <div className={`text-sm flex items-center mt-0.5 ${
+                                darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                              }`}>
                                 <PhoneIcon className="h-3.5 w-3.5 mr-1" />
                                 {user.phone}
                               </div>
@@ -284,53 +325,85 @@ export default function Users() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center text-sm text-white">
-                            <BuildingOfficeIcon className="h-4 w-4 text-[#BBBECC] mr-2" />
+                          <div className={`flex items-center text-sm ${
+                            darkMode ? 'text-white' : 'text-gray-900'
+                          }`}>
+                            <BuildingOfficeIcon className={`h-4 w-4 mr-2 ${
+                              darkMode ? 'text-[#BBBECC]' : 'text-gray-400'
+                            }`} />
                             {user.department}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getRoleBadgeStyle(user.role)}`}>
-                            {getRoleIcon(user.role)}
-                            <span className="ml-1.5">
-                              {getRoleLabel(user.role)}
-                            </span>
-                          </div>
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
+                            user.role === 'ceo' 
+                              ? darkMode ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-700'
+                              : user.role === 'admin'
+                              ? darkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-700'
+                              : user.role === 'account_manager'
+                              ? darkMode ? 'bg-cyan-500/10 text-cyan-400' : 'bg-cyan-50 text-cyan-700'
+                              : user.role === 'support'
+                              ? darkMode ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-700'
+                              : darkMode ? 'bg-gray-500/10 text-gray-400' : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {getRoleLabel(user.role)}
+                          </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {user.status === 'active' ? (
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#2BE89A]/20 text-[#2BE89A] border border-[#2BE89A]/30">
-                              <CheckCircleIcon className="h-4 w-4 mr-1.5" />
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
+                              darkMode 
+                                ? 'bg-green-500/10 text-green-400'
+                                : 'bg-green-50 text-green-700'
+                            }`}>
+                              <CheckCircleIcon className="h-3.5 w-3.5 mr-1" />
                               Actief
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30">
-                              <XCircleIcon className="h-4 w-4 mr-1.5" />
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
+                              darkMode 
+                                ? 'bg-red-500/10 text-red-400'
+                                : 'bg-red-50 text-red-700'
+                            }`}>
+                              <XCircleIcon className="h-3.5 w-3.5 mr-1" />
                               Inactief
                             </span>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center text-sm text-[#BBBECC]">
+                          <div className={`flex items-center text-sm ${
+                            darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                          }`}>
                             <ClockIcon className="h-4 w-4 mr-1.5" />
                             {formatDate(user.lastLogin)}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className="flex items-center justify-end space-x-3">
+                          <div className="flex items-center justify-end space-x-2">
                             <Link
                               href={`/users/${user.id}`}
-                              className="inline-flex items-center px-3 py-1.5 bg-[#0A0B0F] text-[#2BE89A] border border-[#2BE89A]/30 rounded-lg hover:bg-[#2BE89A]/10 transition text-sm"
+                              className={`text-sm font-medium transition-colors ${
+                                darkMode 
+                                  ? 'text-green-400 hover:text-green-300'
+                                  : 'text-green-600 hover:text-green-700'
+                              }`}
                             >
                               Bewerk
                             </Link>
-                            {canDelete && user.role !== 'ceo' && ( // Don't allow deleting CEO
-                              <Link
-                                href={`/users/${user.id}?delete=true`}
-                                className="inline-flex items-center px-3 py-1.5 bg-[#0A0B0F] text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition text-sm"
-                              >
-                                Verwijder
-                              </Link>
+                            {canDelete && user.role !== 'ceo' && (
+                              <>
+                                <span className={darkMode ? 'text-gray-600' : 'text-gray-300'}>•</span>
+                                <Link
+                                  href={`/users/${user.id}?delete=true`}
+                                  className={`text-sm font-medium transition-colors ${
+                                    darkMode 
+                                      ? 'text-red-400 hover:text-red-300'
+                                      : 'text-red-600 hover:text-red-700'
+                                  }`}
+                                >
+                                  Verwijder
+                                </Link>
+                              </>
                             )}
                           </div>
                         </td>
@@ -342,10 +415,18 @@ export default function Users() {
               
               {/* Table Footer */}
               {filteredUsers.length > 0 && (
-                <div className="bg-[#0A0B0F] px-6 py-4 border-t border-[#2a2d3a]">
+                <div className={`px-6 py-4 border-t ${
+                  darkMode 
+                    ? 'bg-[#0A0B0F] border-[#2a2d3a]'
+                    : 'bg-gray-50 border-gray-200'
+                }`}>
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-[#BBBECC]">
-                      <span className="font-medium text-white">{filteredUsers.length}</span> gebruikers gevonden
+                    <div className={`text-sm ${
+                      darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
+                    }`}>
+                      <span className={`font-medium ${
+                        darkMode ? 'text-white' : 'text-gray-900'
+                      }`}>{filteredUsers.length}</span> gebruikers gevonden
                     </div>
                   </div>
                 </div>
@@ -354,10 +435,20 @@ export default function Users() {
 
             {/* Empty State */}
             {filteredUsers.length === 0 && (
-              <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] p-12 text-center">
-                <UserGroupIcon className="mx-auto h-12 w-12 text-[#BBBECC] mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">Geen gebruikers gevonden</h3>
-                <p className="text-[#BBBECC]">Probeer je zoekfilters aan te passen</p>
+              <div className={`rounded-xl p-12 text-center ${
+                darkMode 
+                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                  : 'bg-white shadow-sm'
+              }`}>
+                <UserGroupIcon className={`mx-auto h-12 w-12 mb-4 ${
+                  darkMode ? 'text-[#BBBECC]' : 'text-gray-400'
+                }`} />
+                <h3 className={`text-lg font-medium mb-2 ${
+                  darkMode ? 'text-white' : 'text-gray-900'
+                }`}>Geen gebruikers gevonden</h3>
+                <p className={darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}>
+                  Probeer je zoekfilters aan te passen
+                </p>
               </div>
             )}
           </div>

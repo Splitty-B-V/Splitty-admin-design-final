@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Layout from '../../components/Layout'
 import Breadcrumb from '../../components/Breadcrumb'
 import { useRestaurants } from '../../contexts/RestaurantsContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import React from 'react'
 import {
   ArrowLeftIcon,
@@ -20,6 +21,7 @@ import { CheckIcon as CheckIconSolid } from '@heroicons/react/24/solid'
 export default function NewRestaurant() {
   const router = useRouter()
   const { addRestaurant } = useRestaurants()
+  const { darkMode } = useTheme()
   const [currentStep, setCurrentStep] = useState(1)
   const [showMediaError, setShowMediaError] = useState(false)
   const [dragActive, setDragActive] = useState({ logo: false, banner: false })
@@ -216,10 +218,12 @@ export default function NewRestaurant() {
               className={`flex items-center justify-center w-12 h-12 rounded-full border transition-all
                       ${
                         currentStep > step.number
-                          ? 'border-[#2BE89A] bg-[#2BE89A] text-black'
+                          ? 'border-green-500 bg-gradient-to-r from-green-500 to-green-600 text-white'
                           : currentStep === step.number
-                          ? 'border-[#2BE89A] bg-[#2BE89A] text-black scale-110 shadow-lg shadow-[#2BE89A]/30'
-                          : 'border-[#2a2d3a] bg-[#1c1e27] text-[#BBBECC]'
+                          ? 'border-green-500 bg-gradient-to-r from-green-500 to-green-600 text-white scale-110 shadow-lg shadow-green-500/30'
+                          : darkMode
+                          ? 'border-[#2a2d3a] bg-[#1c1e27] text-[#BBBECC]'
+                          : 'border-gray-300 bg-white text-gray-500'
                       }`}
             >
               {currentStep > step.number ? (
@@ -230,7 +234,9 @@ export default function NewRestaurant() {
             </div>
             <div className="ml-3 hidden md:block">
               <p className={`text-sm font-medium ${
-                currentStep >= step.number ? 'text-[#2BE89A]' : 'text-[#BBBECC]'
+                currentStep >= step.number 
+                  ? 'text-green-500' 
+                  : darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
               }`}>
                 {step.title}
               </p>
@@ -238,7 +244,9 @@ export default function NewRestaurant() {
           </div>
           {index < steps.length - 1 && (
             <div className={`w-16 h-0.5 ${
-              currentStep > step.number ? 'bg-[#2BE89A]' : 'bg-[#2a2d3a]'
+              currentStep > step.number 
+                ? 'bg-green-500' 
+                : darkMode ? 'bg-[#2a2d3a]' : 'bg-gray-300'
             }`} />
           )}
         </React.Fragment>
@@ -249,20 +257,24 @@ export default function NewRestaurant() {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div className="flex items-center space-x-3 mb-6">
-        <BuildingStorefrontIcon className="h-6 w-6 text-[#2BE89A]" />
-        <h2 className="text-xl font-semibold text-white">Basisinformatie</h2>
+        <BuildingStorefrontIcon className={`h-6 w-6 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+        <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Basisinformatie</h2>
       </div>
       <div className="grid grid-cols-1 gap-5">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-[#BBBECC] mb-2">
-            Restaurant Naam <span className="text-red-400">*</span>
+          <label htmlFor="name" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+            Restaurant Naam <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             name="name"
             id="name"
             required
-            className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+              darkMode
+                ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white placeholder-[#BBBECC]/50 focus:ring-[#2BE89A]'
+                : 'bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 hover:border-gray-300'
+            }`}
             placeholder="Bijv. Restaurant De Gouden Lepel"
             value={formData.name}
             onChange={handleInputChange}
@@ -270,15 +282,19 @@ export default function NewRestaurant() {
         </div>
 
         <div>
-          <label htmlFor="address" className="block text-sm font-medium text-[#BBBECC] mb-2">
-            Adres <span className="text-red-400">*</span>
+          <label htmlFor="address" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+            Adres <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             name="address"
             id="address"
             required
-            className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+            className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+              darkMode
+                ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white placeholder-[#BBBECC]/50 focus:ring-[#2BE89A]'
+                : 'bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 hover:border-gray-300'
+            }`}
             placeholder="Straatnaam 123"
             value={formData.address}
             onChange={handleInputChange}
@@ -287,15 +303,19 @@ export default function NewRestaurant() {
 
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label htmlFor="city" className="block text-sm font-medium text-[#BBBECC] mb-2">
-              Stad <span className="text-red-400">*</span>
+            <label htmlFor="city" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+              Stad <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="city"
               id="city"
               required
-              className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+              className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+              darkMode
+                ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white placeholder-[#BBBECC]/50 focus:ring-[#2BE89A]'
+                : 'bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 hover:border-gray-300'
+            }`}
               placeholder="Amsterdam"
               value={formData.city}
               onChange={handleInputChange}
@@ -303,15 +323,19 @@ export default function NewRestaurant() {
           </div>
 
           <div>
-            <label htmlFor="postal_code" className="block text-sm font-medium text-[#BBBECC] mb-2">
-              Postcode <span className="text-red-400">*</span>
+            <label htmlFor="postal_code" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+              Postcode <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="postal_code"
               id="postal_code"
               required
-              className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+              className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+              darkMode
+                ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white placeholder-[#BBBECC]/50 focus:ring-[#2BE89A]'
+                : 'bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 hover:border-gray-300'
+            }`}
               placeholder="1234 AB"
               value={formData.postal_code}
               onChange={handleInputChange}
@@ -319,14 +343,18 @@ export default function NewRestaurant() {
           </div>
 
           <div>
-            <label htmlFor="country" className="block text-sm font-medium text-[#BBBECC] mb-2">
-              Land <span className="text-red-400">*</span>
+            <label htmlFor="country" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+              Land <span className="text-red-500">*</span>
             </label>
             <select
               name="country"
               id="country"
               required
-              className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+              className={`w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-1 focus:border-transparent cursor-pointer ${
+                darkMode
+                  ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white focus:ring-[#2BE89A]'
+                  : 'bg-white border border-gray-200 text-gray-900 focus:ring-green-500 hover:border-gray-300'
+              }`}
               value={formData.country}
               onChange={handleInputChange}
             >
@@ -345,20 +373,24 @@ export default function NewRestaurant() {
     <div className="space-y-6">
       <div>
         <div className="flex items-center space-x-3 mb-6">
-          <EnvelopeIcon className="h-6 w-6 text-[#2BE89A]" />
-          <h2 className="text-xl font-semibold text-white">Contactinformatie</h2>
+          <EnvelopeIcon className={`h-6 w-6 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+          <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Contactinformatie</h2>
         </div>
         <div className="grid grid-cols-1 gap-5">
           <div>
-            <label htmlFor="contact_email" className="block text-sm font-medium text-[#BBBECC] mb-2">
-              Contact Email <span className="text-red-400">*</span>
+            <label htmlFor="contact_email" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+              Contact Email <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
               name="contact_email"
               id="contact_email"
               required
-              className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+              className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+              darkMode
+                ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white placeholder-[#BBBECC]/50 focus:ring-[#2BE89A]'
+                : 'bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 hover:border-gray-300'
+            }`}
               placeholder="restaurant@example.com"
               value={formData.contact_email}
               onChange={handleInputChange}
@@ -366,7 +398,7 @@ export default function NewRestaurant() {
           </div>
 
           <div>
-            <label htmlFor="contact_phone" className="block text-sm font-medium text-[#BBBECC] mb-2">
+            <label htmlFor="contact_phone" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
               <PhoneIcon className="inline h-4 w-4 mr-1" />
               Contact Telefoon
             </label>
@@ -374,7 +406,11 @@ export default function NewRestaurant() {
               type="tel"
               name="contact_phone"
               id="contact_phone"
-              className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+              className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+              darkMode
+                ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white placeholder-[#BBBECC]/50 focus:ring-[#2BE89A]'
+                : 'bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 hover:border-gray-300'
+            }`}
               placeholder="+31 6 12345678"
               value={formData.contact_phone}
               onChange={handleInputChange}
@@ -383,20 +419,24 @@ export default function NewRestaurant() {
         </div>
       </div>
 
-      <div className="border-t border-[#2a2d3a] pt-6">
+      <div className={`border-t pt-6 ${darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'}`}>
         <div className="flex items-center space-x-3 mb-6">
-          <CurrencyEuroIcon className="h-6 w-6 text-[#2BE89A]" />
-          <h2 className="text-xl font-semibold text-white">Service Kosten</h2>
+          <CurrencyEuroIcon className={`h-6 w-6 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+          <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Service Kosten</h2>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="service_fee_type" className="block text-sm font-medium text-[#BBBECC] mb-2">
+            <label htmlFor="service_fee_type" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
               Kosten Type
             </label>
             <select
               name="service_fee_type"
               id="service_fee_type"
-              className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+              className={`w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-1 focus:border-transparent cursor-pointer ${
+                darkMode
+                  ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white focus:ring-[#2BE89A]'
+                  : 'bg-white border border-gray-200 text-gray-900 focus:ring-green-500 hover:border-gray-300'
+              }`}
               value={formData.service_fee_type}
               onChange={handleInputChange}
             >
@@ -406,7 +446,7 @@ export default function NewRestaurant() {
           </div>
 
           <div>
-            <label htmlFor="service_fee_amount" className="block text-sm font-medium text-[#BBBECC] mb-2">
+            <label htmlFor="service_fee_amount" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
               Kosten Bedrag {formData.service_fee_type === 'flat' ? '(€)' : '(%)'}
             </label>
             <input
@@ -415,7 +455,11 @@ export default function NewRestaurant() {
               id="service_fee_amount"
               step="0.01"
               min="0"
-              className="w-full px-4 py-2.5 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC]/50 focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+              className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+              darkMode
+                ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white placeholder-[#BBBECC]/50 focus:ring-[#2BE89A]'
+                : 'bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 hover:border-gray-300'
+            }`}
               placeholder={formData.service_fee_type === 'flat' ? '0.70' : '3.00'}
               value={formData.service_fee_amount}
               onChange={handleInputChange}
@@ -430,8 +474,8 @@ export default function NewRestaurant() {
     <div className="space-y-6">
       <div>
         <div className="flex items-center space-x-3 mb-6">
-          <PhotoIcon className="h-6 w-6 text-[#2BE89A]" />
-          <h2 className="text-xl font-semibold text-white">Media & Branding</h2>
+          <PhotoIcon className={`h-6 w-6 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+          <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Media & Branding</h2>
         </div>
         
         <div className="space-y-4">
@@ -449,15 +493,17 @@ export default function NewRestaurant() {
           
           {/* Logo Upload */}
           <div>
-            <label className="block text-sm font-medium text-[#BBBECC] mb-2">
-              Restaurant Logo <span className="text-red-400">*</span>
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+              Restaurant Logo <span className="text-red-500">*</span>
             </label>
             {formData.logoPreview ? (
               <div className="relative">
                 <img 
                   src={formData.logoPreview} 
                   alt="Logo preview" 
-                  className="w-full h-40 object-contain bg-[#0A0B0F] rounded-lg border border-[#2a2d3a]"
+                  className={`w-full h-40 object-contain rounded-lg border ${
+                    darkMode ? 'bg-[#0A0B0F] border-[#2a2d3a]' : 'bg-gray-50 border-gray-200'
+                  }`}
                 />
                 <button
                   type="button"
@@ -475,10 +521,18 @@ export default function NewRestaurant() {
               </div>
             ) : (
               <div 
-                className={`flex justify-center px-6 py-5 border-2 border-dashed rounded-lg transition-colors duration-200 bg-[#0A0B0F] ${
-                  dragActive.logo 
-                    ? 'border-[#2BE89A] bg-[#2BE89A]/10' 
-                    : 'border-[#2a2d3a] hover:border-[#2BE89A]/50'
+                className={`flex justify-center px-6 py-5 border-2 border-dashed rounded-lg transition-colors duration-200 ${
+                  darkMode
+                    ? `bg-[#0A0B0F] ${
+                        dragActive.logo 
+                          ? 'border-[#2BE89A] bg-[#2BE89A]/10' 
+                          : 'border-[#2a2d3a] hover:border-[#2BE89A]/50'
+                      }`
+                    : `bg-white ${
+                        dragActive.logo 
+                          ? 'border-green-500 bg-green-50' 
+                          : 'border-gray-300 hover:border-green-400'
+                      }`
                 }`}
                 onDragEnter={(e) => handleDragIn(e, 'logo')}
                 onDragLeave={(e) => handleDragOut(e, 'logo')}
@@ -486,11 +540,13 @@ export default function NewRestaurant() {
                 onDrop={(e) => handleDrop(e, 'logo')}
               >
                 <div className="text-center">
-                  <PhotoIcon className="mx-auto h-10 w-10 text-[#BBBECC]" />
-                  <div className="mt-2 flex text-sm text-[#BBBECC]">
+                  <PhotoIcon className={`mx-auto h-10 w-10 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
+                  <div className={`mt-2 flex text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
                     <label
                       htmlFor="logo-upload"
-                      className="relative cursor-pointer font-medium text-[#2BE89A] hover:text-[#4FFFB0]"
+                      className={`relative cursor-pointer font-medium ${
+                        darkMode ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-500'
+                      }`}
                     >
                       <span>Upload bestand</span>
                       <input 
@@ -504,7 +560,7 @@ export default function NewRestaurant() {
                     </label>
                     <p className="pl-1">of sleep en laat vallen</p>
                   </div>
-                  <p className="text-xs text-[#BBBECC]/70 mt-1">PNG, JPG tot 10MB</p>
+                  <p className={`text-xs mt-1 ${darkMode ? 'text-[#BBBECC]/70' : 'text-gray-500'}`}>PNG, JPG tot 10MB</p>
                 </div>
               </div>
             )}
@@ -512,15 +568,17 @@ export default function NewRestaurant() {
 
           {/* Banner Upload */}
           <div>
-            <label className="block text-sm font-medium text-[#BBBECC] mb-2">
-              Restaurant Banner <span className="text-red-400">*</span>
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+              Restaurant Banner <span className="text-red-500">*</span>
             </label>
             {formData.bannerPreview ? (
               <div className="relative">
                 <img 
                   src={formData.bannerPreview} 
                   alt="Banner preview" 
-                  className="w-full h-40 object-cover bg-[#0A0B0F] rounded-lg border border-[#2a2d3a]"
+                  className={`w-full h-40 object-cover rounded-lg border ${
+                    darkMode ? 'bg-[#0A0B0F] border-[#2a2d3a]' : 'bg-gray-50 border-gray-200'
+                  }`}
                 />
                 <button
                   type="button"
@@ -538,10 +596,18 @@ export default function NewRestaurant() {
               </div>
             ) : (
               <div 
-                className={`flex justify-center px-6 py-5 border-2 border-dashed rounded-lg transition-colors duration-200 bg-[#0A0B0F] ${
-                  dragActive.banner 
-                    ? 'border-[#2BE89A] bg-[#2BE89A]/10' 
-                    : 'border-[#2a2d3a] hover:border-[#2BE89A]/50'
+                className={`flex justify-center px-6 py-5 border-2 border-dashed rounded-lg transition-colors duration-200 ${
+                  darkMode
+                    ? `bg-[#0A0B0F] ${
+                        dragActive.banner 
+                          ? 'border-[#2BE89A] bg-[#2BE89A]/10' 
+                          : 'border-[#2a2d3a] hover:border-[#2BE89A]/50'
+                      }`
+                    : `bg-white ${
+                        dragActive.banner 
+                          ? 'border-green-500 bg-green-50' 
+                          : 'border-gray-300 hover:border-green-400'
+                      }`
                 }`}
                 onDragEnter={(e) => handleDragIn(e, 'banner')}
                 onDragLeave={(e) => handleDragOut(e, 'banner')}
@@ -549,11 +615,13 @@ export default function NewRestaurant() {
                 onDrop={(e) => handleDrop(e, 'banner')}
               >
                 <div className="text-center">
-                  <PhotoIcon className="mx-auto h-10 w-10 text-[#BBBECC]" />
-                  <div className="mt-2 flex text-sm text-[#BBBECC]">
+                  <PhotoIcon className={`mx-auto h-10 w-10 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
+                  <div className={`mt-2 flex text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
                     <label
                       htmlFor="banner-upload"
-                      className="relative cursor-pointer font-medium text-[#2BE89A] hover:text-[#4FFFB0]"
+                      className={`relative cursor-pointer font-medium ${
+                        darkMode ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-500'
+                      }`}
                     >
                       <span>Upload bestand</span>
                       <input 
@@ -567,7 +635,7 @@ export default function NewRestaurant() {
                     </label>
                     <p className="pl-1">of sleep en laat vallen</p>
                   </div>
-                  <p className="text-xs text-[#BBBECC]/70 mt-1">PNG, JPG tot 10MB</p>
+                  <p className={`text-xs mt-1 ${darkMode ? 'text-[#BBBECC]/70' : 'text-gray-500'}`}>PNG, JPG tot 10MB</p>
                 </div>
               </div>
             )}
@@ -577,12 +645,22 @@ export default function NewRestaurant() {
       </div>
       
       {/* Next Steps Info */}
-      <div className="mt-6 bg-gradient-to-r from-[#2BE89A]/10 to-[#4FFFB0]/10 border border-[#2BE89A]/30 rounded-lg p-4">
+      <div className={`mt-6 rounded-lg p-4 border ${
+        darkMode 
+          ? 'bg-gradient-to-r from-green-900/20 to-green-800/20 border-green-700' 
+          : 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200'
+      }`}>
         <div className="flex items-start">
-          <ArrowRightIcon className="h-5 w-5 text-[#2BE89A] mt-0.5 mr-3 flex-shrink-0" />
+          <ArrowRightIcon className={`h-5 w-5 mt-0.5 mr-3 flex-shrink-0 ${
+            darkMode ? 'text-green-400' : 'text-green-600'
+          }`} />
           <div>
-            <p className="text-[#2BE89A] font-medium mb-1">Wat gebeurt er hierna?</p>
-            <p className="text-sm text-[#BBBECC]">
+            <p className={`font-medium mb-1 ${
+              darkMode ? 'text-green-400' : 'text-green-700'
+            }`}>Wat gebeurt er hierna?</p>
+            <p className={`text-sm ${
+              darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
+            }`}>
               Na het aanmaken van het restaurant word je direct naar de onboarding pagina gestuurd. 
               Daar kun je personeel toevoegen, Stripe koppelen en het POS systeem configureren.
             </p>
@@ -594,7 +672,7 @@ export default function NewRestaurant() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0A0B0F]">
+      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
         <div className="px-4 sm:px-6 lg:px-8 py-6">
           <div className="space-y-6">
             {/* Breadcrumb */}
@@ -606,42 +684,60 @@ export default function NewRestaurant() {
             />
 
             {/* Back Link */}
-            <div className="flex justify-between items-center">
-              <Link
-                href="/restaurants"
-                className="inline-flex items-center text-[#BBBECC] hover:text-white transition-colors"
-              >
-                <ArrowLeftIcon className="h-5 w-5 mr-2" />
-                Terug naar restaurants
-              </Link>
-            </div>
+            <Link
+              href="/restaurants"
+              className={`inline-flex items-center px-4 py-2 rounded-lg transition-all text-sm font-medium group ${
+                darkMode 
+                  ? 'bg-[#1c1e27] border border-[#2a2d3a] text-[#BBBECC] hover:text-white hover:bg-[#0A0B0F] hover:border-green-500' 
+                  : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-700 hover:bg-gray-100 hover:border-green-300'
+              }`}
+            >
+              <ArrowLeftIcon className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+              Terug naar Restaurants
+            </Link>
 
             <div className="max-w-3xl mx-auto">
-              <div className="bg-[#1c1e27] rounded-xl overflow-hidden border border-[#2a2d3a]">
+              <div className={`rounded-xl overflow-hidden border ${
+                darkMode ? 'bg-[#1c1e27] border-[#2a2d3a]' : 'bg-white border-gray-200'
+              }`}>
                 {/* Form Header with Steps - More compact */}
-                <div className="px-8 py-8 bg-gradient-to-r from-[#1c1e27] to-[#252833] border-b border-[#2a2d3a]">
-                  <h1 className="text-2xl font-bold text-white text-center mb-3">
+                <div className={`px-8 py-8 border-b ${
+                  darkMode 
+                    ? 'bg-gradient-to-r from-[#1c1e27] to-[#252833] border-[#2a2d3a]' 
+                    : 'bg-gradient-to-r from-gray-50 to-white border-gray-200'
+                }`}>
+                  <h1 className={`text-2xl font-bold text-center mb-3 ${
+                    darkMode ? 'text-white' : 'text-[#111827]'
+                  }`}>
                     Nieuw Restaurant Toevoegen
                   </h1>
-                  <p className="text-[#BBBECC] text-center mb-8 text-base">
+                  <p className={`text-center mb-8 text-base ${
+                    darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                  }`}>
                     Vul de gegevens in om een restaurant toe te voegen
                   </p>
                   {renderStepIndicator()}
                 </div>
 
                 {/* Form Content - More compact padding */}
-                <div className="px-8 py-8 bg-[#0A0B0F]">
+                <div className={`px-8 py-8 ${darkMode ? 'bg-[#0A0B0F]' : 'bg-white'}`}>
                   {currentStep === 1 && renderStep1()}
                   {currentStep === 2 && renderStep2()}
                   {currentStep === 3 && renderStep3()}
                 </div>
 
                 {/* Form Footer - More compact */}
-                <div className="px-8 py-5 bg-[#0A0B0F] border-t border-[#2a2d3a] flex justify-between">
+                <div className={`px-8 py-5 border-t flex justify-between ${
+                  darkMode ? 'bg-[#0A0B0F] border-[#2a2d3a]' : 'bg-gray-50 border-gray-200'
+                }`}>
                   {currentStep === 1 ? (
                     <Link
                       href="/restaurants"
-                      className="inline-flex items-center px-5 py-2.5 border border-[#2a2d3a] rounded-lg text-white bg-[#1c1e27] hover:bg-[#252833] transition-all duration-200"
+                      className={`inline-flex items-center px-5 py-2.5 border rounded-lg transition-all duration-200 ${
+                        darkMode
+                          ? 'border-[#2a2d3a] text-white bg-[#1c1e27] hover:bg-[#252833]'
+                          : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                      }`}
                     >
                       <ArrowLeftIcon className="-ml-1 mr-2 h-5 w-5" />
                       Annuleren
@@ -650,7 +746,11 @@ export default function NewRestaurant() {
                     <button
                       type="button"
                       onClick={handlePrevious}
-                      className="inline-flex items-center px-5 py-2.5 border border-[#2a2d3a] rounded-lg text-white bg-[#1c1e27] hover:bg-[#252833] transition-all duration-200"
+                      className={`inline-flex items-center px-5 py-2.5 border rounded-lg transition-all duration-200 ${
+                        darkMode
+                          ? 'border-[#2a2d3a] text-white bg-[#1c1e27] hover:bg-[#252833]'
+                          : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                      }`}
                     >
                       <ArrowLeftIcon className="-ml-1 mr-2 h-5 w-5" />
                       Vorige
@@ -662,7 +762,11 @@ export default function NewRestaurant() {
                       type="button"
                       onClick={handleNext}
                       disabled={!isStepValid()}
-                      className="inline-flex items-center px-4 py-2 border border-[#2a2d3a] rounded-lg text-white text-sm bg-[#1c1e27] hover:bg-[#252833] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={`inline-flex items-center px-4 py-2 border rounded-lg text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                        darkMode
+                          ? 'border-[#2a2d3a] text-white bg-[#1c1e27] hover:bg-[#252833]'
+                          : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                      }`}
                     >
                       Volgende
                       <ArrowRightIcon className="ml-2 -mr-1 h-5 w-5" />
@@ -671,7 +775,7 @@ export default function NewRestaurant() {
                     <button
                       type="button"
                       onClick={handleSubmit}
-                      className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg"
+                      className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-sm"
                     >
                       Maak aan & Start Onboarding
                       <ArrowRightIcon className="ml-2 -mr-1 h-5 w-5" />
