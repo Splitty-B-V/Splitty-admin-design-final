@@ -109,7 +109,7 @@ export default function Orders() {
     
     if (status === 'completed') {
       return (
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#2BE89A]/20 text-[#2BE89A] border border-[#2BE89A]/30">
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
           <CheckCircleIcon className="h-4 w-4 mr-1.5" />
           Voltooid
         </span>
@@ -118,17 +118,17 @@ export default function Orders() {
     
     return (
       <div className="flex items-center space-x-3">
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">
           <ClockIcon className="h-4 w-4 mr-1.5" />
           Actief
         </span>
-        <div className="w-20 bg-[#0A0B0F] rounded-full h-2">
+        <div className="w-20 rounded-full h-2 bg-gray-200">
           <div 
-            className="bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] h-2 rounded-full transition-all duration-300"
+            className="h-2 rounded-full transition-all duration-300 bg-green-600"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <span className="text-xs text-[#BBBECC]">{Math.round(progress)}%</span>
+        <span className="text-xs text-gray-600">{Math.round(progress)}%</span>
       </div>
     )
   }
@@ -161,93 +161,101 @@ export default function Orders() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0A0B0F]">
-        <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className="min-h-screen bg-[#F9FAFB]">
+        <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Breadcrumb */}
             <Breadcrumb items={[{ name: "Alle Splitty's" }]} />
 
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-white">Alle Splitty Transacties</h1>
-                <p className="text-[#BBBECC] mt-1">Real-time overzicht van alle Splitty betalingen</p>
+                <h1 className="text-2xl font-semibold text-[#111827] mb-1">
+                  Alle Splitty Transacties
+                </h1>
+                <p className="text-[#6B7280]">
+                  Real-time overzicht van alle Splitty betalingen
+                </p>
               </div>
               <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={handleRefresh}
-                  className="inline-flex items-center px-4 py-2 bg-[#1c1e27] border border-[#2a2d3a] rounded-lg text-white hover:bg-[#2a2d3a] transition"
+                  className="inline-flex items-center px-4 py-2.5 rounded-lg transition-all border border-gray-200 text-[#6B7280] bg-white hover:bg-gray-50 shadow-sm"
                 >
-                  <ArrowPathIcon className="h-5 w-5 mr-2" />
+                  <ArrowPathIcon className="-ml-1 mr-2 h-5 w-5 text-gray-500" />
                   Vernieuwen
                 </button>
                 <button
                   type="button"
                   onClick={handleExport}
-                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition shadow-lg"
+                  className="inline-flex items-center px-4 py-2.5 font-medium rounded-lg transition bg-green-600 text-white hover:bg-green-700 shadow-sm"
                 >
-                  <ArrowDownTrayIcon className="h-5 w-5 mr-2" />
+                  <ArrowDownTrayIcon className="-ml-1 mr-2 h-5 w-5" />
                   Exporteren
                 </button>
               </div>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-[#1c1e27] rounded-xl p-5 border border-[#2a2d3a]">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[#BBBECC] text-sm">Restaurant Bestellingen</p>
-                    <p className="text-2xl font-bold text-white mt-1">{activeCount}</p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+              <div className="p-6 rounded-xl bg-white shadow-sm">
+                <div className="flex items-center">
+                  <div className="p-3 rounded-lg bg-blue-100">
+                    <ClockIcon className="h-6 w-6 text-blue-600" />
                   </div>
-                  <div className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg">
-                    <ClockIcon className="h-6 w-6 text-white" />
-                  </div>
-                </div>
-              </div>
-              <div className="bg-[#1c1e27] rounded-xl p-5 border border-[#2a2d3a]">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[#BBBECC] text-sm">Transacties Vandaag</p>
-                    <p className="text-2xl font-bold text-white mt-1">{todayTransactions}</p>
-                  </div>
-                  <div className="p-3 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-lg">
-                    <ArrowsRightLeftIcon className="h-6 w-6 text-white" />
+                  <div className="ml-4">
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">ACTIEVE BESTELLINGEN</p>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">{activeCount}</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1c1e27] rounded-xl p-5 border border-[#2a2d3a]">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[#BBBECC] text-sm">Totaal via Splitty</p>
-                    <p className="text-2xl font-bold text-white mt-1">{formatCurrency(totalRevenue)}</p>
+              <div className="p-6 rounded-xl bg-white shadow-sm">
+                <div className="flex items-center">
+                  <div className="p-3 rounded-lg bg-green-100">
+                    <ArrowsRightLeftIcon className="h-6 w-6 text-green-600" />
                   </div>
-                  <div className="p-3 bg-gradient-to-r from-[#667EEA] to-[#764BA2] rounded-lg">
-                    <UserGroupIcon className="h-6 w-6 text-white" />
+                  <div className="ml-4">
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">TRANSACTIES VANDAAG</p>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">{todayTransactions}</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1c1e27] rounded-xl p-5 border border-[#2a2d3a]">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[#BBBECC] text-sm">Transactie Omzet</p>
-                    <p className="text-2xl font-bold text-white mt-1">{formatCurrency(todayTransactionRevenue)}</p>
+              <div className="p-6 rounded-xl bg-white shadow-sm">
+                <div className="flex items-center">
+                  <div className="p-3 rounded-lg bg-purple-100">
+                    <UserGroupIcon className="h-6 w-6 text-purple-600" />
                   </div>
-                  <div className="p-3 bg-gradient-to-r from-[#FF6B6B] to-[#FF8E53] rounded-lg">
-                    <CurrencyEuroIcon className="h-6 w-6 text-white" />
+                  <div className="ml-4">
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">TOTAAL VIA SPLITTY</p>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">{formatCurrency(totalRevenue)}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 rounded-xl bg-white shadow-sm">
+                <div className="flex items-center">
+                  <div className="p-3 rounded-lg bg-yellow-100">
+                    <CurrencyEuroIcon className="h-6 w-6 text-yellow-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">TRANSACTIE OMZET</p>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">{formatCurrency(todayTransactionRevenue)}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Filters */}
-            <div className="bg-[#1c1e27] rounded-xl p-6 border border-[#2a2d3a]">
+            <div className={`p-6 rounded-xl ${
+              false 
+                ? 'bg-[#1c1e27] border border-[#2a2d3a]'
+                : 'bg-white shadow-sm'
+            }`}>
               <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MagnifyingGlassIcon className="h-5 w-5 text-[#BBBECC]" />
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       type="text"
@@ -255,7 +263,7 @@ export default function Orders() {
                       id="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="block w-full pl-10 pr-3 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className="block w-full pl-12 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition bg-[#F9FAFB] border-gray-200 text-[#111827] placeholder-gray-500 focus:ring-green-500 focus:border-transparent hover:border-gray-300"
                       placeholder="Zoek op Splitty ID, restaurant of tafel..."
                     />
                   </div>
@@ -264,7 +272,7 @@ export default function Orders() {
                   <select
                     value={restaurantFilter}
                     onChange={(e) => setRestaurantFilter(e.target.value)}
-                    className="px-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent cursor-pointer"
+                    className="px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 cursor-pointer transition bg-[#F9FAFB] border-gray-200 text-[#111827] focus:ring-green-500 focus:border-transparent hover:border-gray-300"
                   >
                     <option value="all">Alle Restaurants</option>
                     {restaurants.filter(r => !r.deleted).map(restaurant => (
@@ -273,7 +281,7 @@ export default function Orders() {
                       </option>
                     ))}
                   </select>
-                  <div className="flex bg-[#0A0B0F] rounded-lg p-1">
+                  <div className="flex rounded-lg p-1 bg-gray-100">
                     {[
                       { value: 'active', label: 'Actief' },
                       { value: 'completed', label: 'Voltooid' },
@@ -284,8 +292,8 @@ export default function Orders() {
                         onClick={() => setStatusFilter(option.value)}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                           statusFilter === option.value
-                            ? 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black'
-                            : 'text-[#BBBECC] hover:text-white'
+                            ? 'bg-green-600 text-white'
+                            : 'text-gray-600 hover:text-gray-900'
                         }`}
                       >
                         {option.label}
@@ -297,33 +305,33 @@ export default function Orders() {
             </div>
 
             {/* Orders Table */}
-            <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden">
+            <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
               <div className="overflow-x-auto">
                 <table className="min-w-full">
-                  <thead className="bg-[#0A0B0F] border-b border-[#2a2d3a]">
+                  <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Splitty ID
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Restaurant
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Tafel
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Gasten
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Totaal
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Betaald
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Status
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-[#BBBECC] uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Tijd
                       </th>
                       <th className="relative px-6 py-4">
@@ -331,37 +339,41 @@ export default function Orders() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#2a2d3a]">
+                  <tbody className="divide-y divide-gray-200">
                     {filteredOrders.map((order) => (
-                      <tr key={order.id} className="hover:bg-[#0A0B0F] transition-colors">
+                      <tr key={order.id} className="transition-colors hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className="p-2 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] rounded-lg">
-                              <ArrowsRightLeftIcon className="h-4 w-4 text-black" />
+                            <div className="p-2 bg-green-100 rounded-lg">
+                              <ArrowsRightLeftIcon className="h-4 w-4 text-green-600" />
                             </div>
-                            <span className="ml-3 text-sm font-medium text-white">{order.id}</span>
+                            <span className="ml-3 text-sm font-medium text-[#111827]">{order.id}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <BuildingStorefrontIcon className="h-5 w-5 text-[#BBBECC] mr-2" />
-                            <span className="text-sm text-white">{order.restaurant}</span>
+                            <BuildingStorefrontIcon className="h-5 w-5 mr-2 text-gray-500" />
+                            <span className="text-sm text-[#111827]">{order.restaurant}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#111827]">
                           {order.table}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <UserGroupIcon className="h-4 w-4 text-[#BBBECC] mr-2" />
-                            <span className="text-sm text-white">{order.paidGuests}/{order.guests}</span>
+                            <UserGroupIcon className="h-4 w-4 mr-2 text-gray-500" />
+                            <span className="text-sm text-[#111827]">{order.paidGuests}/{order.guests}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-semibold text-white">{formatCurrency(order.total)}</span>
+                          <span className="text-sm font-semibold text-[#111827]">{formatCurrency(order.total)}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`text-sm font-semibold ${order.paid >= order.total ? 'text-[#2BE89A]' : 'text-yellow-400'}`}>
+                          <span className={`text-sm font-semibold ${
+                            order.paid >= order.total 
+                              ? 'text-green-600'
+                              : 'text-yellow-600'
+                          }`}>
                             {formatCurrency(order.paid)}
                           </span>
                         </td>
@@ -369,7 +381,7 @@ export default function Orders() {
                           {getStatusBadge(order.status, order.remaining, order.total)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center text-sm text-[#BBBECC]">
+                          <div className="flex items-center text-sm text-gray-500">
                             <CalendarIcon className="h-4 w-4 mr-1.5" />
                             {formatDate(order.created)}
                           </div>
@@ -377,7 +389,7 @@ export default function Orders() {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                           <Link
                             href={`/orders/${order.id}`}
-                            className="inline-flex items-center px-3 py-1.5 bg-[#0A0B0F] text-[#2BE89A] border border-[#2BE89A]/30 rounded-lg hover:bg-[#2BE89A]/10 transition"
+                            className="inline-flex items-center px-3 py-1.5 rounded-lg transition bg-green-50 text-green-600 border border-green-200 hover:bg-green-100"
                           >
                             Bekijk
                             <svg className="ml-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -393,10 +405,10 @@ export default function Orders() {
               
               {/* Table Footer */}
               {filteredOrders.length > 0 && (
-                <div className="bg-[#0A0B0F] px-6 py-4 border-t border-[#2a2d3a]">
+                <div className="px-6 py-4 border-t bg-gray-50 border-gray-200">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-[#BBBECC]">
-                      <span className="font-medium text-white">{filteredOrders.length}</span> Splitty transacties gevonden
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium text-gray-900">{filteredOrders.length}</span> Splitty transacties gevonden
                     </div>
                   </div>
                 </div>
@@ -405,10 +417,10 @@ export default function Orders() {
 
             {/* Empty State */}
             {filteredOrders.length === 0 && (
-              <div className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] p-12 text-center">
-                <MagnifyingGlassIcon className="mx-auto h-12 w-12 text-[#BBBECC] mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">Geen Splitty transacties gevonden</h3>
-                <p className="text-[#BBBECC]">Probeer je filters aan te passen of selecteer een ander restaurant</p>
+              <div className="text-center py-16 rounded-xl bg-white shadow-sm">
+                <MagnifyingGlassIcon className="mx-auto h-12 w-12 mb-4 text-gray-400" />
+                <h3 className="text-lg font-medium mb-2 text-gray-900">Geen Splitty transacties gevonden</h3>
+                <p className="text-gray-600">Probeer je filters aan te passen of selecteer een ander restaurant</p>
               </div>
             )}
           </div>

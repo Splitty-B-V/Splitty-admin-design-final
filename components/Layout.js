@@ -109,7 +109,7 @@ const allNavigation = [
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const { darkMode, setTheme } = useTheme()
+  const { darkMode } = useTheme()
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState(() => {
@@ -291,7 +291,7 @@ export default function Layout({ children }) {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-[#0F1117] text-white' : 'bg-[#F9FAFB] text-[#111827]'}`}>
+    <div className="min-h-screen transition-colors duration-300 bg-[#F9FAFB] text-[#111827]">
       {/* Mobile sidebar backdrop */}
       <div
         className={`fixed inset-0 z-40 bg-gray-900/50 backdrop-blur-sm transition-opacity lg:hidden ${
@@ -310,11 +310,7 @@ export default function Layout({ children }) {
         <div className="lg:hidden absolute right-0 top-0 p-4">
           <button
             type="button"
-            className={`transition-colors duration-200 p-2 rounded-lg ${
-              darkMode
-                ? 'text-gray-500 hover:text-gray-300 hover:bg-gray-900'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            }`}
+            className="transition-colors duration-200 p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100"
             onClick={() => setSidebarOpen(false)}
           >
             <XMarkIcon className="h-6 w-6" />
@@ -544,24 +540,20 @@ export default function Layout({ children }) {
             {/* Theme Switcher */}
             {!sidebarCollapsed && (
               <div className="flex items-center rounded-full p-1 bg-gray-100">
-                <button
-                  onClick={() => setTheme(false)}
-                  className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                    !darkMode ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
-                  }`}
-                >
+                <div className="flex-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 bg-white text-gray-900 shadow-sm">
                   <SunIcon className="h-4 w-4 inline mr-1" />
                   Light
-                </button>
-                <button
-                  onClick={() => setTheme(true)}
-                  className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                    darkMode ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-600'
-                  }`}
+                </div>
+                <div
+                  className="flex-1 px-3 py-1.5 rounded-full text-xs font-medium cursor-not-allowed opacity-60 text-gray-400 relative group"
+                  title="Dark mode coming soon!"
                 >
                   <MoonIcon className="h-4 w-4 inline mr-1" />
                   Dark
-                </button>
+                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+                    🚀 Coming Soon!
+                  </div>
+                </div>
               </div>
             )}
 
@@ -741,9 +733,7 @@ export default function Layout({ children }) {
         </header>
 
         {/* Page content */}
-        <main className={`min-h-screen transition-colors duration-300 lg:pt-0 pt-[72px] ${
-          darkMode ? 'bg-[#0F1117]' : 'bg-[#F9FAFB]'
-        }`}>
+        <main className="min-h-screen transition-colors duration-300 lg:pt-0 pt-[72px] bg-[#F9FAFB]">
           {children}
         </main>
       </div>

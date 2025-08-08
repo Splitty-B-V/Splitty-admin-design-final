@@ -3,7 +3,6 @@ import Link from 'next/link'
 import Layout from '../components/Layout'
 import Breadcrumb from '../components/Breadcrumb'
 import { useRestaurants } from '../contexts/RestaurantsContext'
-import { useTheme } from '../contexts/ThemeContext'
 import {
   BuildingStorefrontIcon,
   CheckCircleIcon,
@@ -23,7 +22,6 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function POSIntegration() {
-  const { darkMode } = useTheme()
   const { restaurants } = useRestaurants()
   const [posStatuses, setPosStatuses] = useState({})
   const [refreshing, setRefreshing] = useState(false)
@@ -123,7 +121,7 @@ export default function POSIntegration() {
 
   return (
     <Layout>
-      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+      <div className={`min-h-screen ${false ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
         <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Breadcrumb */}
@@ -132,10 +130,10 @@ export default function POSIntegration() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'} mb-1`}>
+                <h1 className={`text-2xl font-semibold ${false ? 'text-white' : 'text-[#111827]'} mb-1`}>
                   POS Integratie Overzicht
                 </h1>
-                <p className={`${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                <p className={`${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
                   Real-time status van alle restaurant POS integraties
                 </p>
               </div>
@@ -143,7 +141,7 @@ export default function POSIntegration() {
                 type="button"
                 onClick={handleRefresh}
                 className={`inline-flex items-center px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                  darkMode 
+                  false 
                     ? 'border border-[#2a2d3a] text-white bg-[#1c1e27] hover:bg-[#252833]'
                     : 'border border-gray-200 text-[#6B7280] bg-white hover:bg-gray-50 shadow-sm'
                 } ${
@@ -151,7 +149,7 @@ export default function POSIntegration() {
                 }`}
                 disabled={refreshing}
               >
-                <ArrowPathIcon className={`-ml-1 mr-2 h-5 w-5 ${refreshing ? 'animate-spin' : ''} ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
+                <ArrowPathIcon className={`-ml-1 mr-2 h-5 w-5 ${refreshing ? 'animate-spin' : ''} ${false ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
                 {refreshing ? 'Vernieuwen...' : 'Ververs Status'}
               </button>
             </div>
@@ -159,19 +157,19 @@ export default function POSIntegration() {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
               <div className={`p-6 rounded-xl ${
-                darkMode 
+                false 
                   ? 'bg-[#1c1e27] border border-[#2a2d3a]'
                   : 'bg-white shadow-sm'
               }`}>
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]" : "p-3 rounded-lg bg-green-100"}>
-                    <BuildingStorefrontIcon className={darkMode ? "h-6 w-6 text-black" : "h-6 w-6 text-green-600"} />
+                  <div className={false ? "p-3 rounded-lg bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]" : "p-3 rounded-lg bg-green-100"}>
+                    <BuildingStorefrontIcon className={false ? "h-6 w-6 text-black" : "h-6 w-6 text-green-600"} />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className={`text-xs font-medium uppercase tracking-wider ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
                       TOTAAL RESTAURANTS
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className={`text-2xl font-bold mt-2 ${false ? 'text-white' : 'text-[#111827]'}`}>
                       {activeRestaurants.length}
                     </p>
                   </div>
@@ -179,19 +177,19 @@ export default function POSIntegration() {
               </div>
 
               <div className={`p-6 rounded-xl ${
-                darkMode 
+                false 
                   ? 'bg-[#1c1e27] border border-[#2a2d3a]'
                   : 'bg-white shadow-sm'
               }`}>
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-emerald-500/20" : "p-3 rounded-lg bg-emerald-50"}>
-                    <CpuChipIcon className={darkMode ? "h-6 w-6 text-emerald-400" : "h-6 w-6 text-emerald-600"} />
+                  <div className={false ? "p-3 rounded-lg bg-emerald-500/20" : "p-3 rounded-lg bg-emerald-50"}>
+                    <CpuChipIcon className={false ? "h-6 w-6 text-emerald-400" : "h-6 w-6 text-emerald-600"} />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className={`text-xs font-medium uppercase tracking-wider ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
                       POS VERBONDEN
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className={`text-2xl font-bold mt-2 ${false ? 'text-white' : 'text-[#111827]'}`}>
                       {connectedCount}
                     </p>
                   </div>
@@ -199,19 +197,19 @@ export default function POSIntegration() {
               </div>
 
               <div className={`p-6 rounded-xl ${
-                darkMode 
+                false 
                   ? 'bg-[#1c1e27] border border-[#2a2d3a]'
                   : 'bg-white shadow-sm'
               }`}>
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-[#2BE89A]/20" : "p-3 rounded-lg bg-green-50"}>
-                    <WifiIcon className={darkMode ? "h-6 w-6 text-[#2BE89A]" : "h-6 w-6 text-green-500"} />
+                  <div className={false ? "p-3 rounded-lg bg-[#2BE89A]/20" : "p-3 rounded-lg bg-green-50"}>
+                    <WifiIcon className={false ? "h-6 w-6 text-[#2BE89A]" : "h-6 w-6 text-green-500"} />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className={`text-xs font-medium uppercase tracking-wider ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
                       ACTIEF
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className={`text-2xl font-bold mt-2 ${false ? 'text-white' : 'text-[#111827]'}`}>
                       {activeCount}
                     </p>
                   </div>
@@ -219,19 +217,19 @@ export default function POSIntegration() {
               </div>
 
               <div className={`p-6 rounded-xl ${
-                darkMode 
+                false 
                   ? 'bg-[#1c1e27] border border-[#2a2d3a]'
                   : 'bg-white shadow-sm'
               }`}>
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-red-500/20" : "p-3 rounded-lg bg-red-50"}>
-                    <ExclamationTriangleIcon className={darkMode ? "h-6 w-6 text-red-400" : "h-6 w-6 text-red-500"} />
+                  <div className={false ? "p-3 rounded-lg bg-red-500/20" : "p-3 rounded-lg bg-red-50"}>
+                    <ExclamationTriangleIcon className={false ? "h-6 w-6 text-red-400" : "h-6 w-6 text-red-500"} />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className={`text-xs font-medium uppercase tracking-wider ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
                       NIET VERBONDEN
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className={`text-2xl font-bold mt-2 ${false ? 'text-white' : 'text-[#111827]'}`}>
                       {activeRestaurants.length - connectedCount}
                     </p>
                   </div>
@@ -242,7 +240,7 @@ export default function POSIntegration() {
             {/* Notifications Section - Simplified */}
             {notifications.filter(n => n.type === 'error').length > 0 && showNotifications && (
               <div className={`rounded-lg ${
-                darkMode 
+                false 
                   ? 'bg-[#1c1e27] border border-[#2a2d3a]'
                   : 'bg-white border border-gray-200'
               }`}>
@@ -250,10 +248,10 @@ export default function POSIntegration() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center">
                       <ExclamationTriangleIcon className={`h-5 w-5 mr-2 ${
-                        darkMode ? 'text-yellow-400' : 'text-yellow-500'
+                        false ? 'text-yellow-400' : 'text-yellow-500'
                       }`} />
                       <h3 className={`text-sm font-medium ${
-                        darkMode ? 'text-white' : 'text-gray-900'
+                        false ? 'text-white' : 'text-gray-900'
                       }`}>
                         Aandacht vereist ({notifications.filter(n => n.type === 'error').length})
                       </h3>
@@ -261,11 +259,11 @@ export default function POSIntegration() {
                     <button
                       onClick={() => setShowNotifications(false)}
                       className={`p-1 rounded transition-colors ${
-                        darkMode ? 'hover:bg-[#2a2d3a]' : 'hover:bg-gray-100'
+                        false ? 'hover:bg-[#2a2d3a]' : 'hover:bg-gray-100'
                       }`}
                     >
                       <XMarkIcon className={`h-4 w-4 ${
-                        darkMode ? 'text-gray-400' : 'text-gray-500'
+                        false ? 'text-gray-400' : 'text-gray-500'
                       }`} />
                     </button>
                   </div>
@@ -275,13 +273,13 @@ export default function POSIntegration() {
                         key={notification.id}
                         className="flex items-center justify-between"
                       >
-                        <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <p className={`text-sm ${false ? 'text-gray-300' : 'text-gray-600'}`}>
                           {notification.message}
                         </p>
                         <Link
                           href={`/restaurants/${notification.restaurantId}/onboarding?step=3`}
                           className={`text-sm ${
-                            darkMode ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-700'
+                            false ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-700'
                           }`}
                         >
                           Configureer →
@@ -295,15 +293,15 @@ export default function POSIntegration() {
 
             {/* Restaurant POS Status List */}
             <div className={`rounded-xl overflow-hidden ${
-              darkMode 
+              false 
                 ? 'bg-[#1c1e27] border border-[#2a2d3a]'
                 : 'bg-white shadow-sm'
             }`}>
               <div className={`px-6 py-4 border-b ${
-                darkMode ? 'border-[#2a2d3a] bg-[#0A0B0F]' : 'border-gray-200 bg-gray-50'
+                false ? 'border-[#2a2d3a] bg-[#0A0B0F]' : 'border-gray-200 bg-gray-50'
               }`}>
                 <h2 className={`text-lg font-semibold ${
-                  darkMode ? 'text-white' : 'text-[#111827]'
+                  false ? 'text-white' : 'text-[#111827]'
                 }`}>
                   Restaurant POS Status
                 </h2>
@@ -320,10 +318,10 @@ export default function POSIntegration() {
                       key={restaurant.id} 
                       className={`p-5 rounded-lg transition-all ${
                         !isConnected
-                          ? darkMode 
+                          ? false 
                             ? 'bg-[#0A0B0F] border border-red-500/20 hover:border-red-500/30'
                             : 'bg-white border border-red-200 hover:border-red-300'
-                          : darkMode 
+                          : false 
                             ? 'bg-[#0A0B0F] border border-[#2a2d3a] hover:border-[#3a3d4a]'
                             : 'bg-white border border-gray-200 hover:border-gray-300'
                       }`}
@@ -340,10 +338,10 @@ export default function POSIntegration() {
                               />
                             ) : (
                               <div className={`h-full w-full flex items-center justify-center ${
-                                darkMode ? 'bg-gray-700' : 'bg-gray-200'
+                                false ? 'bg-gray-700' : 'bg-gray-200'
                               }`}>
                                 <BuildingStorefrontIcon className={`h-5 w-5 ${
-                                  darkMode ? 'text-gray-400' : 'text-gray-500'
+                                  false ? 'text-gray-400' : 'text-gray-500'
                                 }`} />
                               </div>
                             )}
@@ -352,17 +350,17 @@ export default function POSIntegration() {
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-3">
                               <h3 className={`text-sm font-medium ${
-                                darkMode ? 'text-white' : 'text-gray-900'
+                                false ? 'text-white' : 'text-gray-900'
                               }`}>
                                 {restaurant.name}
                               </h3>
                               {posStatus && posStatus.connected && (
-                                <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                <span className={`text-xs ${false ? 'text-gray-500' : 'text-gray-400'}`}>
                                   {posStatus.posType}
                                 </span>
                               )}
                             </div>
-                            <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <p className={`text-xs mt-1 ${false ? 'text-gray-400' : 'text-gray-500'}`}>
                               {restaurant.location}
                             </p>
                           </div>
@@ -372,10 +370,10 @@ export default function POSIntegration() {
                           {/* Status */}
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
                             isConnected && isActive
-                              ? darkMode ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-700'
+                              ? false ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-700'
                               : !isConnected
-                              ? darkMode ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-600'
-                              : darkMode ? 'bg-yellow-500/10 text-yellow-400' : 'bg-yellow-50 text-yellow-700'
+                              ? false ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-600'
+                              : false ? 'bg-yellow-500/10 text-yellow-400' : 'bg-yellow-50 text-yellow-700'
                           }`}>
                             {isConnected && isActive ? (
                               <>
@@ -403,8 +401,8 @@ export default function POSIntegration() {
                             }
                             className={`text-sm font-medium ${
                               !isConnected
-                                ? darkMode ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-700'
-                                : darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-700'
+                                ? false ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-700'
+                                : false ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-700'
                             }`}
                           >
                             {!isConnected ? 'Configureer →' : 'Details →'}
@@ -420,19 +418,19 @@ export default function POSIntegration() {
             {/* Empty State */}
             {activeRestaurants.length === 0 && (
               <div className={`text-center py-16 rounded-xl ${
-                darkMode 
+                false 
                   ? 'bg-[#1c1e27] border border-[#2a2d3a]'
                   : 'bg-white shadow-sm'
               }`}>
                 <BuildingStorefrontIcon className={`mx-auto h-12 w-12 ${
-                  darkMode ? 'text-[#BBBECC]' : 'text-gray-400'
+                  false ? 'text-[#BBBECC]' : 'text-gray-400'
                 }`} />
                 <h3 className={`mt-4 text-base font-medium ${
-                  darkMode ? 'text-white' : 'text-[#111827]'
+                  false ? 'text-white' : 'text-[#111827]'
                 }`}>
                   Geen actieve restaurants
                 </h3>
-                <p className={`mt-2 text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                <p className={`mt-2 text-sm ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
                   Begin met het toevoegen van je eerste restaurant partner.
                 </p>
                 <Link

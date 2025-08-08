@@ -88,13 +88,13 @@ export default function Settings() {
   }, [])
 
   const tabs = [
-    { id: 'profile', name: 'Profiel', icon: UserCircleIcon },
-    { id: 'general', name: 'Algemeen', icon: Cog6ToothIcon },
-    { id: 'notifications', name: 'Notificaties', icon: BellIcon },
-    { id: 'payment', name: 'Betalingen', icon: CreditCardIcon },
-    { id: 'security', name: 'Beveiliging', icon: KeyIcon },
-    { id: 'api', name: 'API', icon: GlobeAltIcon },
-    { id: 'legal', name: 'Juridisch', icon: DocumentTextIcon },
+    { id: 'profile', name: 'Profiel', icon: UserCircleIcon, description: 'Persoonlijke gegevens' },
+    { id: 'general', name: 'Algemeen', icon: Cog6ToothIcon, description: 'Bedrijfsinformatie' },
+    { id: 'notifications', name: 'Notificaties', icon: BellIcon, description: 'Melding voorkeuren' },
+    { id: 'payment', name: 'Betalingen', icon: CreditCardIcon, description: 'Betalingsmethoden' },
+    { id: 'security', name: 'Beveiliging', icon: KeyIcon, description: 'Account beveiliging' },
+    { id: 'api', name: 'API', icon: GlobeAltIcon, description: 'Integraties & webhooks' },
+    { id: 'legal', name: 'Juridisch', icon: DocumentTextIcon, description: 'Documenten & compliance' },
   ]
 
   // Format role display
@@ -233,49 +233,49 @@ export default function Settings() {
   const renderProfileSettings = () => (
     <div className="space-y-8">
       <div>
-        <h3 className="text-2xl font-bold text-white">Mijn Profiel</h3>
-        <p className="mt-2 text-base text-[#BBBECC]">
+        <h3 className="text-xl font-semibold text-[#111827]">Mijn Profiel</h3>
+        <p className="mt-1 text-sm text-[#6B7280]">
           Beheer je persoonlijke informatie en profielfoto
         </p>
       </div>
 
       {/* Avatar Upload Section */}
-      <div className="flex items-start space-x-8">
-        <div>
-          <label className="block text-sm font-medium text-[#BBBECC] mb-4">
-            Profielfoto
-          </label>
-          <div className="flex items-center space-x-6">
-            {/* Current Avatar */}
-            <div className="relative">
-              {avatarPreview ? (
-                <div className="relative">
-                  <img 
-                    src={avatarPreview} 
-                    alt="Avatar preview" 
-                    className="h-24 w-24 rounded-full object-cover border-2 border-[#2a2d3a]"
-                  />
-                  <button
-                    onClick={handleDeleteAvatar}
-                    className="absolute -bottom-1 -right-1 p-2 bg-red-500 hover:bg-red-600 rounded-full transition-colors duration-200 shadow-lg"
-                    title="Verwijder profielfoto"
-                  >
-                    <TrashIcon className="h-4 w-4 text-white" />
-                  </button>
-                </div>
-              ) : (
-                <div className="h-24 w-24 rounded-full bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] flex items-center justify-center text-black font-bold text-2xl">
-                  {currentUser?.name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
-                </div>
-              )}
-            </div>
+      <div className="p-6 rounded-xl bg-gray-50">
+        <label className="block text-sm font-medium mb-4 text-gray-700">
+          Profielfoto
+        </label>
+        <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
+          {/* Current Avatar */}
+          <div className="relative">
+            {avatarPreview ? (
+              <div className="relative group">
+                <img 
+                  src={avatarPreview} 
+                  alt="Avatar preview" 
+                  className="h-32 w-32 rounded-xl object-cover border-2 border-gray-200"
+                />
+                <button
+                  onClick={handleDeleteAvatar}
+                  className="absolute -bottom-2 -right-2 p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 shadow-lg bg-red-600 hover:bg-red-700"
+                  title="Verwijder profielfoto"
+                >
+                  <TrashIcon className="h-4 w-4 text-white" />
+                </button>
+              </div>
+            ) : (
+              <div className="h-32 w-32 rounded-xl bg-green-500 flex items-center justify-center text-white font-bold text-3xl">
+                {currentUser?.name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+              </div>
+            )}
+          </div>
 
-            {/* Upload Area */}
+          {/* Upload Area */}
+          <div className="flex-1">
             <div
-              className={`relative flex flex-col items-center justify-center w-64 h-32 border-2 border-dashed rounded-lg transition-all ${
+              className={`relative flex flex-col items-center justify-center h-32 border-2 border-dashed rounded-xl transition-all ${
                 dragActive 
-                  ? 'border-[#2BE89A] bg-[#2BE89A]/10' 
-                  : 'border-[#2a2d3a] bg-[#0A0B0F] hover:border-[#2BE89A]/50'
+                  ? 'border-green-500 bg-green-50'
+                  : 'border-gray-300 bg-white hover:border-green-400'
               }`}
               onDragEnter={handleDragIn}
               onDragLeave={handleDragOut}
@@ -291,15 +291,17 @@ export default function Settings() {
               />
               <label
                 htmlFor="avatar-upload"
-                className="cursor-pointer text-center"
+                className="cursor-pointer text-center w-full h-full flex flex-col items-center justify-center"
               >
-                <div className={`p-3 rounded-full ${dragActive ? 'bg-[#2BE89A]/20' : 'bg-[#1c1e27]'} mb-3`}>
-                  <CloudArrowUpIcon className={`h-8 w-8 ${dragActive ? 'text-[#2BE89A]' : 'text-[#BBBECC]'}`} />
-                </div>
-                <p className="text-sm text-[#BBBECC]">
-                  <span className="font-medium text-[#2BE89A]">Klik om te uploaden</span> of sleep hierheen
+                <CloudArrowUpIcon className={`h-8 w-8 mb-2 ${
+                  dragActive 
+                    ? 'text-green-600'
+                    : 'text-gray-400'
+                }`} />
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium text-green-600">Klik om te uploaden</span> of sleep hierheen
                 </p>
-                <p className="text-xs text-[#BBBECC]/60 mt-1">PNG, JPG, GIF • Max 5MB</p>
+                <p className="text-xs mt-1 text-gray-400">PNG, JPG, GIF • Max 5MB</p>
               </label>
             </div>
           </div>
@@ -307,133 +309,114 @@ export default function Settings() {
       </div>
 
       {/* Personal Information */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="space-y-6">
+        <h4 className="text-sm font-medium text-gray-700">
+          Persoonlijke Gegevens
+        </h4>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label htmlFor="profile-first-name" className="block text-sm font-medium mb-2 text-gray-700">
+              Voornaam
+            </label>
+            <input
+              type="text"
+              name="profile-first-name"
+              id="profile-first-name"
+              value={profileFormData.first_name}
+              onChange={(e) => setProfileFormData(prev => ({ ...prev, first_name: e.target.value }))}
+              className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="profile-last-name" className="block text-sm font-medium mb-2 text-gray-700">
+              Achternaam
+            </label>
+            <input
+              type="text"
+              name="profile-last-name"
+              id="profile-last-name"
+              value={profileFormData.last_name}
+              onChange={(e) => setProfileFormData(prev => ({ ...prev, last_name: e.target.value }))}
+              className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="profile-email" className="block text-sm font-medium mb-2 text-gray-700">
+              E-mailadres
+            </label>
+            <input
+              type="email"
+              name="profile-email"
+              id="profile-email"
+              value={profileFormData.email}
+              onChange={(e) => setProfileFormData(prev => ({ ...prev, email: e.target.value }))}
+              className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="profile-phone" className="block text-sm font-medium mb-2 text-gray-700">
+              Telefoonnummer
+            </label>
+            <input
+              type="tel"
+              name="profile-phone"
+              id="profile-phone"
+              value={profileFormData.phone}
+              onChange={(e) => setProfileFormData(prev => ({ ...prev, phone: e.target.value }))}
+              className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="profile-role" className="block text-sm font-medium mb-2 text-gray-700">
+              Functie
+            </label>
+            <input
+              type="text"
+              name="profile-role"
+              id="profile-role"
+              value={getRoleDisplay(currentUser?.role || '')}
+              disabled
+              className="w-full px-4 py-3 rounded-lg border cursor-not-allowed opacity-75 bg-gray-50 border-gray-200 text-gray-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="profile-department" className="block text-sm font-medium mb-2 text-gray-700">
+              Afdeling
+            </label>
+            <input
+              type="text"
+              name="profile-department"
+              id="profile-department"
+              value={currentUser?.department || ''}
+              disabled
+              className="w-full px-4 py-3 rounded-lg border cursor-not-allowed opacity-75 bg-gray-50 border-gray-200 text-gray-500"
+            />
+          </div>
+        </div>
+
         <div>
-          <label htmlFor="profile-first-name" className="block text-sm font-medium text-[#BBBECC] mb-2">
-            Voornaam
+          <label htmlFor="profile-bio" className="block text-sm font-medium mb-2 text-gray-700">
+            Bio
           </label>
-          <input
-            type="text"
-            name="profile-first-name"
-            id="profile-first-name"
-            value={profileFormData.first_name}
-            onChange={(e) => setProfileFormData(prev => ({ ...prev, first_name: e.target.value }))}
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
+          <textarea
+            id="profile-bio"
+            name="profile-bio"
+            rows={4}
+            value={profileFormData.bio}
+            onChange={(e) => setProfileFormData(prev => ({ ...prev, bio: e.target.value }))}
+            placeholder="Vertel iets over jezelf..."
+            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 resize-none transition ${
               darkMode
                 ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
                 : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
             }`}
           />
         </div>
-
-        <div>
-          <label htmlFor="profile-last-name" className="block text-sm font-medium text-[#BBBECC] mb-2">
-            Achternaam
-          </label>
-          <input
-            type="text"
-            name="profile-last-name"
-            id="profile-last-name"
-            value={profileFormData.last_name}
-            onChange={(e) => setProfileFormData(prev => ({ ...prev, last_name: e.target.value }))}
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-            }`}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="profile-email" className="block text-sm font-medium text-[#BBBECC] mb-2">
-            E-mailadres
-          </label>
-          <input
-            type="email"
-            name="profile-email"
-            id="profile-email"
-            value={profileFormData.email}
-            onChange={(e) => setProfileFormData(prev => ({ ...prev, email: e.target.value }))}
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-            }`}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="profile-phone" className="block text-sm font-medium text-[#BBBECC] mb-2">
-            Telefoonnummer
-          </label>
-          <input
-            type="tel"
-            name="profile-phone"
-            id="profile-phone"
-            value={profileFormData.phone}
-            onChange={(e) => setProfileFormData(prev => ({ ...prev, phone: e.target.value }))}
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-            }`}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="profile-role" className="block text-sm font-medium text-[#BBBECC] mb-2">
-            Functie
-          </label>
-          <input
-            type="text"
-            name="profile-role"
-            id="profile-role"
-            value={getRoleDisplay(currentUser?.role || '')}
-            disabled
-            className={`w-full px-4 py-3 rounded-lg border cursor-not-allowed opacity-75 ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-[#BBBECC]'
-                : 'bg-gray-50 border-gray-200 text-gray-500'
-            }`}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="profile-department" className="block text-sm font-medium text-[#BBBECC] mb-2">
-            Afdeling
-          </label>
-          <input
-            type="text"
-            name="profile-department"
-            id="profile-department"
-            value={currentUser?.department || ''}
-            disabled
-            className={`w-full px-4 py-3 rounded-lg border cursor-not-allowed opacity-75 ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-[#BBBECC]'
-                : 'bg-gray-50 border-gray-200 text-gray-500'
-            }`}
-          />
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="profile-bio" className="block text-sm font-medium text-[#BBBECC] mb-2">
-          Bio
-        </label>
-        <textarea
-          id="profile-bio"
-          name="profile-bio"
-          rows={4}
-          value={profileFormData.bio}
-          onChange={(e) => setProfileFormData(prev => ({ ...prev, bio: e.target.value }))}
-          placeholder="Vertel iets over jezelf..."
-          className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 resize-none transition ${
-            darkMode
-              ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-              : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-          }`}
-        />
       </div>
     </div>
   )
@@ -441,17 +424,15 @@ export default function Settings() {
   const renderGeneralSettings = () => (
     <div className="space-y-8">
       <div>
-        <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Bedrijfsinformatie</h3>
-        <p className={`mt-2 text-base ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+        <h3 className="text-xl font-semibold text-[#111827]">Bedrijfsinformatie</h3>
+        <p className="mt-1 text-sm text-[#6B7280]">
           Deze informatie wordt weergegeven op je publieke profiel
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
         <div>
-          <label htmlFor="company-name" className={`block text-sm font-medium mb-2 ${
-            darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
-          }`}>
+          <label htmlFor="company-name" className="block text-sm font-medium mb-2 text-gray-700">
             Bedrijfsnaam
           </label>
           <input
@@ -459,18 +440,12 @@ export default function Settings() {
             name="company-name"
             id="company-name"
             defaultValue="Splitty B.V."
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-            }`}
+            className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
           />
         </div>
 
         <div>
-          <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
-            darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
-          }`}>
+          <label htmlFor="email" className="block text-sm font-medium mb-2 text-gray-700">
             Contact E-mail
           </label>
           <input
@@ -478,18 +453,12 @@ export default function Settings() {
             name="email"
             id="email"
             defaultValue="contact@splitty.com"
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-            }`}
+            className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
           />
         </div>
 
         <div>
-          <label htmlFor="phone" className={`block text-sm font-medium mb-2 ${
-            darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
-          }`}>
+          <label htmlFor="phone" className="block text-sm font-medium mb-2 text-gray-700">
             Telefoonnummer
           </label>
           <input
@@ -497,18 +466,12 @@ export default function Settings() {
             name="phone"
             id="phone"
             defaultValue="+31 20 123 4567"
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-            }`}
+            className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
           />
         </div>
 
         <div>
-          <label htmlFor="website" className={`block text-sm font-medium mb-2 ${
-            darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
-          }`}>
+          <label htmlFor="website" className="block text-sm font-medium mb-2 text-gray-700">
             Website
           </label>
           <input
@@ -516,38 +479,103 @@ export default function Settings() {
             name="website"
             id="website"
             defaultValue="https://splitty.com"
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-            }`}
+            className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="kvk-number" className="block text-sm font-medium mb-2 text-gray-700">
+            KVK Nummer
+          </label>
+          <input
+            type="text"
+            name="kvk-number"
+            id="kvk-number"
+            defaultValue="85291234"
+            className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="btw-number" className="block text-sm font-medium mb-2 text-gray-700">
+            BTW Nummer
+          </label>
+          <input
+            type="text"
+            name="btw-number"
+            id="btw-number"
+            defaultValue="NL003456789B01"
+            className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
           />
         </div>
       </div>
 
+      {/* Address Fields */}
       <div>
-        <label htmlFor="address" className={`block text-sm font-medium mb-2 ${
-          darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
-        }`}>
+        <h4 className="text-lg font-medium mb-4 text-gray-900">
           Adres
-        </label>
-        <textarea
-          id="address"
-          name="address"
-          rows={3}
-          defaultValue="Herengracht 182\n1016 BR Amsterdam\nNetherlands"
-          className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 resize-none transition ${
-            darkMode
-              ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-              : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-          }`}
-        />
+        </h4>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="sm:col-span-2">
+            <label htmlFor="street-address" className="block text-sm font-medium mb-2 text-gray-700">
+              Straat en huisnummer
+            </label>
+            <input
+              type="text"
+              name="street-address"
+              id="street-address"
+              defaultValue="Herengracht 182"
+              className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="postal-code" className="block text-sm font-medium mb-2 text-gray-700">
+              Postcode
+            </label>
+            <input
+              type="text"
+              name="postal-code"
+              id="postal-code"
+              defaultValue="1016 BR"
+              className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="city" className="block text-sm font-medium mb-2 text-gray-700">
+              Stad
+            </label>
+            <input
+              type="text"
+              name="city"
+              id="city"
+              defaultValue="Amsterdam"
+              className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+
+          <div className="sm:col-span-2 lg:col-span-1">
+            <label htmlFor="country" className="block text-sm font-medium mb-2 text-gray-700">
+              Land
+            </label>
+            <select
+              id="country"
+              name="country"
+              defaultValue="Netherlands"
+              className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 cursor-pointer transition bg-white border-gray-200 text-gray-900 focus:ring-green-500 focus:border-transparent"
+            >
+              <option value="Netherlands">Nederland</option>
+              <option value="Belgium">België</option>
+              <option value="Germany">Duitsland</option>
+              <option value="France">Frankrijk</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div>
-        <label htmlFor="timezone" className={`block text-sm font-medium mb-2 ${
-          darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
-        }`}>
+        <label htmlFor="timezone" className="block text-sm font-medium mb-2 text-gray-700">
           Tijdzone
         </label>
         <select
@@ -572,85 +600,124 @@ export default function Settings() {
   const renderNotificationSettings = () => (
     <div className="space-y-8">
       <div>
-        <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>E-mail Notificaties</h3>
-        <p className={`mt-2 text-base ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+        <h3 className="text-xl font-semibold text-[#111827]">E-mail Notificaties</h3>
+        <p className="mt-1 text-sm text-[#6B7280]">
           Beheer welke e-mails je wilt ontvangen
         </p>
       </div>
 
-      <div className="space-y-6">
-        {[
-          { id: 'new-orders', label: 'Nieuwe Bestellingen', description: 'Ontvang melding bij nieuwe bestellingen', checked: true },
-          { id: 'payment-received', label: 'Betaling Ontvangen', description: 'Notificatie voor succesvolle betalingen', checked: true },
-          { id: 'payout-sent', label: 'Uitbetaling Verstuurd', description: 'Updates wanneer uitbetalingen worden verwerkt', checked: true },
-          { id: 'low-inventory', label: 'Lage Voorraad', description: 'Waarschuwing wanneer items bijna op zijn', checked: false },
-          { id: 'new-reviews', label: 'Nieuwe Reviews', description: 'Klantbeoordelingen en ratings', checked: false },
-          { id: 'marketing', label: 'Marketing Updates', description: 'Product updates en aankondigingen', checked: false },
-        ].map((item) => (
-          <div key={item.id} className={`flex items-start p-4 rounded-lg transition-colors duration-200 ${
-            darkMode ? 'hover:bg-[#0A0B0F]' : 'hover:bg-gray-50'
-          }`}>
-            <div className="flex h-6 items-center">
-              <input
-                id={item.id}
-                name={item.id}
-                type="checkbox"
-                defaultChecked={item.checked}
-                className={`h-5 w-5 rounded border-2 focus:ring-2 focus:ring-opacity-20 transition-all duration-200 ${
-                  darkMode
-                    ? 'border-[#2a2d3a] bg-[#0A0B0F] text-[#2BE89A] focus:ring-[#2BE89A]'
-                    : 'border-gray-300 bg-white text-green-600 focus:ring-green-500'
-                }`}
-              />
+      <div className="rounded-xl p-6 bg-gray-50">
+        <div className="grid grid-cols-1 gap-4">
+          {[
+            { id: 'new-orders', label: 'Nieuwe Bestellingen', description: 'Ontvang melding bij nieuwe bestellingen', checked: true, category: 'critical' },
+            { id: 'payment-received', label: 'Betaling Ontvangen', description: 'Notificatie voor succesvolle betalingen', checked: true, category: 'critical' },
+            { id: 'payout-sent', label: 'Uitbetaling Verstuurd', description: 'Updates wanneer uitbetalingen worden verwerkt', checked: true, category: 'important' },
+            { id: 'low-inventory', label: 'Lage Voorraad', description: 'Waarschuwing wanneer items bijna op zijn', checked: false, category: 'optional' },
+            { id: 'new-reviews', label: 'Nieuwe Reviews', description: 'Klantbeoordelingen en ratings', checked: false, category: 'optional' },
+            { id: 'marketing', label: 'Marketing Updates', description: 'Product updates en aankondigingen', checked: false, category: 'optional' },
+          ].map((item) => (
+            <div key={item.id} className={`flex items-start p-4 rounded-xl border transition-all duration-200 ${
+              darkMode 
+                ? 'bg-[#1c1e27] border-[#2a2d3a] hover:border-green-500/30' 
+                : 'bg-white border-gray-200 hover:border-green-300 hover:shadow-sm'
+            }`}>
+              <div className="flex h-6 items-center">
+                <input
+                  id={item.id}
+                  name={item.id}
+                  type="checkbox"
+                  defaultChecked={item.checked}
+                  className={`h-5 w-5 rounded-md border-2 focus:outline-none focus:ring-2 focus:ring-offset-1 transition-all duration-200 ${
+                    darkMode
+                      ? 'border-[#2a2d3a] bg-[#0A0B0F] text-green-500 focus:ring-green-500/50 focus:ring-offset-[#1c1e27]'
+                      : 'border-gray-300 bg-white text-green-600 focus:ring-green-500/30 focus:ring-offset-white'
+                  }`}
+                />
+              </div>
+              <div className="ml-4 flex-1">
+                <div className="flex items-center justify-between">
+                  <label htmlFor={item.id} className={`text-base font-medium cursor-pointer ${
+                    darkMode ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {item.label}
+                  </label>
+                  {item.category === 'critical' && (
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      darkMode 
+                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                        : 'bg-red-100 text-red-700 border border-red-200'
+                    }`}>
+                      Belangrijk
+                    </span>
+                  )}
+                  {item.category === 'important' && (
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      darkMode 
+                        ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                        : 'bg-yellow-100 text-yellow-700 border border-yellow-200'
+                    }`}>
+                      Aanbevolen
+                    </span>
+                  )}
+                </div>
+                <p className={`text-sm mt-1 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+                  {item.description}
+                </p>
+              </div>
             </div>
-            <div className="ml-4">
-              <label htmlFor={item.id} className={`text-base font-medium cursor-pointer ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}>
-                {item.label}
-              </label>
-              <p className={`text-sm mt-1 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>{item.description}</p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      <div className="border-t border-[#2a2d3a] pt-6">
-        <h3 className="text-lg font-medium leading-6 text-white">Push Notificaties</h3>
-        <p className="mt-1 text-sm text-[#BBBECC]">
-          Beheer mobiele app notificaties
-        </p>
-      </div>
+      <div className={`border-t pt-8 ${darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'}`}>
+        <div className="mb-6">
+          <h3 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Push Notificaties</h3>
+          <p className={`mt-1 text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+            Beheer mobiele app notificaties
+          </p>
+        </div>
 
-      <div className="space-y-4">
-        {[
-          { id: 'push-orders', label: 'Order Updates', checked: true },
-          { id: 'push-payments', label: 'Payment Alerts', checked: true },
-          { id: 'push-staff', label: 'Staff Messages', checked: false },
-        ].map((item) => (
-          <div key={item.id} className="flex items-start">
-            <div className="flex h-5 items-center">
-              <input
-                id={item.id}
-                name={item.id}
-                type="checkbox"
-                defaultChecked={item.checked}
-                className={`h-4 w-4 rounded focus:ring-2 ${
-                  darkMode
-                    ? 'border-gray-600 bg-gray-700 text-green-400 focus:ring-green-400'
-                    : 'border-gray-300 bg-white text-green-600 focus:ring-green-500'
-                }`}
-              />
-            </div>
-            <div className="ml-3">
-              <label htmlFor={item.id} className={`text-sm font-medium ${
-                darkMode ? 'text-gray-300' : 'text-gray-700'
+        <div className={`rounded-xl p-6 ${
+          darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50'
+        }`}>
+          <div className="space-y-4">
+            {[
+              { id: 'push-orders', label: 'Bestelling Updates', description: 'Real-time updates over bestellingen', checked: true },
+              { id: 'push-payments', label: 'Betaling Alerts', description: 'Directe notificaties bij betalingen', checked: true },
+              { id: 'push-staff', label: 'Personeel Berichten', description: 'Communicatie van teamleden', checked: false },
+            ].map((item) => (
+              <div key={item.id} className={`flex items-start p-4 rounded-lg border transition-all duration-200 ${
+                darkMode 
+                  ? 'bg-[#1c1e27] border-[#2a2d3a] hover:border-green-500/30' 
+                  : 'bg-white border-gray-200 hover:border-green-300'
               }`}>
-                {item.label}
-              </label>
-            </div>
+                <div className="flex h-6 items-center">
+                  <input
+                    id={item.id}
+                    name={item.id}
+                    type="checkbox"
+                    defaultChecked={item.checked}
+                    className={`h-4 w-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-1 transition-all duration-200 ${
+                      darkMode
+                        ? 'border-[#2a2d3a] bg-[#0A0B0F] text-green-500 focus:ring-green-500/50 focus:ring-offset-[#1c1e27]'
+                        : 'border-gray-300 bg-white text-green-600 focus:ring-green-500/30 focus:ring-offset-white'
+                    }`}
+                  />
+                </div>
+                <div className="ml-4 flex-1">
+                  <label htmlFor={item.id} className={`text-sm font-medium cursor-pointer ${
+                    darkMode ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {item.label}
+                  </label>
+                  <p className={`text-xs mt-1 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   )
@@ -658,25 +725,39 @@ export default function Settings() {
   const renderPaymentSettings = () => (
     <div className="space-y-8">
       <div>
-        <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Betaalmethoden</h3>
-        <p className={`mt-2 text-base ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+        <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Betaalmethoden</h3>
+        <p className={`mt-1 text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
           Configureer je betalingsverwerkingsopties
         </p>
       </div>
 
-      <div className="bg-[#0A0B0F] rounded-xl p-8 border border-[#2a2d3a]">
+      <div className={`rounded-xl p-6 ${
+        darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50'
+      }`}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <div className="bg-blue-500/20 p-4 rounded-xl">
-              <CreditCardIcon className="h-8 w-8 text-blue-400" />
+            <div className={`p-3 rounded-lg ${
+              darkMode ? 'bg-blue-500/20' : 'bg-blue-100'
+            }`}>
+              <CreditCardIcon className={`h-7 w-7 ${
+                darkMode ? 'text-blue-400' : 'text-blue-600'
+              }`} />
             </div>
-            <div className="ml-6">
-              <h4 className="text-xl font-semibold text-white">Stripe</h4>
-              <p className="text-base text-[#BBBECC] mt-1">Verwerk betalingen met Stripe</p>
+            <div className="ml-4">
+              <h4 className={`text-lg font-semibold ${
+                darkMode ? 'text-white' : 'text-gray-900'
+              }`}>Stripe</h4>
+              <p className={`text-sm mt-0.5 ${
+                darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
+              }`}>Verwerk betalingen met Stripe</p>
             </div>
           </div>
-          <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-[#2BE89A]/20 text-[#2BE89A] border border-[#2BE89A]/30">
-            <CheckIcon className="h-5 w-5 mr-2" />
+          <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium ${
+            darkMode 
+              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+              : 'bg-green-100 text-green-700 border border-green-200'
+          }`}>
+            <CheckIcon className="h-4 w-4 mr-1.5" />
             Verbonden
           </span>
         </div>
@@ -702,9 +783,9 @@ export default function Settings() {
       </div>
 
       <div>
-        <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Payout Settings</h3>
-        <p className={`mt-2 text-base ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-          Configure automatic payouts to restaurants
+        <h3 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Uitbetalingsinstellingen</h3>
+        <p className={`mt-1 text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+          Configureer automatische uitbetalingen aan restaurants
         </p>
       </div>
 
@@ -762,15 +843,17 @@ export default function Settings() {
   const renderSecuritySettings = () => (
     <div className="space-y-8">
       <div>
-        <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Beveiligingsinstellingen</h3>
-        <p className={`mt-2 text-base ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+        <h3 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Beveiligingsinstellingen</h3>
+        <p className={`mt-1 text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
           Beheer je account beveiligingsvoorkeuren
         </p>
       </div>
 
       <div className="space-y-6">
         <div>
-          <label htmlFor="current-password" className="block text-sm font-medium text-[#BBBECC] mb-2">
+          <label htmlFor="current-password" className={`block text-sm font-medium mb-2 ${
+            darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+          }`}>
             Huidig Wachtwoord
           </label>
           <input
@@ -780,16 +863,14 @@ export default function Settings() {
             placeholder="••••••••"
             value={passwordData.currentPassword}
             onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-            }`}
+            className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
           />
         </div>
 
         <div>
-          <label htmlFor="new-password" className="block text-sm font-medium text-[#BBBECC] mb-2">
+          <label htmlFor="new-password" className={`block text-sm font-medium mb-2 ${
+            darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+          }`}>
             Nieuw Wachtwoord
           </label>
           <input
@@ -799,11 +880,7 @@ export default function Settings() {
             placeholder="••••••••"
             value={passwordData.newPassword}
             onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-            }`}
+            className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
           />
         </div>
 
@@ -820,32 +897,38 @@ export default function Settings() {
             placeholder="••••••••"
             value={passwordData.confirmPassword}
             onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition ${
-              darkMode
-                ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
-            }`}
+            className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent"
           />
         </div>
       </div>
 
-      <div className="border-t border-[#2a2d3a] pt-6">
-        <h3 className="text-lg font-medium leading-6 text-white">Twee-Factor Authenticatie</h3>
-        <p className="mt-1 text-sm text-[#BBBECC]">
+      <div className={`border-t pt-6 ${darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'}`}>
+        <h3 className={`text-lg font-medium leading-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Twee-Factor Authenticatie</h3>
+        <p className={`mt-1 text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
           Voeg een extra beveiligingslaag toe aan je account
         </p>
       </div>
 
-      <div className="bg-[#0A0B0F] rounded-lg p-6 border border-[#2a2d3a]">
+      <div className={`rounded-xl p-6 ${
+        darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-green-50 border border-green-200'
+      }`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <ShieldCheckIcon className="h-8 w-8 text-[#2BE89A]" />
+            <ShieldCheckIcon className={`h-8 w-8 ${
+              darkMode ? 'text-green-400' : 'text-green-600'
+            }`} />
             <div className="ml-4">
-              <p className="text-white font-medium">Twee-Factor Authenticatie is ingeschakeld</p>
-              <p className="text-sm text-[#BBBECC]">Je account is beveiligd met 2FA</p>
+              <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                Twee-Factor Authenticatie is ingeschakeld
+              </p>
+              <p className={`text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+                Je account is beveiligd met 2FA
+              </p>
             </div>
           </div>
-          <button className="text-red-400 hover:text-red-300 text-sm font-medium">
+          <button className={`text-sm font-medium ${
+            darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700'
+          }`}>
             Uitschakelen
           </button>
         </div>
@@ -864,15 +947,27 @@ export default function Settings() {
           { device: 'iPhone 13 - App', location: 'Amsterdam, NL', current: false },
           { device: 'iPad Pro - Safari', location: 'Rotterdam, NL', current: false },
         ].map((session, index) => (
-          <div key={index} className="bg-[#0A0B0F] rounded-lg p-4 flex items-center justify-between border border-[#2a2d3a]">
+          <div key={index} className={`rounded-lg p-4 flex items-center justify-between border ${
+            darkMode 
+              ? 'bg-[#0A0B0F] border-[#2a2d3a]' 
+              : 'bg-white border-gray-200'
+          }`}>
             <div>
-              <p className="text-white font-medium">{session.device}</p>
-              <p className="text-sm text-[#BBBECC]">{session.location}</p>
+              <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                {session.device}
+              </p>
+              <p className={`text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+                {session.location}
+              </p>
             </div>
             {session.current ? (
-              <span className="text-sm text-[#2BE89A]">Huidige sessie</span>
+              <span className={`text-sm ${
+                darkMode ? 'text-green-400' : 'text-green-600'
+              }`}>Huidige sessie</span>
             ) : (
-              <button className="text-red-400 hover:text-red-300 text-sm">Intrekken</button>
+              <button className={`text-sm ${
+                darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700'
+              }`}>Intrekken</button>
             )}
           </div>
         ))}
@@ -1091,76 +1186,132 @@ export default function Settings() {
 
   return (
     <Layout>
-      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
-        <div className="px-4 sm:px-6 lg:px-8 py-6">
-          <div className="space-y-6">
-            {/* Breadcrumb */}
-            <Breadcrumb items={[{ name: 'Instellingen' }]} />
+      <div className="min-h-screen bg-[#F9FAFB]">
+        {/* Sticky Header Section */}
+        <div className="sticky top-0 z-30 bg-[#F9FAFB] border-b border-gray-200">
+          <div className="px-4 sm:px-6 lg:px-8 py-6">
+            <div className="space-y-6">
+              {/* Breadcrumb */}
+              <Breadcrumb items={[{ name: 'Instellingen' }]} />
 
-            {/* Header */}
-            <div>
-              <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Instellingen</h1>
-              <p className={`mt-2 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
-                Beheer je accountinstellingen en voorkeuren
-              </p>
-            </div>
-
-            <div className="flex flex-col lg:flex-row gap-6">
-              {/* Sidebar */}
-              <div className="lg:w-64">
-                <nav className={`rounded-xl border p-2 ${
-                  darkMode ? 'bg-[#1c1e27] border-[#2a2d3a]' : 'bg-white border-gray-200 shadow-sm'
-                }`}>
-                  {tabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 mb-1 ${
-                        activeTab === tab.id
-                          ? darkMode
-                            ? 'bg-green-500/10 text-green-400'
-                            : 'bg-green-50 text-green-600'
-                          : darkMode
-                            ? 'text-[#BBBECC] hover:bg-[#0A0B0F] hover:text-white'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                      }`}
-                    >
-                      <tab.icon className="mr-3 h-5 w-5" />
-                      {tab.name}
-                    </button>
-                  ))}
-                </nav>
+              {/* Header with User Info Card */}
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <h1 className="text-2xl font-semibold text-[#111827] mb-1">Instellingen</h1>
+                  <p className="text-[#6B7280]">
+                    Beheer je accountinstellingen en voorkeuren
+                  </p>
+                </div>
+                {currentUser && (
+                  <div className="mt-4 lg:mt-0 flex items-center space-x-4 px-5 py-3 rounded-xl bg-white shadow-sm">
+                    <div className="flex-shrink-0">
+                      {avatarPreview ? (
+                        <img 
+                          src={avatarPreview} 
+                          alt="Avatar" 
+                          className="h-12 w-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                          {currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {currentUser.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {getRoleDisplay(currentUser.role)}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
+              {/* Tab Navigation as Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`group relative p-4 rounded-xl border transition-all duration-200 ${
+                      activeTab === tab.id
+                        ? 'bg-green-50 border-green-500 shadow-md'
+                        : 'bg-white border-gray-200 hover:border-green-300 hover:shadow-md'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-2">
+                      <div className={`p-2.5 rounded-lg transition-colors ${
+                        activeTab === tab.id
+                          ? 'bg-green-100'
+                          : 'bg-gray-50 group-hover:bg-green-50'
+                      }`}>
+                        <tab.icon className={`h-6 w-6 transition-colors ${
+                          activeTab === tab.id
+                            ? 'text-green-600'
+                            : 'text-gray-500 group-hover:text-green-600'
+                        }`} />
+                      </div>
+                      <div>
+                        <p className={`text-xs font-medium transition-colors ${
+                          activeTab === tab.id
+                            ? 'text-green-600'
+                            : 'text-gray-900 group-hover:text-green-600'
+                        }`}>
+                          {tab.name}
+                        </p>
+                        <p className="text-[10px] mt-0.5 hidden sm:block text-gray-400">
+                          {tab.description}
+                        </p>
+                      </div>
+                    </div>
+                    {activeTab === tab.id && (
+                      <div className="absolute -bottom-px left-1/2 transform -translate-x-1/2 w-8 h-1 rounded-full bg-green-600" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="px-4 sm:px-6 lg:px-8 py-8">
+          <div className="space-y-6">
+
+            <div className="flex flex-col gap-6">
               {/* Content */}
               <div className="flex-1">
-                <div className={`rounded-xl border overflow-hidden ${
-                  darkMode ? 'bg-[#1c1e27] border-[#2a2d3a]' : 'bg-white border-gray-200 shadow-sm'
-                }`}>
+                <div className="rounded-xl overflow-hidden bg-white shadow-sm">
                   <div className="p-8">
                     {renderContent()}
                   </div>
-                  <div className={`px-6 py-4 flex justify-end space-x-3 border-t ${
-                    darkMode ? 'bg-[#0A0B0F] border-[#2a2d3a]' : 'bg-gray-50 border-gray-200'
-                  }`}>
-                    <button className={`px-6 py-3 font-medium rounded-lg transition border ${
-                      darkMode
-                        ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white hover:bg-[#1a1c25]'
-                        : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
-                    }`}>
-                      Annuleren
-                    </button>
-                    <button
-                      onClick={handleSave}
-                      className={`inline-flex items-center px-6 py-3 font-medium rounded-lg transition ${
-                        darkMode
-                          ? 'bg-green-500 text-white hover:bg-green-600'
-                          : 'bg-green-600 text-white hover:bg-green-700'
-                      }`}
-                    >
-                      {saved && <CheckIcon className="h-4 w-4 mr-2" />}
-                      {saved ? 'Opgeslagen' : 'Wijzigingen Opslaan'}
-                    </button>
+                  <div className="px-8 py-6 flex justify-between items-center border-t bg-gray-50 border-gray-200">
+                    <div className="flex items-center space-x-2">
+                      {saved && (
+                        <div className="flex items-center space-x-2 text-green-500">
+                          <CheckIcon className="h-5 w-5" />
+                          <span className="text-sm font-medium">Wijzigingen opgeslagen!</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex space-x-3">
+                      <button className="px-6 py-2.5 font-medium rounded-lg transition border bg-white border-gray-200 text-gray-700 hover:bg-gray-50">
+                        Annuleren
+                      </button>
+                      <button
+                        onClick={handleSave}
+                        className={`inline-flex items-center px-6 py-2.5 font-medium rounded-lg transition ${
+                          saved
+                            ? 'bg-green-100 text-green-700 border border-green-200'
+                            : 'bg-green-600 text-white hover:bg-green-700'
+                        }`}
+                        disabled={saved}
+                      >
+                        {saved ? 'Opgeslagen' : 'Wijzigingen Opslaan'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

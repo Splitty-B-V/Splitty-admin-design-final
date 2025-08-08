@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Layout from '../../components/Layout'
 import { useUsers } from '../../contexts/UsersContext'
-import { useTheme } from '../../contexts/ThemeContext'
 import {
   ArrowLeftIcon,
   UserPlusIcon,
@@ -17,7 +16,6 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function NewUser() {
-  const { darkMode } = useTheme()
   const router = useRouter()
   const { addCompanyUser } = useUsers()
   const [formData, setFormData] = useState({
@@ -113,7 +111,7 @@ export default function NewUser() {
 
   return (
     <Layout>
-      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+      <div className={`min-h-screen ${false ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
         <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-4xl mx-auto space-y-6">
             {/* Header */}
@@ -121,7 +119,7 @@ export default function NewUser() {
               <Link
                 href="/users"
                 className={`inline-flex items-center px-4 py-2 rounded-lg transition-all text-sm font-medium mb-4 group ${
-                  darkMode 
+                  false 
                     ? 'bg-[#1c1e27] border border-[#2a2d3a] text-[#BBBECC] hover:text-white hover:bg-[#252833] hover:border-green-500/50'
                     : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-700 hover:bg-gray-100 hover:border-green-300'
                 }`}
@@ -133,25 +131,25 @@ export default function NewUser() {
 
             {/* Form Card */}
             <div className={`rounded-xl overflow-hidden ${
-              darkMode 
+              false 
                 ? 'bg-[#1c1e27] border border-[#2a2d3a]'
                 : 'bg-white shadow-sm'
             }`}>
               <div className={`px-6 py-4 border-b ${
-                darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'
+                false ? 'border-[#2a2d3a]' : 'border-gray-200'
               }`}>
                 <div className="flex items-center">
                   <div className={`p-2 rounded-lg ${
-                    darkMode 
-                      ? 'bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]'
+                    false 
+                      ? 'bg-green-500/20'
                       : 'bg-green-100'
                   }`}>
                     <UserPlusIcon className={`h-6 w-6 ${
-                      darkMode ? 'text-white' : 'text-green-600'
+                      false ? 'text-green-400' : 'text-green-600'
                     }`} />
                   </div>
                   <h1 className={`text-xl font-semibold ml-3 ${
-                    darkMode ? 'text-white' : 'text-gray-900'
+                    false ? 'text-white' : 'text-gray-900'
                   }`}>
                     Nieuwe Medewerker Toevoegen
                   </h1>
@@ -162,12 +160,12 @@ export default function NewUser() {
                 {/* Basic Information */}
                 <div className="space-y-4">
                   <h2 className={`text-lg font-semibold ${
-                    darkMode ? 'text-white' : 'text-gray-900'
+                    false ? 'text-white' : 'text-gray-900'
                   }`}>Persoonlijke Gegevens</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="first_name" className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                        false ? 'text-[#BBBECC]' : 'text-gray-700'
                       }`}>
                         Voornaam
                       </label>
@@ -177,7 +175,7 @@ export default function NewUser() {
                         id="first_name"
                         required
                         className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
                             : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
                         }`}
@@ -189,7 +187,7 @@ export default function NewUser() {
 
                     <div>
                       <label htmlFor="last_name" className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                        false ? 'text-[#BBBECC]' : 'text-gray-700'
                       }`}>
                         Achternaam
                       </label>
@@ -199,7 +197,7 @@ export default function NewUser() {
                         id="last_name"
                         required
                         className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
                             : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
                         }`}
@@ -211,7 +209,7 @@ export default function NewUser() {
 
                     <div>
                       <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                        false ? 'text-[#BBBECC]' : 'text-gray-700'
                       }`}>
                         E-mailadres
                       </label>
@@ -221,7 +219,7 @@ export default function NewUser() {
                         id="email"
                         required
                         className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
                             : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
                         }`}
@@ -232,7 +230,7 @@ export default function NewUser() {
                     </div>
                     <div>
                       <label htmlFor="phone" className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                        false ? 'text-[#BBBECC]' : 'text-gray-700'
                       }`}>
                         Telefoonnummer
                       </label>
@@ -241,7 +239,7 @@ export default function NewUser() {
                         name="phone"
                         id="phone"
                         className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
                             : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
                         }`}
@@ -256,17 +254,17 @@ export default function NewUser() {
                 {/* Password Section */}
                 <div className="space-y-4">
                   <h2 className={`text-lg font-semibold flex items-center ${
-                    darkMode ? 'text-white' : 'text-gray-900'
+                    false ? 'text-white' : 'text-gray-900'
                   }`}>
                     <LockClosedIcon className={`h-5 w-5 mr-2 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      false ? 'text-[#BBBECC]' : 'text-gray-500'
                     }`} />
                     Beveiliging
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="password" className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                        false ? 'text-[#BBBECC]' : 'text-gray-700'
                       }`}>
                         Wachtwoord
                       </label>
@@ -277,7 +275,7 @@ export default function NewUser() {
                         required
                         minLength="8"
                         className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
                             : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
                         }`}
@@ -289,14 +287,14 @@ export default function NewUser() {
                         <div className="mt-2">
                           <div className="flex items-center justify-between mb-1">
                             <span className={`text-xs ${
-                              darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                              false ? 'text-[#BBBECC]' : 'text-gray-500'
                             }`}>Wachtwoord sterkte</span>
                             <span className={`text-xs font-medium ${getPasswordStrengthText().color.replace('bg-', 'text-')}`}>
                               {getPasswordStrengthText().text}
                             </span>
                           </div>
                           <div className={`w-full rounded-full h-2 ${
-                            darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-200'
+                            false ? 'bg-[#0A0B0F]' : 'bg-gray-200'
                           }`}>
                             <div 
                               className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrengthText().color}`}
@@ -309,7 +307,7 @@ export default function NewUser() {
 
                     <div>
                       <label htmlFor="confirm_password" className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                        false ? 'text-[#BBBECC]' : 'text-gray-700'
                       }`}>
                         Bevestig Wachtwoord
                       </label>
@@ -318,7 +316,7 @@ export default function NewUser() {
                         id="confirm_password"
                         required
                         className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
                             : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
                         }`}
@@ -345,13 +343,13 @@ export default function NewUser() {
                 {/* Role & Restaurant */}
                 <div className="space-y-4">
                   <h2 className={`text-lg font-semibold ${
-                    darkMode ? 'text-white' : 'text-gray-900'
+                    false ? 'text-white' : 'text-gray-900'
                   }`}>Rol & Toegang</h2>
                   
                   {/* Role Selection */}
                   <div>
                     <label className={`block text-sm font-medium mb-3 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                      false ? 'text-[#BBBECC]' : 'text-gray-700'
                     }`}>Selecteer Rol</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {[
@@ -365,10 +363,10 @@ export default function NewUser() {
                           key={role.value}
                           className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none transition-all ${
                             formData.role === role.value
-                              ? darkMode 
+                              ? false 
                                 ? 'bg-[#0A0B0F] border-green-500'
                                 : 'bg-green-50 border-green-500'
-                              : darkMode
+                              : false
                                 ? 'bg-[#0A0B0F] border-[#2a2d3a] hover:border-[#2BE89A]/50'
                                 : 'bg-white border-gray-200 hover:border-green-300'
                           }`}
@@ -384,27 +382,27 @@ export default function NewUser() {
                           <div className="flex flex-col w-full">
                             <div className="flex items-center mb-2">
                               <div className={`p-2 rounded-lg ${
-                                darkMode 
+                                false 
                                   ? 'bg-gray-700'
                                   : 'bg-gray-100'
                               }`}>
                                 <role.icon className={`h-5 w-5 ${
                                   formData.role === role.value
                                     ? 'text-green-500'
-                                    : darkMode ? 'text-gray-400' : 'text-gray-600'
+                                    : false ? 'text-gray-400' : 'text-gray-600'
                                 }`} />
                               </div>
                               <span className={`ml-3 text-sm font-medium ${
-                                darkMode ? 'text-white' : 'text-gray-900'
+                                false ? 'text-white' : 'text-gray-900'
                               }`}>{role.label}</span>
                             </div>
                             <p className={`text-xs ${
-                              darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                              false ? 'text-[#BBBECC]' : 'text-gray-500'
                             }`}>{role.desc}</p>
                           </div>
                           {formData.role === role.value && (
                             <CheckCircleIcon className={`absolute top-4 right-4 h-5 w-5 ${
-                              darkMode ? 'text-[#2BE89A]' : 'text-green-500'
+                              false ? 'text-[#2BE89A]' : 'text-green-500'
                             }`} />
                           )}
                         </label>
@@ -415,7 +413,7 @@ export default function NewUser() {
                   {/* Department Selection */}
                   <div>
                     <label htmlFor="department" className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-700'
+                      false ? 'text-[#BBBECC]' : 'text-gray-700'
                     }`}>
                       Afdeling
                     </label>
@@ -423,7 +421,7 @@ export default function NewUser() {
                       id="department"
                       name="department"
                       className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
-                        darkMode
+                        false
                           ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white focus:ring-[#2BE89A] focus:border-transparent'
                           : 'bg-white border-gray-200 text-gray-900 focus:ring-green-500 focus:border-transparent'
                       }`}
@@ -442,7 +440,7 @@ export default function NewUser() {
 
                   {/* Active Status */}
                   <div className={`rounded-lg p-4 ${
-                    darkMode 
+                    false 
                       ? 'bg-[#0A0B0F]'
                       : 'bg-gray-50'
                   }`}>
@@ -452,7 +450,7 @@ export default function NewUser() {
                         name="is_active"
                         type="checkbox"
                         className={`h-4 w-4 rounded focus:ring-2 ${
-                          darkMode
+                          false
                             ? 'text-[#2BE89A] focus:ring-[#2BE89A] border-[#2a2d3a] bg-[#0A0B0F]'
                             : 'text-green-600 focus:ring-green-500 border-gray-300 bg-white'
                         }`}
@@ -461,10 +459,10 @@ export default function NewUser() {
                       />
                       <label htmlFor="is_active" className="ml-3">
                         <span className={`text-sm font-medium ${
-                          darkMode ? 'text-white' : 'text-gray-900'
+                          false ? 'text-white' : 'text-gray-900'
                         }`}>Actieve medewerker</span>
                         <p className={`text-xs ${
-                          darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                          false ? 'text-[#BBBECC]' : 'text-gray-500'
                         }`}>Inactieve medewerkers kunnen niet inloggen</p>
                       </label>
                     </div>
@@ -473,12 +471,12 @@ export default function NewUser() {
 
                 {/* Submit Buttons */}
                 <div className={`flex justify-between pt-6 border-t ${
-                  darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'
+                  false ? 'border-[#2a2d3a]' : 'border-gray-200'
                 }`}>
                   <Link
                     href="/users"
                     className={`px-6 py-2.5 font-medium rounded-lg transition ${
-                      darkMode
+                      false
                         ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white hover:bg-[#1a1c25]'
                         : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
                     }`}
@@ -488,7 +486,7 @@ export default function NewUser() {
                   <button
                     type="submit"
                     className={`px-6 py-2.5 font-medium rounded-lg transition ${
-                      darkMode
+                      false
                         ? 'bg-green-500 text-white hover:bg-green-600'
                         : 'bg-green-600 text-white hover:bg-green-700'
                     }`}

@@ -259,9 +259,9 @@ export default function Tables() {
 
   const getStatusColor = (remaining, total) => {
     const percentage = (remaining / total) * 100
-    if (percentage === 100) return 'bg-yellow-500/20 text-yellow-400'
-    if (percentage > 50) return 'bg-orange-500/20 text-orange-400'
-    return 'bg-[#2BE89A]/20 text-[#2BE89A]'
+    if (percentage === 100) return 'bg-yellow-50 text-yellow-700'
+    if (percentage > 50) return 'bg-orange-50 text-orange-700'
+    return 'bg-green-50 text-green-700'
   }
 
   const handleRefresh = () => {
@@ -270,8 +270,8 @@ export default function Tables() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0A0B0F]">
-        <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className="min-h-screen bg-[#F9FAFB]">
+        <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Breadcrumb */}
             <Breadcrumb items={[{ name: 'Actieve Tafels' }]} />
@@ -279,66 +279,95 @@ export default function Tables() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-white">Actieve Tafels</h1>
-                <p className="text-[#BBBECC] mt-1">Overzicht van alle actieve tafels per restaurant</p>
+                <h1 className="text-2xl font-semibold text-[#111827] mb-1">
+                  Actieve Tafels
+                </h1>
+                <p className="text-[#6B7280]">
+                  Overzicht van alle actieve tafels per restaurant
+                </p>
               </div>
               <button
                 type="button"
                 onClick={handleRefresh}
-                className="inline-flex items-center px-4 py-3 border border-[#2a2d3a] rounded-lg text-white bg-[#1c1e27] hover:bg-[#252833] transition-all duration-200"
+                className="inline-flex items-center px-4 py-2.5 rounded-lg transition-all border border-gray-200 text-[#6B7280] bg-white hover:bg-gray-50 shadow-sm"
               >
-                <ArrowPathIcon className="-ml-1 mr-2 h-5 w-5 text-[#BBBECC]" />
+                <ArrowPathIcon className="-ml-1 mr-2 h-5 w-5 text-gray-500" />
                 Ververs
               </button>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+              <div className={`p-6 rounded-xl ${
+                'bg-white shadow-sm'
+              }`}>
                 <div className="flex items-center">
-                  <div className="p-3 rounded-lg bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]">
-                    <TableCellsIcon className="h-6 w-6 text-black" />
+                  <div className={"p-3 rounded-lg bg-green-100"
+                  }>
+                    <TableCellsIcon className={"h-6 w-6 text-green-600"} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Actieve Tafels</p>
-                    <p className="text-2xl font-bold text-white">{activeTables.length}</p>
+                    <p className={`text-xs font-medium uppercase tracking-wider ${
+                      'text-[#6B7280]'
+                    }`}>ACTIEVE TAFELS</p>
+                    <p className={`text-2xl font-bold mt-2 ${
+                      'text-[#111827]'
+                    }`}>{activeTables.length}</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
+              <div className={`p-6 rounded-xl ${
+                'bg-white shadow-sm'
+              }`}>
                 <div className="flex items-center">
-                  <div className="p-3 rounded-lg bg-blue-500/20">
-                    <UserGroupIcon className="h-6 w-6 text-blue-400" />
+                  <div className={"p-3 rounded-lg bg-blue-100"}>
+                    <UserGroupIcon className={"h-6 w-6 text-blue-600"} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Totaal Gasten</p>
-                    <p className="text-2xl font-bold text-white">
+                    <p className={`text-xs font-medium uppercase tracking-wider ${
+                      'text-[#6B7280]'
+                    }`}>TOTAAL GASTEN</p>
+                    <p className={`text-2xl font-bold mt-2 ${
+                      'text-[#111827]'
+                    }`}>
                       {activeTables.reduce((sum, table) => sum + table.guests, 0)}
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
+              <div className={`p-6 rounded-xl ${
+                'bg-white shadow-sm'
+              }`}>
                 <div className="flex items-center">
-                  <div className="p-3 rounded-lg bg-purple-500/20">
-                    <ChartBarIcon className="h-6 w-6 text-purple-400" />
+                  <div className={"p-3 rounded-lg bg-purple-100"}>
+                    <ChartBarIcon className={"h-6 w-6 text-purple-600"} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Totaal Bedrag</p>
-                    <p className="text-2xl font-bold text-white">
+                    <p className={`text-xs font-medium uppercase tracking-wider ${
+                      'text-[#6B7280]'
+                    }`}>TOTAAL BEDRAG</p>
+                    <p className={`text-2xl font-bold mt-2 ${
+                      'text-[#111827]'
+                    }`}>
                       {formatCurrency(activeTables.reduce((sum, table) => sum + table.amount, 0))}
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
+              <div className={`p-6 rounded-xl ${
+                'bg-white shadow-sm'
+              }`}>
                 <div className="flex items-center">
-                  <div className="p-3 rounded-lg bg-yellow-500/20">
-                    <CurrencyEuroIcon className="h-6 w-6 text-yellow-400" />
+                  <div className={"p-3 rounded-lg bg-yellow-100"}>
+                    <CurrencyEuroIcon className={"h-6 w-6 text-yellow-600"} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-[#BBBECC] text-sm">Nog Te Betalen</p>
-                    <p className="text-2xl font-bold text-white">
+                    <p className={`text-xs font-medium uppercase tracking-wider ${
+                      'text-[#6B7280]'
+                    }`}>NOG TE BETALEN</p>
+                    <p className={`text-2xl font-bold mt-2 ${
+                      'text-[#111827]'
+                    }`}>
                       {formatCurrency(activeTables.reduce((sum, table) => sum + table.remaining, 0))}
                     </p>
                   </div>
@@ -347,7 +376,7 @@ export default function Tables() {
             </div>
 
             {/* Filters */}
-            <div className="bg-[#1c1e27] p-6 rounded-xl border border-[#2a2d3a]">
+            <div className="p-6 rounded-xl bg-white shadow-sm">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <label htmlFor="search" className="sr-only">
@@ -355,7 +384,7 @@ export default function Tables() {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <MagnifyingGlassIcon className="h-5 w-5 text-[#BBBECC]" />
+                      <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       type="text"
@@ -363,7 +392,7 @@ export default function Tables() {
                       id="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-3 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white placeholder-[#BBBECC] focus:outline-none focus:ring-2 focus:ring-[#2BE89A] focus:border-transparent"
+                      className="block w-full pl-12 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition bg-[#F9FAFB] border-gray-200 text-[#111827] placeholder-gray-500 focus:ring-green-500 focus:border-transparent hover:border-gray-300"
                       placeholder="Zoek op restaurant, tafel nummer, of bestelling ID..."
                     />
                   </div>
@@ -374,19 +403,25 @@ export default function Tables() {
             {/* Restaurants with Active Tables */}
             <div className="space-y-6">
               {filteredRestaurants.map((group) => (
-                <div key={group.restaurantId} className="bg-[#1c1e27] rounded-xl border border-[#2a2d3a] overflow-hidden">
-                  <div className="p-6 border-b border-[#2a2d3a]">
+                <div key={group.restaurantId} className="rounded-xl overflow-hidden bg-white shadow-sm">
+                  <div className="p-6 border-b border-gray-200">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center">
-                        <BuildingStorefrontIcon className="h-6 w-6 text-[#2BE89A] mr-3" />
+                        <BuildingStorefrontIcon className={`h-6 w-6 mr-3 ${
+                          'text-green-600'
+                        }`} />
                         <div>
-                          <h2 className="text-xl font-bold text-white">{group.restaurant}</h2>
-                          <p className="text-sm text-[#BBBECC]">{group.tables.length} actieve tafels</p>
+                          <h2 className={`text-xl font-bold ${
+                            'text-[#111827]'
+                          }`}>{group.restaurant}</h2>
+                          <p className={`text-sm ${
+                            'text-[#6B7280]'
+                          }`}>{group.tables.length} actieve tafels</p>
                         </div>
                       </div>
                       <Link
                         href={`/restaurants/${group.restaurantId}`}
-                        className="inline-flex items-center px-4 py-2 bg-[#0A0B0F] border border-[#2a2d3a] rounded-lg text-white hover:bg-[#1a1c25] transition"
+                        className="inline-flex items-center px-4 py-2 rounded-lg transition bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
                       >
                         Restaurant Profiel
                         <ArrowRightIcon className="ml-2 h-4 w-4" />
@@ -399,15 +434,19 @@ export default function Tables() {
                       {group.tables.map((table) => (
                         <div
                           key={table.id}
-                          className="bg-[#0A0B0F] rounded-xl border border-[#2a2d3a] overflow-hidden hover:border-[#2BE89A]/30 transition-all duration-200"
+                          className="rounded-xl overflow-hidden transition-all bg-gray-50 border border-gray-200 hover:border-green-300 hover:shadow-md"
                         >
                           <div className="p-4">
                             <div className="flex justify-between items-start mb-4">
                               <div>
-                                <h3 className="text-lg font-bold text-white">
+                                <h3 className={`text-lg font-bold ${
+                                  'text-[#111827]'
+                                }`}>
                                   Tafel {table.tableNumber}
                                 </h3>
-                                <p className="text-sm text-[#BBBECC]">{table.restaurant}</p>
+                                <p className={`text-sm ${
+                                  'text-[#6B7280]'
+                                }`}>{table.restaurant}</p>
                               </div>
                               <span
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
@@ -421,36 +460,42 @@ export default function Tables() {
 
                             <div className="space-y-3">
                               <div className="flex justify-between text-sm">
-                                <span className="text-[#BBBECC]">Bestelling #</span>
-                                <span className="text-white font-medium">{table.orderId}</span>
+                                <span className={'text-[#6B7280]'}>Bestelling #</span>
+                                <span className={`font-medium ${'text-[#111827]'}`}>{table.orderId}</span>
                               </div>
                               <div className="flex justify-between text-sm">
-                                <span className="text-[#BBBECC]">Gasten</span>
-                                <span className="text-white font-medium">{table.guests}</span>
+                                <span className={'text-[#6B7280]'}>Gasten</span>
+                                <span className={`font-medium ${'text-[#111827]'}`}>{table.guests}</span>
                               </div>
                               <div className="flex justify-between text-sm">
-                                <span className="text-[#BBBECC]">Bedrag</span>
-                                <span className="text-white font-medium">{formatCurrency(table.amount)}</span>
+                                <span className={'text-[#6B7280]'}>Bedrag</span>
+                                <span className={`font-medium ${'text-[#111827]'}`}>{formatCurrency(table.amount)}</span>
                               </div>
                               <div className="flex justify-between text-sm">
-                                <span className="text-[#BBBECC]">Resterend</span>
-                                <span className="text-yellow-400 font-medium">
+                                <span className={'text-[#6B7280]'}>Resterend</span>
+                                <span className={`font-medium ${
+                                  'text-yellow-600'
+                                }`}>
                                   {formatCurrency(table.remaining)}
                                 </span>
                               </div>
                               <div className="flex justify-between text-sm">
-                                <span className="text-[#BBBECC]">Duur</span>
-                                <span className="text-white font-medium flex items-center">
+                                <span className={'text-[#6B7280]'}>Duur</span>
+                                <span className={`font-medium flex items-center ${
+                                  'text-[#111827]'
+                                }`}>
                                   <ClockIcon className="h-4 w-4 mr-1" />
                                   {table.duration}
                                 </span>
                               </div>
                             </div>
 
-                            <div className="mt-4 pt-4 border-t border-[#2a2d3a]">
+                            <div className={`mt-4 pt-4 border-t ${
+                              'border-gray-200'
+                            }`}>
                               <Link
                                 href={`/orders/${table.orderId}`}
-                                className="w-full inline-flex justify-center items-center px-4 py-2.5 bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0] text-black font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg"
+                                className="w-full inline-flex justify-center items-center px-4 py-2.5 font-medium rounded-lg transition-all bg-green-600 text-white hover:bg-green-700 shadow-sm"
                               >
                                 Bekijk Bestelling
                               </Link>
@@ -466,9 +511,9 @@ export default function Tables() {
 
             {/* Empty State */}
             {filteredRestaurants.length === 0 && (
-              <div className="text-center py-16 bg-[#1c1e27] rounded-xl border border-[#2a2d3a]">
-                <TableCellsIcon className="mx-auto h-12 w-12 text-[#BBBECC]" />
-                <p className="mt-4 text-[#BBBECC]">
+              <div className="text-center py-16 rounded-xl bg-white shadow-sm">
+                <TableCellsIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="mt-4 text-[#6B7280]">
                   Geen actieve tafels gevonden die voldoen aan je criteria.
                 </p>
               </div>

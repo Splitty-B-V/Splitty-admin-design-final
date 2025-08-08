@@ -4,7 +4,6 @@ import Link from 'next/link'
 import Layout from '../../../components/Layout'
 import Breadcrumb from '../../../components/Breadcrumb'
 import { useRestaurants } from '../../../contexts/RestaurantsContext'
-import { useTheme } from '../../../contexts/ThemeContext'
 import {
   ArrowLeftIcon,
   BuildingStorefrontIcon,
@@ -19,7 +18,6 @@ export default function EditRestaurant() {
   const router = useRouter()
   const { id } = router.query
   const { getRestaurant, updateRestaurant } = useRestaurants()
-  const { darkMode } = useTheme()
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
   const [formData, setFormData] = useState({
@@ -156,8 +154,8 @@ export default function EditRestaurant() {
   if (!restaurant) {
     return (
       <Layout>
-        <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'} flex items-center justify-center`}>
-          <p className={darkMode ? 'text-white' : 'text-[#111827]'}>Restaurant niet gevonden</p>
+        <div className={`min-h-screen ${false ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'} flex items-center justify-center`}>
+          <p className={false ? 'text-white' : 'text-[#111827]'}>Restaurant niet gevonden</p>
         </div>
       </Layout>
     )
@@ -165,7 +163,7 @@ export default function EditRestaurant() {
 
   return (
     <Layout>
-      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+      <div className={`min-h-screen ${false ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
         <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-3xl mx-auto">
             {/* Breadcrumb */}
@@ -179,7 +177,7 @@ export default function EditRestaurant() {
             <Link
               href={`/restaurants/${id}`}
               className={`inline-flex items-center px-4 py-2 rounded-lg transition-all text-sm font-medium mb-4 group ${
-                darkMode 
+                false 
                   ? 'bg-[#1c1e27] border border-[#2a2d3a] text-[#BBBECC] hover:text-white hover:bg-[#0A0B0F] hover:border-green-500' 
                   : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-700 hover:bg-gray-100 hover:border-green-300'
               }`}
@@ -190,23 +188,23 @@ export default function EditRestaurant() {
 
             {/* Header */}
             <div className="mb-8">
-              <h1 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'} mb-1`}>
+              <h1 className={`text-2xl font-semibold ${false ? 'text-white' : 'text-[#111827]'} mb-1`}>
                 Restaurant Bewerken
               </h1>
-              <p className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Pas de restaurant gegevens aan</p>
+              <p className={false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Pas de restaurant gegevens aan</p>
             </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Basic Information */}
               <div className={`rounded-xl p-6 ${
-                darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+                false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
               }`}>
                 <h2 className={`text-xl font-semibold mb-6 flex items-center ${
-                  darkMode ? 'text-white' : 'text-[#111827]'
+                  false ? 'text-white' : 'text-[#111827]'
                 }`}>
                   <BuildingStorefrontIcon className={`h-6 w-6 mr-2 ${
-                    darkMode ? 'text-[#2BE89A]' : 'text-green-500'
+                    false ? 'text-[#2BE89A]' : 'text-green-500'
                   }`} />
                   Basis Informatie
                 </h2>
@@ -214,7 +212,7 @@ export default function EditRestaurant() {
                 <div className="space-y-6">
                   <div>
                     <label htmlFor="name" className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                      false ? 'text-[#BBBECC]' : 'text-[#6B7280]'
                     }`}>
                       Restaurant Naam <span className="text-red-500">*</span>
                     </label>
@@ -225,7 +223,7 @@ export default function EditRestaurant() {
                       value={formData.name}
                       onChange={handleInputChange}
                       className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
-                        darkMode
+                        false
                           ? `bg-[#0A0B0F] border ${errors.name ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
                           : `bg-white border ${errors.name ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
                       }`}
@@ -241,14 +239,14 @@ export default function EditRestaurant() {
 
                   <div>
                     <label htmlFor="logo" className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                      false ? 'text-[#BBBECC]' : 'text-[#6B7280]'
                     }`}>
                       Restaurant Logo
                     </label>
                     <div className="flex items-center space-x-6">
                       {formData.logoPreview && (
                         <div className={`h-20 w-20 rounded-lg overflow-hidden border-2 ${
-                          darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'
+                          false ? 'border-[#2a2d3a]' : 'border-gray-200'
                         }`}>
                           <img
                             src={formData.logoPreview}
@@ -260,11 +258,11 @@ export default function EditRestaurant() {
                       <div className="flex-1">
                         <label className="cursor-pointer">
                           <div className={`px-4 py-2.5 rounded-lg transition inline-flex items-center ${
-                            darkMode
+                            false
                               ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-[#BBBECC] hover:bg-[#1c1e27]'
                               : 'bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100'
                           }`}>
-                            <PhotoIcon className={`h-5 w-5 mr-2 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
+                            <PhotoIcon className={`h-5 w-5 mr-2 ${false ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
                             {formData.logoPreview ? 'Logo Wijzigen' : 'Logo Uploaden'}
                           </div>
                           <input
@@ -274,21 +272,21 @@ export default function EditRestaurant() {
                             className="hidden"
                           />
                         </label>
-                        <p className={`text-xs mt-2 ${darkMode ? 'text-[#9CA3B5]' : 'text-gray-500'}`}>PNG, JPG tot 5MB</p>
+                        <p className={`text-xs mt-2 ${false ? 'text-[#9CA3B5]' : 'text-gray-500'}`}>PNG, JPG tot 5MB</p>
                       </div>
                     </div>
                   </div>
 
                   <div>
                     <label htmlFor="banner" className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                      false ? 'text-[#BBBECC]' : 'text-[#6B7280]'
                     }`}>
                       Restaurant Banner
                     </label>
                     <div className="space-y-4">
                       {formData.bannerPreview && (
                         <div className={`w-full h-40 rounded-lg overflow-hidden border-2 ${
-                          darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'
+                          false ? 'border-[#2a2d3a]' : 'border-gray-200'
                         }`}>
                           <img
                             src={formData.bannerPreview}
@@ -299,11 +297,11 @@ export default function EditRestaurant() {
                       )}
                       <label className="cursor-pointer">
                         <div className={`px-4 py-2.5 rounded-lg transition inline-flex items-center ${
-                          darkMode
+                          false
                             ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-[#BBBECC] hover:bg-[#1c1e27]'
                             : 'bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100'
                         }`}>
-                          <PhotoIcon className={`h-5 w-5 mr-2 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
+                          <PhotoIcon className={`h-5 w-5 mr-2 ${false ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
                           {formData.bannerPreview ? 'Banner Wijzigen' : 'Banner Uploaden'}
                         </div>
                         <input
@@ -313,7 +311,7 @@ export default function EditRestaurant() {
                           className="hidden"
                         />
                       </label>
-                      <p className={`text-xs ${darkMode ? 'text-[#9CA3B5]' : 'text-gray-500'}`}>Aanbevolen: 1920x400px, PNG of JPG tot 5MB</p>
+                      <p className={`text-xs ${false ? 'text-[#9CA3B5]' : 'text-gray-500'}`}>Aanbevolen: 1920x400px, PNG of JPG tot 5MB</p>
                     </div>
                   </div>
                 </div>
@@ -321,13 +319,13 @@ export default function EditRestaurant() {
 
               {/* Contact Information */}
               <div className={`rounded-xl p-6 ${
-                darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+                false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
               }`}>
                 <h2 className={`text-xl font-semibold mb-6 flex items-center ${
-                  darkMode ? 'text-white' : 'text-[#111827]'
+                  false ? 'text-white' : 'text-[#111827]'
                 }`}>
                   <EnvelopeIcon className={`h-6 w-6 mr-2 ${
-                    darkMode ? 'text-[#2BE89A]' : 'text-green-500'
+                    false ? 'text-[#2BE89A]' : 'text-green-500'
                   }`} />
                   Contact Informatie
                 </h2>
@@ -335,13 +333,13 @@ export default function EditRestaurant() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                      false ? 'text-[#BBBECC]' : 'text-[#6B7280]'
                     }`}>
                       Email <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <EnvelopeIcon className={`h-5 w-5 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
+                        <EnvelopeIcon className={`h-5 w-5 ${false ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
                       </div>
                       <input
                         type="email"
@@ -350,7 +348,7 @@ export default function EditRestaurant() {
                         value={formData.email}
                         onChange={handleInputChange}
                         className={`w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? `bg-[#0A0B0F] border ${errors.email ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
                             : `bg-white border ${errors.email ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
                         }`}
@@ -367,13 +365,13 @@ export default function EditRestaurant() {
 
                   <div>
                     <label htmlFor="phone" className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                      false ? 'text-[#BBBECC]' : 'text-[#6B7280]'
                     }`}>
                       Telefoon <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <PhoneIcon className={`h-5 w-5 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
+                        <PhoneIcon className={`h-5 w-5 ${false ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
                       </div>
                       <input
                         type="tel"
@@ -382,7 +380,7 @@ export default function EditRestaurant() {
                         value={formData.phone}
                         onChange={handleInputChange}
                         className={`w-full pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? `bg-[#0A0B0F] border ${errors.phone ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
                             : `bg-white border ${errors.phone ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
                         }`}
@@ -401,13 +399,13 @@ export default function EditRestaurant() {
 
               {/* Address Information */}
               <div className={`rounded-xl p-6 ${
-                darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+                false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
               }`}>
                 <h2 className={`text-xl font-semibold mb-6 flex items-center ${
-                  darkMode ? 'text-white' : 'text-[#111827]'
+                  false ? 'text-white' : 'text-[#111827]'
                 }`}>
                   <MapPinIcon className={`h-6 w-6 mr-2 ${
-                    darkMode ? 'text-[#2BE89A]' : 'text-green-500'
+                    false ? 'text-[#2BE89A]' : 'text-green-500'
                   }`} />
                   Adres Informatie
                 </h2>
@@ -415,7 +413,7 @@ export default function EditRestaurant() {
                 <div className="space-y-6">
                   <div>
                     <label htmlFor="street" className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                      false ? 'text-[#BBBECC]' : 'text-[#6B7280]'
                     }`}>
                       Straat & Huisnummer <span className="text-red-500">*</span>
                     </label>
@@ -426,7 +424,7 @@ export default function EditRestaurant() {
                       value={formData.street}
                       onChange={handleInputChange}
                       className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
-                        darkMode
+                        false
                           ? `bg-[#0A0B0F] border ${errors.street ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
                           : `bg-white border ${errors.street ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
                       }`}
@@ -443,7 +441,7 @@ export default function EditRestaurant() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="postalCode" className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                        false ? 'text-[#BBBECC]' : 'text-[#6B7280]'
                       }`}>
                         Postcode <span className="text-red-500">*</span>
                       </label>
@@ -454,7 +452,7 @@ export default function EditRestaurant() {
                         value={formData.postalCode}
                         onChange={handleInputChange}
                         className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? `bg-[#0A0B0F] border ${errors.postalCode ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
                             : `bg-white border ${errors.postalCode ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
                         }`}
@@ -470,7 +468,7 @@ export default function EditRestaurant() {
 
                     <div>
                       <label htmlFor="city" className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                        false ? 'text-[#BBBECC]' : 'text-[#6B7280]'
                       }`}>
                         Stad <span className="text-red-500">*</span>
                       </label>
@@ -481,7 +479,7 @@ export default function EditRestaurant() {
                         value={formData.city}
                         onChange={handleInputChange}
                         className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? `bg-[#0A0B0F] border ${errors.city ? 'border-red-500' : 'border-[#2a2d3a]'} text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]`
                             : `bg-white border ${errors.city ? 'border-red-500' : 'border-gray-200'} text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300`
                         }`}
@@ -498,7 +496,7 @@ export default function EditRestaurant() {
 
                   <div>
                     <label htmlFor="country" className={`block text-sm font-medium mb-2 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'
+                      false ? 'text-[#BBBECC]' : 'text-[#6B7280]'
                     }`}>
                       Land
                     </label>
@@ -508,7 +506,7 @@ export default function EditRestaurant() {
                       value={formData.country}
                       onChange={handleInputChange}
                       className={`w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition ${
-                        darkMode
+                        false
                           ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white focus:ring-[#2BE89A]'
                           : 'bg-white border border-gray-200 text-gray-900 focus:ring-green-500 hover:border-gray-300'
                       }`}
@@ -527,7 +525,7 @@ export default function EditRestaurant() {
                 <Link
                   href={`/restaurants/${id}`}
                   className={`px-4 py-2.5 font-medium rounded-lg transition-all ${
-                    darkMode
+                    false
                       ? 'bg-[#1c1e27] border border-[#2a2d3a] text-white hover:bg-[#0A0B0F]'
                       : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
                   }`}

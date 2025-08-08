@@ -3,7 +3,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Layout from '../components/Layout'
 import Breadcrumb from '../components/Breadcrumb'
-import { useTheme } from '../contexts/ThemeContext'
 import { useRestaurants } from '../contexts/RestaurantsContext'
 import { 
   PlusIcon, 
@@ -31,7 +30,6 @@ const StripeIcon = () => (
 )
 
 export default function Restaurants() {
-  const { darkMode } = useTheme()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -114,7 +112,7 @@ export default function Restaurants() {
           <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
           
           <div className={`inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full ${
-            darkMode ? 'bg-[#1c1e27] border border-red-500' : 'bg-white'
+            false ? 'bg-[#1c1e27] border border-red-500' : 'bg-white'
           }`}>
             <div className="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <div className="sm:flex sm:items-start">
@@ -122,21 +120,21 @@ export default function Restaurants() {
                   <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
-                  <h3 className={`text-lg leading-6 font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h3 className={`text-lg leading-6 font-medium ${false ? 'text-white' : 'text-gray-900'}`}>
                     Permanent verwijderen
                   </h3>
                   <div className="mt-2">
-                    <p className={`text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`}>
+                    <p className={`text-sm ${false ? 'text-[#BBBECC]' : 'text-gray-500'}`}>
                       Je staat op het punt om <span className="font-semibold">{restaurantToDelete.name}</span> permanent te verwijderen.
                     </p>
-                    <div className={`mt-3 p-3 rounded-lg ${darkMode ? 'bg-red-900/20 border border-red-500/50' : 'bg-red-50 border border-red-200'}`}>
-                      <p className={`text-sm font-semibold ${darkMode ? 'text-red-400' : 'text-red-800'}`}>
+                    <div className={`mt-3 p-3 rounded-lg ${false ? 'bg-red-900/20 border border-red-500/50' : 'bg-red-50 border border-red-200'}`}>
+                      <p className={`text-sm font-semibold ${false ? 'text-red-400' : 'text-red-800'}`}>
                         ⚠️ Let op: Deze actie kan niet ongedaan worden gemaakt
                       </p>
-                      <p className={`text-sm mt-2 ${darkMode ? 'text-red-300' : 'text-red-700'}`}>
+                      <p className={`text-sm mt-2 ${false ? 'text-red-300' : 'text-red-700'}`}>
                         Als je dit restaurant nu verwijdert:
                       </p>
-                      <ul className={`text-sm mt-2 ml-4 list-disc ${darkMode ? 'text-red-300' : 'text-red-700'}`}>
+                      <ul className={`text-sm mt-2 ml-4 list-disc ${false ? 'text-red-300' : 'text-red-700'}`}>
                         <li>Alle restaurantgegevens worden permanent verwijderd</li>
                         <li>Alle transactiegeschiedenis gaat verloren</li>
                         <li>Alle gebruikersaccounts worden verwijderd</li>
@@ -144,7 +142,7 @@ export default function Restaurants() {
                       </ul>
                     </div>
                     <div className="mt-4">
-                      <label className={`block text-sm font-medium ${darkMode ? 'text-[#BBBECC]' : 'text-gray-700'} mb-2`}>
+                      <label className={`block text-sm font-medium ${false ? 'text-[#BBBECC]' : 'text-gray-700'} mb-2`}>
                         Type de naam van het restaurant om te bevestigen: <span className="font-semibold">{restaurantToDelete.name}</span>
                       </label>
                       <input
@@ -153,7 +151,7 @@ export default function Restaurants() {
                         onChange={(e) => setDeleteConfirmText(e.target.value)}
                         placeholder="Vul de restaurantnaam in"
                         className={`w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition ${
-                          darkMode
+                          false
                             ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-red-500'
                             : 'bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-red-500'
                         }`}
@@ -163,7 +161,7 @@ export default function Restaurants() {
                 </div>
               </div>
             </div>
-            <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-50'}`}>
+            <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${false ? 'bg-[#0A0B0F]' : 'bg-gray-50'}`}>
               <button
                 type="button"
                 onClick={handleConfirmDelete}
@@ -183,7 +181,7 @@ export default function Restaurants() {
                   setDeleteConfirmText('')
                 }}
                 className={`mt-3 w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm ${
-                  darkMode 
+                  false 
                     ? 'border-gray-600 bg-[#1c1e27] text-gray-300 hover:bg-[#2a2d3a]' 
                     : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                 }`}
@@ -200,7 +198,7 @@ export default function Restaurants() {
   return (
     <Layout>
       <DeleteConfirmationModal />
-      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+      <div className="min-h-screen bg-[#F9FAFB]">
         <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Breadcrumb */}
@@ -209,10 +207,10 @@ export default function Restaurants() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'} mb-1`}>
+                <h1 className="text-2xl font-semibold text-[#111827] mb-1">
                   Restaurant Partners
                 </h1>
-                <p className={`${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                <p className="text-[#6B7280]">
                   Beheer al je restaurant partners en hun prestaties
                 </p>
               </div>
@@ -227,60 +225,48 @@ export default function Restaurants() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className={`p-6 rounded-xl transition-all ${
-                darkMode 
-                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                  : 'bg-white shadow-sm'
-              }`}>
+              <div className="p-6 rounded-xl transition-all bg-white shadow-sm">
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]" : "p-3 rounded-lg bg-green-100"}>
-                    <BuildingStorefrontIcon className={darkMode ? "h-6 w-6 text-black" : "h-6 w-6 text-green-600"} />
+                  <div className="p-3 rounded-lg bg-green-100">
+                    <BuildingStorefrontIcon className="h-6 w-6 text-green-600" />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
                       TOTAAL PARTNERS
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">
                       {activeRestaurants.length}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className={`p-6 rounded-xl transition-all ${
-                darkMode 
-                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                  : 'bg-white shadow-sm'
-              }`}>
+              <div className="p-6 rounded-xl transition-all bg-white shadow-sm">
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-yellow-500/20" : "p-3 rounded-lg bg-yellow-50"}>
-                    <ClockIcon className={darkMode ? "h-6 w-6 text-yellow-400" : "h-6 w-6 text-yellow-600"} />
+                  <div className="p-3 rounded-lg bg-yellow-50">
+                    <ClockIcon className="h-6 w-6 text-yellow-600" />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
                       SETUP VEREIST
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">
                       {onboardingRestaurants.length}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className={`p-6 rounded-xl transition-all ${
-                darkMode 
-                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                  : 'bg-white shadow-sm'
-              }`}>
+              <div className="p-6 rounded-xl transition-all bg-white shadow-sm">
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-red-500/20" : "p-3 rounded-lg bg-red-50"}>
-                    <TrashIcon className={darkMode ? "h-6 w-6 text-red-400" : "h-6 w-6 text-red-500"} />
+                  <div className="p-3 rounded-lg bg-red-50">
+                    <TrashIcon className="h-6 w-6 text-red-500" />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
                       GEARCHIVEERD
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">
                       {deletedRestaurants.length}
                     </p>
                   </div>
@@ -289,34 +275,26 @@ export default function Restaurants() {
             </div>
 
             {/* Filter Tabs */}
-            <div className={`flex space-x-2 p-1.5 rounded-xl shadow-sm ${
-              darkMode 
-                ? 'bg-gradient-to-r from-[#1c1e27] to-[#2a2d3a] border border-[#2a2d3a]' 
-                : 'bg-gradient-to-r from-gray-100 to-gray-50 border border-gray-200'
-            }`}>
+            <div className="flex space-x-2 p-1.5 rounded-xl shadow-sm bg-gradient-to-r from-gray-100 to-gray-50 border border-gray-200">
               <button
                 onClick={() => setStatusFilter('all')}
                 className={`flex-1 py-2.5 px-5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   statusFilter === 'all'
-                    ? darkMode
-                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg transform scale-[1.02]'
-                      : 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
-                    : darkMode
-                      ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-gray-400 hover:text-white hover:border-gray-600 hover:bg-[#1c1e27] hover:shadow-md cursor-pointer'
-                      : 'bg-white/70 border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-white hover:shadow-md hover:border-gray-300 cursor-pointer'
+                    ? 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
+                    : 'bg-white/70 border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-white hover:shadow-md hover:border-gray-300 cursor-pointer'
                 }`}
               >
                 <span className="flex items-center justify-center gap-2">
                   <BuildingStorefrontIcon className={`h-4 w-4 ${
                     statusFilter === 'all' 
-                      ? darkMode ? 'text-white' : 'text-green-500'
+                      ? 'text-green-500'
                       : ''
                   }`} />
                   Alle Restaurants 
                   <span className={`inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full ${
                     statusFilter === 'all' 
-                      ? darkMode ? 'bg-green-900/50 text-white' : 'bg-green-100 text-green-600'
-                      : darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
+                      ? 'bg-green-100 text-green-600'
+                      : 'bg-gray-100 text-gray-600'
                   }`}>
                     {activeRestaurants.length}
                   </span>
@@ -326,25 +304,21 @@ export default function Restaurants() {
                 onClick={() => setStatusFilter('onboarding')}
                 className={`flex-1 py-2.5 px-5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   statusFilter === 'onboarding'
-                    ? darkMode
-                      ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-lg transform scale-[1.02]'
-                      : 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
-                    : darkMode
-                      ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-gray-400 hover:text-white hover:border-gray-600 hover:bg-[#1c1e27] hover:shadow-md cursor-pointer'
-                      : 'bg-white/70 border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-white hover:shadow-md hover:border-gray-300 cursor-pointer'
+                    ? 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
+                    : 'bg-white/70 border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-white hover:shadow-md hover:border-gray-300 cursor-pointer'
                 }`}
               >
                 <span className="flex items-center justify-center gap-2">
                   <ArrowPathIcon className={`h-4 w-4 ${
                     statusFilter === 'onboarding' 
-                      ? darkMode ? 'text-white animate-spin' : 'text-yellow-500 animate-spin'
+                      ? 'text-yellow-500 animate-spin'
                       : ''
                   }`} />
                   Onboarding
                   <span className={`inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full ${
                     statusFilter === 'onboarding' 
-                      ? darkMode ? 'bg-yellow-900/50 text-white' : 'bg-yellow-100 text-yellow-600'
-                      : darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
+                      ? 'bg-yellow-100 text-yellow-600'
+                      : 'bg-gray-100 text-gray-600'
                   }`}>
                     {onboardingRestaurants.length}
                   </span>
@@ -354,25 +328,21 @@ export default function Restaurants() {
                 onClick={() => setStatusFilter('deleted')}
                 className={`flex-1 py-2.5 px-5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   statusFilter === 'deleted'
-                    ? darkMode
-                      ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg transform scale-[1.02]'
-                      : 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
-                    : darkMode
-                      ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-gray-400 hover:text-white hover:border-gray-600 hover:bg-[#1c1e27] hover:shadow-md cursor-pointer'
-                      : 'bg-white/70 border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-white hover:shadow-md hover:border-gray-300 cursor-pointer'
+                    ? 'bg-white text-gray-900 shadow-md border border-gray-200 transform scale-[1.02]'
+                    : 'bg-white/70 border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-white hover:shadow-md hover:border-gray-300 cursor-pointer'
                 }`}
               >
                 <span className="flex items-center justify-center gap-2">
                   <ArchiveBoxIcon className={`h-4 w-4 ${
                     statusFilter === 'deleted' 
-                      ? darkMode ? 'text-white' : 'text-red-500'
+                      ? 'text-red-500'
                       : ''
                   }`} />
                   Gearchiveerd
                   <span className={`inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full ${
                     statusFilter === 'deleted' 
-                      ? darkMode ? 'bg-red-900/50 text-white' : 'bg-red-100 text-red-600'
-                      : darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
+                      ? 'bg-red-100 text-red-600'
+                      : 'bg-gray-100 text-gray-600'
                   }`}>
                     {deletedRestaurants.length}
                   </span>
@@ -381,26 +351,18 @@ export default function Restaurants() {
             </div>
 
             {/* Search and Filter */}
-            <div className={`rounded-xl ${
-              darkMode 
-                ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                : 'bg-white shadow-sm'
-            }`}>
+            <div className="rounded-xl bg-white shadow-sm">
               <div className="p-6">
                 <div className="flex flex-col lg:flex-row gap-4">
                   <div className="relative flex-1">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MagnifyingGlassIcon className={`h-5 w-5 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
+                      <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className={`block w-full pl-10 pr-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition ${
-                        darkMode
-                          ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A]'
-                          : 'bg-white border border-gray-200 text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300'
-                      }`}
+                      className="block w-full pl-10 pr-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition bg-white border border-gray-200 text-gray-900 placeholder-gray-500 focus:ring-green-500 hover:border-gray-300"
                       placeholder="Zoek restaurants op naam of locatie..."
                     />
                   </div>
@@ -409,11 +371,7 @@ export default function Restaurants() {
                     <select
                       value={selectedFilter}
                       onChange={(e) => setSelectedFilter(e.target.value)}
-                      className={`appearance-none w-full pl-3 pr-10 py-2.5 rounded-lg focus:outline-none focus:ring-2 cursor-pointer transition text-sm ${
-                        darkMode
-                          ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-white focus:ring-[#2BE89A]'
-                          : 'bg-white border border-gray-200 text-gray-900 focus:ring-green-500 hover:border-gray-300'
-                      }`}
+                      className="appearance-none w-full pl-3 pr-10 py-2.5 rounded-lg focus:outline-none focus:ring-2 cursor-pointer transition text-sm bg-white border border-gray-200 text-gray-900 focus:ring-green-500 hover:border-gray-300"
                     >
                       <option value="all">Alle Locaties</option>
                       <option value="amsterdam">Amsterdam</option>
@@ -424,7 +382,7 @@ export default function Restaurants() {
                       <option value="zaandam">Zaandam</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <svg className={`h-5 w-5 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-400'}`} viewBox="0 0 20 20" fill="currentColor">
+                      <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
                     </div>
@@ -440,12 +398,8 @@ export default function Restaurants() {
                   key={restaurant.id}
                   className={`rounded-lg p-5 transition-all flex flex-col relative ${
                     !restaurant.isOnboarded && !restaurant.deleted
-                      ? darkMode
-                        ? 'bg-[#1c1e27] border-2 border-emerald-500/50 hover:shadow-xl animate-pulse-border'
-                        : 'bg-white border border-emerald-400 hover:shadow-md animate-pulse-border'
-                      : darkMode 
-                        ? 'bg-[#1c1e27] border border-[#2a2d3a] hover:shadow-xl'
-                        : 'bg-white border border-gray-200 hover:shadow-md hover:border-gray-300'
+                      ? 'bg-white border border-emerald-400 hover:shadow-md animate-pulse-border'
+                      : 'bg-white border border-gray-200 hover:shadow-md hover:border-gray-300'
                   }`}
                 >
                   {/* Header with logo and name */}
@@ -475,9 +429,7 @@ export default function Restaurants() {
                     </div>
                     
                     <div className="flex-1">
-                      <h3 className={`text-base font-semibold mb-1 ${
-                        darkMode ? 'text-white' : 'text-[#111827]'
-                      }`}>
+                      <h3 className="text-base font-semibold mb-1 text-[#111827]">
                         {restaurant.name}
                       </h3>
                       <div className="flex items-center flex-wrap gap-2">
@@ -512,7 +464,7 @@ export default function Restaurants() {
                   
                   {/* Location and stats */}
                   <div className="flex-1 space-y-3 mb-4">
-                    <div className={`flex items-center text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <div className="flex items-center text-sm text-[#6B7280]">
                       <MapPinIcon className="h-4 w-4 mr-2 flex-shrink-0" />
                       {restaurant.location}
                     </div>
@@ -520,28 +472,28 @@ export default function Restaurants() {
                     {restaurant.isOnboarded && (
                       <div className="grid grid-cols-3 gap-3">
                         <div>
-                          <span className={`block text-xs mb-1 ${darkMode ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>
+                          <span className="block text-xs mb-1 text-[#9CA3AF]">
                             Omzet
                           </span>
-                          <span className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                          <span className="font-semibold text-sm text-[#111827]">
                             {restaurant.revenue}
                           </span>
                         </div>
                         <div>
-                          <span className={`block text-xs mb-1 ${darkMode ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>
+                          <span className="block text-xs mb-1 text-[#9CA3AF]">
                             Transacties
                           </span>
-                          <span className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                          <span className="font-semibold text-sm text-[#111827]">
                             {restaurant.transactions}
                           </span>
                         </div>
                         <div>
-                          <span className={`block text-xs mb-1 ${darkMode ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>
+                          <span className="block text-xs mb-1 text-[#9CA3AF]">
                             Score
                           </span>
                           <div className="flex items-center">
                             <StarSolidIcon className="h-4 w-4 text-yellow-400 mr-1" />
-                            <span className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                            <span className="font-semibold text-sm text-[#111827]">
                               {restaurant.rating}
                             </span>
                           </div>
@@ -551,7 +503,7 @@ export default function Restaurants() {
                     
                     {!restaurant.isOnboarded && (
                       <div>
-                        <span className={`block text-xs mb-2 ${darkMode ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>
+                        <span className="block text-xs mb-2 text-[#9CA3AF]">
                           Onboarding voortgang
                         </span>
                         <div className="flex items-center">
@@ -570,7 +522,7 @@ export default function Restaurants() {
                               }}
                             />
                           </div>
-                          <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                          <span className="text-sm font-medium text-[#111827]">
                             {(() => {
                               const savedData = typeof window !== 'undefined' 
                                 ? localStorage.getItem(`onboarding_${restaurant.id}`)
@@ -586,16 +538,12 @@ export default function Restaurants() {
                   </div>
                   
                   {/* Action buttons */}
-                  <div className={`pt-3 border-t ${darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'}`}>
+                  <div className="pt-3 border-t border-gray-200">
                     {restaurant.deleted ? (
                       <div className="flex gap-2">
                         <Link
                           href={`/restaurants/${restaurant.id}`}
-                          className={`flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                            darkMode 
-                              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
+                          className="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200"
                         >
                           Bekijk Details
                         </Link>
@@ -604,11 +552,7 @@ export default function Restaurants() {
                             e.stopPropagation()
                             restoreRestaurant(restaurant.id)
                           }}
-                          className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                            darkMode 
-                              ? 'bg-[#2BE89A]/20 text-[#2BE89A] hover:bg-[#2BE89A]/30'
-                              : 'bg-green-50 text-green-600 hover:bg-green-100'
-                          }`}
+                          className="flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors bg-green-50 text-green-600 hover:bg-green-100"
                         >
                           Herstellen
                         </button>
@@ -617,11 +561,7 @@ export default function Restaurants() {
                             e.stopPropagation()
                             handleDeleteClick(restaurant)
                           }}
-                          className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                            darkMode 
-                              ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                              : 'bg-red-50 text-red-600 hover:bg-red-100'
-                          }`}
+                          className="flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors bg-red-50 text-red-600 hover:bg-red-100"
                         >
                           Verwijderen
                         </button>
@@ -632,9 +572,7 @@ export default function Restaurants() {
                         className={`w-full inline-flex items-center justify-center px-3.5 py-2 rounded-md transition-all text-sm font-medium ${
                           !restaurant.isOnboarded
                             ? 'bg-green-500 text-white hover:bg-green-600'
-                            : darkMode
-                              ? 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
-                              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
+                            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'
                         }`}
                       >
                         {!restaurant.isOnboarded ? 'Start Onboarding' : 'Bekijk Details'}
@@ -648,23 +586,15 @@ export default function Restaurants() {
 
             {/* Empty State */}
             {filteredRestaurants.length === 0 && (
-              <div className={`text-center py-16 rounded-xl ${
-                darkMode 
-                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                  : 'bg-white shadow-sm'
-              }`}>
-                <BuildingStorefrontIcon className={`mx-auto h-12 w-12 ${
-                  darkMode ? 'text-[#BBBECC]' : 'text-gray-400'
-                }`} />
-                <h3 className={`mt-4 text-base font-medium ${
-                  darkMode ? 'text-white' : 'text-[#111827]'
-                }`}>
+              <div className="text-center py-16 rounded-xl bg-white shadow-sm">
+                <BuildingStorefrontIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-4 text-base font-medium text-[#111827]">
                   {statusFilter === 'deleted' 
                     ? 'Geen gearchiveerde restaurants'
                     : 'Geen restaurants gevonden'
                   }
                 </h3>
-                <p className={`mt-2 text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                <p className="mt-2 text-sm text-[#6B7280]">
                   {statusFilter === 'deleted'
                     ? 'Gearchiveerde restaurants verschijnen hier'
                     : 'Begin met het toevoegen van je eerste restaurant partner.'

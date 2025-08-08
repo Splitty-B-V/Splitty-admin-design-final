@@ -2,7 +2,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Layout from '../components/Layout'
 import Breadcrumb from '../components/Breadcrumb'
-import { useTheme } from '../contexts/ThemeContext'
 import {
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -17,7 +16,6 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function Payments() {
-  const { darkMode } = useTheme()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [dateRange, setDateRange] = useState('last30days')
@@ -234,11 +232,11 @@ export default function Payments() {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'succeeded':
-        return <CheckCircleIcon className={`h-4 w-4 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+        return <CheckCircleIcon className="h-4 w-4 text-green-500" />
       case 'failed':
-        return <XCircleIcon className={`h-4 w-4 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+        return <XCircleIcon className="h-4 w-4 text-red-500" />
       case 'pending':
-        return <ClockIcon className={`h-4 w-4 ${darkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
+        return <ClockIcon className="h-4 w-4 text-yellow-600" />
       default:
         return null
     }
@@ -247,13 +245,13 @@ export default function Payments() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'succeeded':
-        return darkMode ? 'bg-[#2BE89A]/10 text-[#2BE89A]' : 'bg-green-50 text-green-700'
+        return 'bg-green-50 text-green-700'
       case 'failed':
-        return darkMode ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-700'
+        return 'bg-red-50 text-red-700'
       case 'pending':
-        return darkMode ? 'bg-yellow-500/10 text-yellow-400' : 'bg-yellow-50 text-yellow-700'
+        return 'bg-yellow-50 text-yellow-700'
       default:
-        return darkMode ? 'bg-gray-500/10 text-gray-400' : 'bg-gray-100 text-gray-700'
+        return 'bg-gray-100 text-gray-700'
     }
   }
 
@@ -263,7 +261,7 @@ export default function Payments() {
 
   return (
     <Layout>
-      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+      <div className="min-h-screen bg-[#F9FAFB]">
         <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Breadcrumb */}
@@ -272,35 +270,27 @@ export default function Payments() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'} mb-1`}>
+                <h1 className="text-2xl font-semibold text-[#111827] mb-1">
                   Betalingen
                 </h1>
-                <p className={`${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                <p className="text-[#6B7280]">
                   Beheer alle betalingstransacties
                 </p>
               </div>
               <div className="flex gap-3">
                 <Link
                   href="/payments/payouts"
-                  className={`inline-flex items-center px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                    darkMode 
-                      ? 'border border-[#2a2d3a] text-white bg-[#1c1e27] hover:bg-[#252833]'
-                      : 'border border-gray-200 text-[#6B7280] bg-white hover:bg-gray-50 shadow-sm'
-                  }`}
+                  className="inline-flex items-center px-4 py-2.5 rounded-lg transition-all duration-200 border border-gray-200 text-[#6B7280] bg-white hover:bg-gray-50 shadow-sm"
                 >
-                  <BanknotesIcon className={`-ml-1 mr-2 h-5 w-5 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
+                  <BanknotesIcon className="-ml-1 mr-2 h-5 w-5 text-gray-500" />
                   Bekijk Uitbetalingen
                 </Link>
                 <button
                   type="button"
                   onClick={handleExport}
-                  className={`inline-flex items-center px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                    darkMode 
-                      ? 'border border-[#2a2d3a] text-white bg-[#1c1e27] hover:bg-[#252833]'
-                      : 'border border-gray-200 text-[#6B7280] bg-white hover:bg-gray-50 shadow-sm'
-                  }`}
+                  className="inline-flex items-center px-4 py-2.5 rounded-lg transition-all duration-200 border border-gray-200 text-[#6B7280] bg-white hover:bg-gray-50 shadow-sm"
                 >
-                  <ArrowDownTrayIcon className={`-ml-1 mr-2 h-5 w-5 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`} />
+                  <ArrowDownTrayIcon className="-ml-1 mr-2 h-5 w-5 text-gray-500" />
                   Exporteer
                 </button>
               </div>
@@ -308,77 +298,61 @@ export default function Payments() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-              <div className={`p-6 rounded-xl ${
-                darkMode 
-                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                  : 'bg-white shadow-sm'
-              }`}>
+              <div className="p-6 rounded-xl bg-white shadow-sm">
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-gradient-to-r from-[#2BE89A] to-[#4FFFB0]" : "p-3 rounded-lg bg-green-100"}>
-                    <CreditCardIcon className={darkMode ? "h-6 w-6 text-black" : "h-6 w-6 text-green-600"} />
+                  <div className="p-3 rounded-lg bg-green-100">
+                    <CreditCardIcon className="h-6 w-6 text-green-600" />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
                       TOTAAL BETALINGEN
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">
                       {filteredPayments.length}
                     </p>
                   </div>
                 </div>
               </div>
-              <div className={`p-6 rounded-xl ${
-                darkMode 
-                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                  : 'bg-white shadow-sm'
-              }`}>
+              <div className="p-6 rounded-xl bg-white shadow-sm">
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-[#2BE89A]/20" : "p-3 rounded-lg bg-green-50"}>
-                    <CheckCircleIcon className={darkMode ? "h-6 w-6 text-[#2BE89A]" : "h-6 w-6 text-green-500"} />
+                  <div className="p-3 rounded-lg bg-green-50">
+                    <CheckCircleIcon className="h-6 w-6 text-green-500" />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
                       GESLAAGD
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">
                       {filteredPayments.filter(p => p.status === 'succeeded').length}
                     </p>
                   </div>
                 </div>
               </div>
-              <div className={`p-6 rounded-xl ${
-                darkMode 
-                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                  : 'bg-white shadow-sm'
-              }`}>
+              <div className="p-6 rounded-xl bg-white shadow-sm">
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-blue-500/20" : "p-3 rounded-lg bg-blue-100"}>
-                    <ChartBarIcon className={darkMode ? "h-6 w-6 text-blue-400" : "h-6 w-6 text-blue-600"} />
+                  <div className="p-3 rounded-lg bg-blue-100">
+                    <ChartBarIcon className="h-6 w-6 text-blue-600" />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
                       TOTAAL BEDRAG
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">
                       {formatCurrency(totalAmount)}
                     </p>
                   </div>
                 </div>
               </div>
-              <div className={`p-6 rounded-xl ${
-                darkMode 
-                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                  : 'bg-white shadow-sm'
-              }`}>
+              <div className="p-6 rounded-xl bg-white shadow-sm">
                 <div className="flex items-center">
-                  <div className={darkMode ? "p-3 rounded-lg bg-red-500/20" : "p-3 rounded-lg bg-red-50"}>
-                    <ExclamationTriangleIcon className={darkMode ? "h-6 w-6 text-red-400" : "h-6 w-6 text-red-500"} />
+                  <div className="p-3 rounded-lg bg-red-50">
+                    <ExclamationTriangleIcon className="h-6 w-6 text-red-500" />
                   </div>
                   <div className="ml-4">
-                    <p className={`text-xs font-medium uppercase tracking-wider ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
                       MISLUKT
                     </p>
-                    <p className={`text-2xl font-bold mt-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                    <p className="text-2xl font-bold mt-2 text-[#111827]">
                       {filteredPayments.filter(p => p.status === 'failed').length}
                     </p>
                   </div>
@@ -388,7 +362,7 @@ export default function Payments() {
 
             {/* Filters */}
             <div className={`p-6 rounded-xl ${
-              darkMode 
+              false 
                 ? 'bg-[#1c1e27] border border-[#2a2d3a]'
                 : 'bg-white shadow-sm'
             }`}>
@@ -399,9 +373,7 @@ export default function Payments() {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <MagnifyingGlassIcon className={`h-5 w-5 ${
-                        darkMode ? 'text-[#BBBECC]' : 'text-gray-400'
-                      }`} />
+                      <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       type="text"
@@ -409,11 +381,7 @@ export default function Payments() {
                       id="search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className={`block w-full pl-12 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition ${
-                        darkMode
-                          ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
-                          : 'bg-[#F9FAFB] border-gray-200 text-[#111827] placeholder-gray-500 focus:ring-green-500 focus:border-transparent hover:border-gray-300'
-                      }`}
+                      className="block w-full pl-12 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 transition bg-[#F9FAFB] border-gray-200 text-[#111827] placeholder-gray-500 focus:ring-green-500 focus:border-transparent hover:border-gray-300"
                       placeholder="Zoek op betaling ID, bestelling ID, of restaurant..."
                     />
                   </div>
@@ -424,11 +392,7 @@ export default function Payments() {
                     name="status"
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className={`block w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 cursor-pointer transition ${
-                      darkMode
-                        ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white focus:ring-[#2BE89A] focus:border-transparent'
-                        : 'bg-[#F9FAFB] border-gray-200 text-[#111827] focus:ring-green-500 focus:border-transparent hover:border-gray-300'
-                    }`}
+                    className="block w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 cursor-pointer transition bg-[#F9FAFB] border-gray-200 text-[#111827] focus:ring-green-500 focus:border-transparent hover:border-gray-300"
                   >
                     <option value="all">Alle Statussen</option>
                     <option value="succeeded">Geslaagd</option>
@@ -440,11 +404,7 @@ export default function Payments() {
                     name="dateRange"
                     value={dateRange}
                     onChange={(e) => setDateRange(e.target.value)}
-                    className={`block w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 cursor-pointer transition ${
-                      darkMode
-                        ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white focus:ring-[#2BE89A] focus:border-transparent'
-                        : 'bg-[#F9FAFB] border-gray-200 text-[#111827] focus:ring-green-500 focus:border-transparent hover:border-gray-300'
-                    }`}
+                    className="block w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 cursor-pointer transition bg-[#F9FAFB] border-gray-200 text-[#111827] focus:ring-green-500 focus:border-transparent hover:border-gray-300"
                   >
                     <option value="today">Vandaag</option>
                     <option value="last7days">Afgelopen 7 Dagen</option>
@@ -456,47 +416,29 @@ export default function Payments() {
             </div>
 
             {/* Payments Table */}
-            <div className={`overflow-x-auto rounded-xl ${
-              darkMode 
-                ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                : 'bg-white shadow-sm'
-            }`}>
-              <table className="min-w-full divide-y ${darkMode ? 'divide-[#2a2d3a]' : 'divide-gray-200'}">
-                <thead className={darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-50'}>
+            <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
+              <table className="min-w-full divide-y ${false ? 'divide-[#2a2d3a]' : 'divide-gray-200'}">
+                <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
-                    }`}>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Betaling ID
                     </th>
-                    <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
-                    }`}>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Bestelling
                     </th>
-                    <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
-                    }`}>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Restaurant
                     </th>
-                    <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
-                    }`}>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Bedrag
                     </th>
-                    <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
-                    }`}>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Methode
                     </th>
-                    <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
-                    }`}>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Status
                     </th>
-                    <th scope="col" className={`px-6 py-4 text-left text-xs font-medium uppercase tracking-wider ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
-                    }`}>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                       Datum
                     </th>
                     <th scope="col" className="relative px-6 py-4">
@@ -504,40 +446,28 @@ export default function Payments() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className={`divide-y ${darkMode ? 'bg-[#1c1e27] divide-[#2a2d3a]' : 'bg-white divide-gray-200'}`}>
+                <tbody className="divide-y bg-white divide-gray-200">
                   {filteredPayments.map((payment) => (
-                    <tr key={payment.id} className={`transition-colors ${
-                      darkMode ? 'hover:bg-[#0A0B0F]' : 'hover:bg-gray-50'
-                    }`}>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
-                        darkMode ? 'text-white' : 'text-gray-900'
-                      }`}>
+                    <tr key={payment.id} className="transition-colors hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {payment.id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <Link
                           href={`/orders/${payment.orderId}`}
-                          className={`transition-colors ${
-                            darkMode ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
-                          }`}
+                          className="transition-colors text-green-600 hover:text-green-700"
                         >
                           #{payment.orderId}
                         </Link>
                       </td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${
-                        darkMode ? 'text-white' : 'text-gray-900'
-                      }`}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {payment.restaurant}
                       </td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
-                        darkMode ? 'text-[#2BE89A]' : 'text-green-600'
-                      }`}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
                         {formatCurrency(payment.amount)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
-                          darkMode ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-700'
-                        }`}>
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700">
                           {payment.method}
                         </span>
                       </td>
@@ -551,17 +481,13 @@ export default function Payments() {
                           </span>
                         </span>
                       </td>
-                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${
-                        darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
-                      }`}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {formatDate(payment.created)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
                           href={`/payments/${payment.id}`}
-                          className={`transition-colors ${
-                            darkMode ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
-                          }`}
+                          className="transition-colors text-green-600 hover:text-green-700"
                         >
                           Bekijk
                         </Link>
@@ -572,18 +498,10 @@ export default function Payments() {
               </table>
               
               {/* Table Footer */}
-              <div className={`px-6 py-4 border-t ${
-                darkMode 
-                  ? 'bg-[#0A0B0F] border-[#2a2d3a]'
-                  : 'bg-gray-50 border-gray-200'
-              }`}>
+              <div className="px-6 py-4 border-t bg-gray-50 border-gray-200">
                 <div className="flex items-center justify-between">
-                  <div className={`text-sm ${
-                    darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
-                  }`}>
-                    Toont <span className={`font-medium ${
-                      darkMode ? 'text-white' : 'text-gray-900'
-                    }`}>{filteredPayments.length}</span> betalingen
+                  <div className="text-sm text-gray-600">
+                    Toont <span className="font-medium text-gray-900">{filteredPayments.length}</span> betalingen
                   </div>
                 </div>
               </div>
@@ -591,17 +509,9 @@ export default function Payments() {
 
             {/* Empty State */}
             {filteredPayments.length === 0 && (
-              <div className={`text-center py-16 rounded-xl ${
-                darkMode 
-                  ? 'bg-[#1c1e27] border border-[#2a2d3a]'
-                  : 'bg-white shadow-sm'
-              }`}>
-                <CreditCardIcon className={`mx-auto h-12 w-12 ${
-                  darkMode ? 'text-[#BBBECC]' : 'text-gray-400'
-                }`} />
-                <p className={`mt-4 ${
-                  darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
-                }`}>
+              <div className="text-center py-16 rounded-xl bg-white shadow-sm">
+                <CreditCardIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <p className="mt-4 text-gray-600">
                   Geen betalingen gevonden die voldoen aan je criteria.
                 </p>
               </div>

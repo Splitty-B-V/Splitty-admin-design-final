@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import Layout from '../components/Layout'
-import { useTheme } from '../contexts/ThemeContext'
 import { 
   BookOpenIcon,
   AcademicCapIcon,
@@ -36,7 +35,7 @@ const sections = [
     id: 'getting-started',
     title: 'Getting Started',
     icon: RocketLaunchIcon,
-    color: darkMode => darkMode ? 'bg-green-500/10 text-green-400' : 'bg-green-50 text-green-600',
+    color: 'bg-green-50 text-green-600',
     articles: [
       { id: 'welcome', title: 'Welcome to Splitty', icon: SparklesIcon },
       { id: 'first-restaurant', title: 'Je Eerste Restaurant', icon: BookOpenIcon },
@@ -47,7 +46,7 @@ const sections = [
     id: 'onboarding',
     title: 'Restaurant Onboarding',
     icon: AcademicCapIcon,
-    color: darkMode => darkMode ? 'bg-purple-500/10 text-purple-400' : 'bg-purple-50 text-purple-700',
+    color: 'bg-purple-50 text-purple-700',
     articles: [
       { id: 'onboard-guide', title: 'Complete Onboarding Guide', icon: ClipboardDocumentCheckIcon },
       { id: 'personnel-setup', title: 'Personeel Toevoegen', icon: UserGroupIcon },
@@ -59,7 +58,7 @@ const sections = [
     id: 'pos-systems',
     title: 'POS Systemen',
     icon: DevicePhoneMobileIcon,
-    color: darkMode => darkMode ? 'bg-cyan-500/10 text-cyan-400' : 'bg-cyan-50 text-cyan-700',
+    color: 'bg-cyan-50 text-cyan-700',
     articles: [
       { id: 'untill-setup', title: 'Untill API Setup', icon: CommandLineIcon },
       { id: 'lightspeed-setup', title: 'Lightspeed Integratie', icon: CommandLineIcon },
@@ -70,7 +69,7 @@ const sections = [
     id: 'payments',
     title: 'Betalingen',
     icon: CreditCardIcon,
-    color: darkMode => darkMode ? 'bg-pink-500/10 text-pink-400' : 'bg-pink-50 text-pink-700',
+    color: 'bg-pink-50 text-pink-700',
     articles: [
       { id: 'payment-flow', title: 'Payment Flow Uitleg', icon: ArrowRightIcon },
       { id: 'stripe-dashboard', title: 'Stripe Dashboard Guide', icon: DocumentTextIcon },
@@ -81,7 +80,7 @@ const sections = [
     id: 'support',
     title: 'Support Procedures',
     icon: ChatBubbleLeftRightIcon,
-    color: darkMode => darkMode ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-700',
+    color: 'bg-red-50 text-red-700',
     articles: [
       { id: 'ticket-system', title: 'Ticket Systeem', icon: HashtagIcon },
       { id: 'escalation', title: 'Escalatie Procedures', icon: ArrowRightIcon },
@@ -92,7 +91,7 @@ const sections = [
     id: 'faq',
     title: 'FAQ & Tips',
     icon: QuestionMarkCircleIcon,
-    color: darkMode => darkMode ? 'bg-yellow-500/10 text-yellow-400' : 'bg-yellow-50 text-yellow-700',
+    color: 'bg-yellow-50 text-yellow-700',
     articles: [
       { id: 'restaurant-faq', title: 'Restaurant FAQ', icon: QuestionMarkCircleIcon },
       { id: 'technical-faq', title: 'Technische FAQ', icon: CommandLineIcon },
@@ -318,7 +317,6 @@ Voor Untill heb je nodig:
 }
 
 export default function KnowledgeBase() {
-  const { darkMode } = useTheme()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSection, setSelectedSection] = useState('getting-started')
   const [selectedArticle, setSelectedArticle] = useState('welcome')
@@ -352,22 +350,22 @@ export default function KnowledgeBase() {
     return content.split('\n').map((line, index) => {
       // Headers
       if (line.startsWith('# ')) {
-        return <h1 key={index} className={`text-2xl font-bold mb-4 mt-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{line.substring(2)}</h1>
+        return <h1 key={index} className={`text-2xl font-bold mb-4 mt-6 ${false ? 'text-white' : 'text-gray-900'}`}>{line.substring(2)}</h1>
       }
       if (line.startsWith('## ')) {
-        return <h2 key={index} className={`text-xl font-semibold mb-3 mt-5 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{line.substring(3)}</h2>
+        return <h2 key={index} className={`text-xl font-semibold mb-3 mt-5 ${false ? 'text-white' : 'text-gray-900'}`}>{line.substring(3)}</h2>
       }
       if (line.startsWith('### ')) {
-        return <h3 key={index} className={`text-lg font-medium mb-2 mt-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{line.substring(4)}</h3>
+        return <h3 key={index} className={`text-lg font-medium mb-2 mt-4 ${false ? 'text-white' : 'text-gray-900'}`}>{line.substring(4)}</h3>
       }
       
       // Bold text
       if (line.includes('**')) {
         const parts = line.split('**')
         return (
-          <p key={index} className={`mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+          <p key={index} className={`mb-2 ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
             {parts.map((part, i) => 
-              i % 2 === 0 ? part : <strong key={i} className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{part}</strong>
+              i % 2 === 0 ? part : <strong key={i} className={`font-semibold ${false ? 'text-white' : 'text-gray-900'}`}>{part}</strong>
             )}
           </p>
         )
@@ -376,7 +374,7 @@ export default function KnowledgeBase() {
       // Bullet points
       if (line.startsWith('- ')) {
         return (
-          <li key={index} className={`mb-1 ml-6 list-disc ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+          <li key={index} className={`mb-1 ml-6 list-disc ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
             {line.substring(2)}
           </li>
         )
@@ -385,7 +383,7 @@ export default function KnowledgeBase() {
       // Numbered lists
       if (line.match(/^\d+\. /)) {
         return (
-          <li key={index} className={`mb-1 ml-6 list-decimal ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
+          <li key={index} className={`mb-1 ml-6 list-decimal ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`}>
             {line.substring(line.indexOf('. ') + 2)}
           </li>
         )
@@ -395,7 +393,7 @@ export default function KnowledgeBase() {
       if (line.startsWith('`') && line.endsWith('`') && line.length > 2) {
         return (
           <code key={index} className={`inline-block px-2 py-1 rounded text-sm mb-2 ${
-            darkMode ? 'bg-[#0A0B0F] text-[#2BE89A]' : 'bg-gray-100 text-green-600'
+            false ? 'bg-[#0A0B0F] text-[#2BE89A]' : 'bg-gray-100 text-green-600'
           }`}>
             {line.substring(1, line.length - 1)}
           </code>
@@ -404,7 +402,7 @@ export default function KnowledgeBase() {
       
       // Regular paragraphs
       if (line.trim()) {
-        return <p key={index} className={`mb-2 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`}>{line}</p>
+        return <p key={index} className={`mb-2 ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`}>{line}</p>
       }
       
       return <br key={index} />
@@ -413,30 +411,30 @@ export default function KnowledgeBase() {
 
   return (
     <Layout>
-      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+      <div className={`min-h-screen ${false ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
         {/* Mobile header */}
         <div className={`lg:hidden p-4 border-b ${
-          darkMode ? 'bg-[#1c1e27] border-[#2a2d3a]' : 'bg-white border-gray-200'
+          false ? 'bg-[#1c1e27] border-[#2a2d3a]' : 'bg-white border-gray-200'
         }`}>
           <div className="flex items-center justify-between">
             <h2 className={`text-xl font-bold flex items-center ${
-              darkMode ? 'text-white' : 'text-gray-900'
+              false ? 'text-white' : 'text-gray-900'
             }`}>
               <BookOpenIcon className={`h-6 w-6 mr-2 ${
-                darkMode ? 'text-[#2BE89A]' : 'text-green-600'
+                false ? 'text-[#2BE89A]' : 'text-green-600'
               }`} />
               Knowledge Base
             </h2>
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className={`p-2 rounded-lg border transition-colors ${
-                darkMode 
+                false 
                   ? 'bg-[#0A0B0F] border-[#2a2d3a] hover:bg-[#1c1e27]'
                   : 'bg-white border-gray-200 hover:bg-gray-50'
               }`}
             >
               <ChevronRightIcon className={`h-5 w-5 transition-transform ${
-                darkMode ? 'text-white' : 'text-gray-600'
+                false ? 'text-white' : 'text-gray-600'
               } ${sidebarOpen ? 'rotate-90' : ''}`} />
             </button>
           </div>
@@ -445,7 +443,7 @@ export default function KnowledgeBase() {
         <div className="flex relative" style={{ height: 'calc(100vh - 72px)' }}>
           {/* Sidebar */}
           <div className={`${sidebarOpen ? 'block' : 'hidden'} lg:block w-full lg:w-80 flex-shrink-0 h-full overflow-y-auto border-r ${
-            darkMode 
+            false 
               ? 'bg-[#1c1e27] border-[#2a2d3a]'
               : 'bg-white border-gray-200'
           }`}>
@@ -453,15 +451,15 @@ export default function KnowledgeBase() {
               {/* Header - verberg op mobile want we hebben al een header */}
               <div className="mb-6 hidden lg:block">
                 <h2 className={`text-xl font-bold flex items-center ${
-                  darkMode ? 'text-white' : 'text-gray-900'
+                  false ? 'text-white' : 'text-gray-900'
                 }`}>
                   <BookOpenIcon className={`h-6 w-6 mr-2 ${
-                    darkMode ? 'text-[#2BE89A]' : 'text-green-600'
+                    false ? 'text-[#2BE89A]' : 'text-green-600'
                   }`} />
                   Knowledge Base
                 </h2>
                 <p className={`text-sm mt-1 ${
-                  darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
+                  false ? 'text-[#BBBECC]' : 'text-gray-600'
                 }`}>Alles wat je moet weten</p>
               </div>
 
@@ -469,13 +467,13 @@ export default function KnowledgeBase() {
             <div className="relative mb-6">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <MagnifyingGlassIcon className={`h-4 w-4 ${
-                  darkMode ? 'text-[#BBBECC]' : 'text-gray-400'
+                  false ? 'text-[#BBBECC]' : 'text-gray-400'
                 }`} />
               </div>
               <input
                 type="search"
                 className={`block w-full pl-9 pr-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 transition ${
-                  darkMode
+                  false
                     ? 'bg-[#0A0B0F] border-[#2a2d3a] text-white placeholder-[#BBBECC] focus:ring-[#2BE89A] focus:border-transparent'
                     : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:ring-green-500 focus:border-transparent'
                 }`}
@@ -496,17 +494,15 @@ export default function KnowledgeBase() {
                     }}
                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition ${
                       selectedSection === section.id
-                        ? section.color(darkMode)
-                        : darkMode
-                          ? 'hover:bg-[#0A0B0F] text-[#BBBECC]'
-                          : 'hover:bg-gray-50 text-gray-700'
+                        ? section.color
+                        : 'hover:bg-gray-50 text-gray-700'
                     }`}
                   >
                     <div className="flex items-center">
                       <section.icon className={`h-5 w-5 mr-3 ${
                         selectedSection === section.id 
                           ? ''
-                          : darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                          : 'text-gray-500'
                       }`} />
                       <span className="text-sm font-medium">{section.title}</span>
                     </div>
@@ -527,10 +523,10 @@ export default function KnowledgeBase() {
                           }}
                           className={`w-full flex items-center px-3 py-2 rounded-lg text-sm transition ${
                             selectedArticle === article.id
-                              ? darkMode
+                              ? false
                                 ? 'bg-[#0A0B0F] text-white'
                                 : 'bg-gray-100 text-gray-900'
-                              : darkMode
+                              : false
                                 ? 'text-[#BBBECC] hover:bg-[#0A0B0F] hover:text-white'
                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                           }`}
@@ -547,38 +543,38 @@ export default function KnowledgeBase() {
 
             {/* Quick Stats */}
             <div className={`mt-8 p-4 rounded-lg border ${
-              darkMode 
+              false 
                 ? 'bg-[#0A0B0F] border-[#2a2d3a]'
                 : 'bg-gray-50 border-gray-200'
             }`}>
               <div className={`text-xs mb-3 ${
-                darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
+                false ? 'text-[#BBBECC]' : 'text-gray-600'
               }`}>Quick Stats</div>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className={`text-xs ${
-                    darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                    false ? 'text-[#BBBECC]' : 'text-gray-500'
                   }`}>Totale Artikelen</span>
                   <span className={`text-sm font-medium ${
-                    darkMode ? 'text-white' : 'text-gray-900'
+                    false ? 'text-white' : 'text-gray-900'
                   }`}>
                     {sections.reduce((acc, s) => acc + s.articles.length, 0)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className={`text-xs ${
-                    darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                    false ? 'text-[#BBBECC]' : 'text-gray-500'
                   }`}>Categorieën</span>
                   <span className={`text-sm font-medium ${
-                    darkMode ? 'text-white' : 'text-gray-900'
+                    false ? 'text-white' : 'text-gray-900'
                   }`}>{sections.length}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className={`text-xs ${
-                    darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                    false ? 'text-[#BBBECC]' : 'text-gray-500'
                   }`}>Laatste Update</span>
                   <span className={`text-sm font-medium ${
-                    darkMode ? 'text-[#2BE89A]' : 'text-green-600'
+                    false ? 'text-[#2BE89A]' : 'text-green-600'
                   }`}>Vandaag</span>
                 </div>
               </div>
@@ -588,7 +584,7 @@ export default function KnowledgeBase() {
 
           {/* Main Content */}
           <div className={`flex-1 overflow-y-auto ${
-            darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'
+            false ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'
           }`}>
             <div className="max-w-5xl mx-auto px-4 lg:px-8 py-6 lg:py-8">
             {/* Article Header */}
@@ -596,12 +592,12 @@ export default function KnowledgeBase() {
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className={`text-3xl font-bold mb-2 ${
-                    darkMode ? 'text-white' : 'text-gray-900'
+                    false ? 'text-white' : 'text-gray-900'
                   }`}>
                     {currentArticle.title}
                   </h1>
                   <div className={`flex items-center space-x-4 text-sm ${
-                    darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
+                    false ? 'text-[#BBBECC]' : 'text-gray-600'
                   }`}>
                     <span className="flex items-center">
                       <ClockIcon className="h-4 w-4 mr-1" />
@@ -609,7 +605,7 @@ export default function KnowledgeBase() {
                     </span>
                     <span className="flex items-center">
                       <CheckCircleIcon className={`h-4 w-4 mr-1 ${
-                        darkMode ? 'text-[#2BE89A]' : 'text-green-600'
+                        false ? 'text-[#2BE89A]' : 'text-green-600'
                       }`} />
                       Laatst bijgewerkt: Vandaag
                     </span>
@@ -617,21 +613,21 @@ export default function KnowledgeBase() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <button className={`p-2 rounded-lg border transition ${
-                    darkMode
+                    false
                       ? 'bg-[#1c1e27] border-[#2a2d3a] hover:bg-[#2a2d3a]'
                       : 'bg-white border-gray-200 hover:bg-gray-50'
                   }`}>
                     <BookOpenIcon className={`h-5 w-5 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      false ? 'text-[#BBBECC]' : 'text-gray-500'
                     }`} />
                   </button>
                   <button className={`p-2 rounded-lg border transition ${
-                    darkMode
+                    false
                       ? 'bg-[#1c1e27] border-[#2a2d3a] hover:bg-[#2a2d3a]'
                       : 'bg-white border-gray-200 hover:bg-gray-50'
                   }`}>
                     <ArrowRightIcon className={`h-5 w-5 ${
-                      darkMode ? 'text-[#BBBECC]' : 'text-gray-500'
+                      false ? 'text-[#BBBECC]' : 'text-gray-500'
                     }`} />
                   </button>
                 </div>
@@ -640,7 +636,7 @@ export default function KnowledgeBase() {
 
               {/* Article Content */}
               <div className={`rounded-xl border overflow-hidden ${
-                darkMode
+                false
                   ? 'bg-[#1c1e27] border-[#2a2d3a]'
                   : 'bg-white border-gray-200 shadow-sm'
               }`}>
@@ -652,19 +648,19 @@ export default function KnowledgeBase() {
               
               {/* Article Footer */}
               <div className={`p-6 border-t ${
-                darkMode
+                false
                   ? 'bg-[#0A0B0F] border-[#2a2d3a]'
                   : 'bg-gray-50 border-gray-200'
               }`}>
                 <div className="flex items-center justify-between">
                   <p className={`text-sm ${
-                    darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
+                    false ? 'text-[#BBBECC]' : 'text-gray-600'
                   }`}>
                     Was dit artikel nuttig?
                   </p>
                   <div className="flex items-center space-x-4">
                     <button className={`flex items-center transition ${
-                      darkMode
+                      false
                         ? 'text-[#2BE89A] hover:text-[#4FFFB0]'
                         : 'text-green-600 hover:text-green-700'
                     }`}>
@@ -672,7 +668,7 @@ export default function KnowledgeBase() {
                       <span className="text-sm">Ja</span>
                     </button>
                     <button className={`flex items-center transition ${
-                      darkMode
+                      false
                         ? 'text-[#BBBECC] hover:text-white'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}>
@@ -687,7 +683,7 @@ export default function KnowledgeBase() {
               {/* Related Articles */}
               <div className="mt-8 mb-12">
                 <h3 className={`text-lg font-semibold mb-4 ${
-                  darkMode ? 'text-white' : 'text-gray-900'
+                  false ? 'text-white' : 'text-gray-900'
                 }`}>Gerelateerde Artikelen</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sections
@@ -702,21 +698,21 @@ export default function KnowledgeBase() {
                         window.scrollTo(0, 0)
                       }}
                       className={`p-4 rounded-lg border transition text-left ${
-                        darkMode
+                        false
                           ? 'bg-[#1c1e27] border-[#2a2d3a] hover:border-[#2BE89A]/30'
                           : 'bg-white border-gray-200 hover:border-green-300 shadow-sm hover:shadow-md'
                       }`}
                     >
                       <div className="flex items-start">
                         <article.icon className={`h-5 w-5 mr-3 mt-0.5 ${
-                          darkMode ? 'text-[#2BE89A]' : 'text-green-600'
+                          false ? 'text-[#2BE89A]' : 'text-green-600'
                         }`} />
                         <div>
                           <h4 className={`font-medium mb-1 ${
-                            darkMode ? 'text-white' : 'text-gray-900'
+                            false ? 'text-white' : 'text-gray-900'
                           }`}>{article.title}</h4>
                           <p className={`text-sm ${
-                            darkMode ? 'text-[#BBBECC]' : 'text-gray-600'
+                            false ? 'text-[#BBBECC]' : 'text-gray-600'
                           }`}>Lees meer over dit onderwerp</p>
                         </div>
                       </div>

@@ -6,7 +6,6 @@ import Layout from '../../components/Layout'
 import Breadcrumb from '../../components/Breadcrumb'
 import { useRestaurants } from '../../contexts/RestaurantsContext'
 import { useUsers } from '../../contexts/UsersContext'
-import { useTheme } from '../../contexts/ThemeContext'
 import RestaurantDeleteModal from '../../components/RestaurantDeleteModal'
 import {
   ArrowLeftIcon,
@@ -42,7 +41,6 @@ export default function RestaurantDetail() {
   const { id } = router.query
   const { getRestaurant, updateRestaurant, deleteRestaurant, deleteRestaurantPermanently } = useRestaurants()
   const { getCompanyUser, authenticateUser, restaurantUsers } = useUsers()
-  const { darkMode } = useTheme()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showPermanentDeleteModal, setShowPermanentDeleteModal] = useState(false)
   const [permanentDeletePassword, setPermanentDeletePassword] = useState('')
@@ -400,7 +398,7 @@ export default function RestaurantDetail() {
 
   return (
     <Layout>
-      <div className={`min-h-screen ${darkMode ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
+      <div className={`min-h-screen ${false ? 'bg-[#0A0B0F]' : 'bg-[#F9FAFB]'}`}>
         <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Breadcrumb */}
@@ -413,7 +411,7 @@ export default function RestaurantDetail() {
             <Link
               href="/restaurants"
               className={`inline-flex items-center px-4 py-2 rounded-lg transition-all text-sm font-medium group ${
-                darkMode 
+                false 
                   ? 'bg-[#1c1e27] border border-[#2a2d3a] text-[#BBBECC] hover:text-white hover:bg-[#0A0B0F] hover:border-green-500' 
                   : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-700 hover:bg-gray-100 hover:border-green-300'
               }`}
@@ -425,10 +423,10 @@ export default function RestaurantDetail() {
             {/* Header */}
             <div className="flex justify-between items-center">
               <div>
-                <h1 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-[#111827]'} mb-1`}>
+                <h1 className={`text-2xl font-semibold ${false ? 'text-white' : 'text-[#111827]'} mb-1`}>
                   {restaurant?.name || 'Restaurant Details'}
                 </h1>
-                <p className={`${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                <p className={`${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
                   Beheer restaurant informatie en instellingen
                 </p>
               </div>
@@ -464,15 +462,15 @@ export default function RestaurantDetail() {
 
             {/* Onboarding Notification */}
             {isNotFullyOnboarded && (
-              <div className={`rounded-xl p-6 ${darkMode ? 'bg-yellow-500/20 border border-yellow-500/30' : 'bg-yellow-50 border border-yellow-200'}`}>
+              <div className={`rounded-xl p-6 ${false ? 'bg-yellow-500/20 border border-yellow-500/30' : 'bg-yellow-50 border border-yellow-200'}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className={`p-3 rounded-lg mr-4 ${darkMode ? 'bg-yellow-500/20' : 'bg-yellow-100'}`}>
-                      <ClockIcon className={`h-6 w-6 ${darkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
+                    <div className={`p-3 rounded-lg mr-4 ${false ? 'bg-yellow-500/20' : 'bg-yellow-100'}`}>
+                      <ClockIcon className={`h-6 w-6 ${false ? 'text-yellow-400' : 'text-yellow-600'}`} />
                     </div>
                     <div>
-                      <p className={`font-semibold text-lg ${darkMode ? 'text-yellow-400' : 'text-yellow-700'}`}>Onboarding niet voltooid</p>
-                      <p className={`text-sm mt-1 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                      <p className={`font-semibold text-lg ${false ? 'text-yellow-400' : 'text-yellow-700'}`}>Onboarding niet voltooid</p>
+                      <p className={`text-sm mt-1 ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
                         Dit restaurant moet eerst de setup voltooien voordat het actief kan worden
                       </p>
                     </div>
@@ -489,7 +487,7 @@ export default function RestaurantDetail() {
             )}
 
             {/* Restaurant Profile Card */}
-            <div className={`rounded-xl overflow-hidden ${darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'}`}>
+            <div className={`rounded-xl overflow-hidden ${false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'}`}>
               {/* Banner */}
               <div className="relative h-32 md:h-40 bg-gradient-to-r from-green-400 to-green-500">
                 <Image
@@ -553,8 +551,8 @@ export default function RestaurantDetail() {
                       </div>
                     </div>
                     <div className="mb-3">
-                      <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>{restaurant.name}</h1>
-                      <div className={`flex items-center mt-1 text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                      <h1 className={`text-2xl font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>{restaurant.name}</h1>
+                      <div className={`flex items-center mt-1 text-sm ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
                         <MapPinIcon className="h-4 w-4 mr-1.5" />
                         {restaurant.location}
                       </div>
@@ -562,16 +560,16 @@ export default function RestaurantDetail() {
                   </div>
                   <div className="flex items-center space-x-2 mt-3 lg:mt-0">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs ${
-                      darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-100 border border-gray-200'
+                      false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-100 border border-gray-200'
                     }`}>
-                      <BuildingStorefrontIcon className={`h-3.5 w-3.5 mr-1 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
-                      <span className={darkMode ? 'text-white' : 'text-gray-900'}>{restaurant.tables} tafels</span>
+                      <BuildingStorefrontIcon className={`h-3.5 w-3.5 mr-1 ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
+                      <span className={false ? 'text-white' : 'text-gray-900'}>{restaurant.tables} tafels</span>
                     </span>
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs ${
-                      darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-100 border border-gray-200'
+                      false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-100 border border-gray-200'
                     }`}>
-                      <ClockIcon className={`h-3.5 w-3.5 mr-1 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
-                      <span className={darkMode ? 'text-white' : 'text-gray-900'}>Piek: {restaurant.peakHours}</span>
+                      <ClockIcon className={`h-3.5 w-3.5 mr-1 ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
+                      <span className={false ? 'text-white' : 'text-gray-900'}>Piek: {restaurant.peakHours}</span>
                     </span>
                   </div>
                 </div>
@@ -580,11 +578,11 @@ export default function RestaurantDetail() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
                   {quickStats.map((stat, index) => (
                     <div key={index} className={`rounded-lg p-4 ${
-                      darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                      false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
                     }`}>
                       <div className="flex items-center justify-between mb-2">
                         <div className={`p-1.5 rounded-lg bg-gradient-to-r ${stat.color}`}>
-                          <stat.icon className={`h-4 w-4 ${darkMode ? 'text-white' : 'text-white'}`} />
+                          <stat.icon className={`h-4 w-4 ${false ? 'text-white' : 'text-white'}`} />
                         </div>
                         {stat.trend && (
                           <span className="text-xs text-green-500 flex items-center">
@@ -593,8 +591,8 @@ export default function RestaurantDetail() {
                           </span>
                         )}
                       </div>
-                      <p className={`text-xs ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{stat.label}</p>
-                      <p className={`text-lg font-bold mt-0.5 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>{stat.value}</p>
+                      <p className={`text-xs ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{stat.label}</p>
+                      <p className={`text-lg font-bold mt-0.5 ${false ? 'text-white' : 'text-[#111827]'}`}>{stat.value}</p>
                     </div>
                   ))}
                 </div>
@@ -1004,8 +1002,8 @@ export default function RestaurantDetail() {
                 {/* Setup Essentials Section */}
                 <div>
                   <div className="mb-6">
-                    <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-[#111827]'} mb-2`}>Setup Essentials</h2>
-                    <p className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Essentiële configuratie voor restaurant operaties</p>
+                    <h2 className={`text-2xl font-bold ${false ? 'text-white' : 'text-[#111827]'} mb-2`}>Setup Essentials</h2>
+                    <p className={false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Essentiële configuratie voor restaurant operaties</p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -1013,19 +1011,19 @@ export default function RestaurantDetail() {
                     
                     {/* Contact Information */}
                     <div className={`p-5 rounded-xl h-fit ${
-                      darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+                      false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
                     }`}>
                       <div className="flex items-center justify-between mb-4">
                         <h3 className={`text-lg font-semibold flex items-center ${
-                          darkMode ? 'text-white' : 'text-[#111827]'
+                          false ? 'text-white' : 'text-[#111827]'
                         }`}>
-                          <MapPinIcon className={`h-5 w-5 mr-2 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+                          <MapPinIcon className={`h-5 w-5 mr-2 ${false ? 'text-[#2BE89A]' : 'text-green-500'}`} />
                           Contact Info
                         </h3>
                         <Link
                           href={`/restaurants/${id}/edit`}
                           className={`p-1.5 rounded-lg transition ${
-                            darkMode ? 'text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F]' : 'text-gray-600 hover:text-green-600 hover:bg-gray-100'
+                            false ? 'text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F]' : 'text-gray-600 hover:text-green-600 hover:bg-gray-100'
                           }`}>
                           <PencilIcon className="h-4 w-4" />
                         </Link>
@@ -1033,22 +1031,22 @@ export default function RestaurantDetail() {
                       <div className="space-y-3">
                         <div>
                           <p className={`text-xs uppercase tracking-wider mb-1 ${
-                            darkMode ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'
+                            false ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'
                           }`}>Adres</p>
                           <p className={`text-sm leading-snug ${
-                            darkMode ? 'text-white' : 'text-[#111827]'
+                            false ? 'text-white' : 'text-[#111827]'
                           }`}>
                             {restaurant.address.street}<br />
                             {restaurant.address.postalCode} {restaurant.address.city}
                           </p>
                         </div>
                         <div className={`flex justify-between items-center py-2 border-t ${
-                          darkMode ? 'border-[#2a2d3a]' : 'border-gray-200'
+                          false ? 'border-[#2a2d3a]' : 'border-gray-200'
                         }`}>
                           <div>
-                            <p className={`text-xs ${darkMode ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>Email</p>
+                            <p className={`text-xs ${false ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>Email</p>
                             <a href={`mailto:${restaurant.email}`} className={`text-sm transition ${
-                              darkMode ? 'text-white hover:text-[#2BE89A]' : 'text-[#111827] hover:text-green-600'
+                              false ? 'text-white hover:text-[#2BE89A]' : 'text-[#111827] hover:text-green-600'
                             }`}>
                               {restaurant.email.length > 20 ? `${restaurant.email.substring(0, 20)}...` : restaurant.email}
                             </a>
@@ -1056,9 +1054,9 @@ export default function RestaurantDetail() {
                         </div>
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className={`text-xs ${darkMode ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>Telefoon</p>
+                            <p className={`text-xs ${false ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>Telefoon</p>
                             <a href={`tel:${restaurant.phone}`} className={`text-sm transition ${
-                              darkMode ? 'text-white hover:text-[#2BE89A]' : 'text-[#111827] hover:text-green-600'
+                              false ? 'text-white hover:text-[#2BE89A]' : 'text-[#111827] hover:text-green-600'
                             }`}>
                               {restaurant.phone}
                             </a>
@@ -1069,13 +1067,13 @@ export default function RestaurantDetail() {
 
                     {/* Restaurant Staff */}
                     <div className={`p-5 rounded-xl h-fit ${
-                      darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+                      false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
                     }`}>
                       <div className="flex items-center justify-between mb-4">
                         <h3 className={`text-lg font-semibold flex items-center ${
-                          darkMode ? 'text-white' : 'text-[#111827]'
+                          false ? 'text-white' : 'text-[#111827]'
                         }`}>
-                          <UserGroupIcon className={`h-5 w-5 mr-2 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+                          <UserGroupIcon className={`h-5 w-5 mr-2 ${false ? 'text-[#2BE89A]' : 'text-green-500'}`} />
                           Restaurant Staff
                           {restaurantUsers[id] && restaurantUsers[id].length > 0 && (
                             <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-600 rounded-full">{restaurantUsers[id].length}</span>
@@ -1086,15 +1084,15 @@ export default function RestaurantDetail() {
                       {(!restaurantUsers[id] || restaurantUsers[id].length === 0) ? (
                         <div className="text-center py-6">
                           <div className={`mx-auto h-12 w-12 rounded-full flex items-center justify-center mb-3 ${
-                            darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-100'
+                            false ? 'bg-[#0A0B0F]' : 'bg-gray-100'
                           }`}>
-                            <UserIcon className={`h-6 w-6 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
+                            <UserIcon className={`h-6 w-6 ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
                           </div>
-                          <p className={`text-sm mb-3 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Geen personeel toegevoegd</p>
+                          <p className={`text-sm mb-3 ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Geen personeel toegevoegd</p>
                           <Link
                             href={`/restaurants/${id}/users`}
                             className={`inline-flex items-center text-sm font-medium ${
-                              darkMode ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
+                              false ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
                             }`}>
                             <PlusIcon className="h-4 w-4 mr-1" />
                             Personeel toevoegen
@@ -1105,15 +1103,15 @@ export default function RestaurantDetail() {
                           {/* Show 1 user if 3+, show 2 users if exactly 2 */}
                           {restaurantUsers[id].slice(0, restaurantUsers[id].length >= 3 ? 1 : 2).map((member) => (
                             <div key={member.id} className={`rounded-lg p-3 ${
-                              darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                              false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
                             }`}>
                               <div className="flex items-center">
                                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-green-400 to-green-500 flex items-center justify-center text-white text-xs font-semibold">
                                   {member.name.split(' ').map(n => n[0]).join('')}
                                 </div>
                                 <div className="ml-3">
-                                  <p className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-[#111827]'}`}>{member.name}</p>
-                                  <p className={`text-xs ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{member.role}</p>
+                                  <p className={`text-sm font-medium ${false ? 'text-white' : 'text-[#111827]'}`}>{member.name}</p>
+                                  <p className={`text-xs ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{member.role}</p>
                                 </div>
                               </div>
                             </div>
@@ -1121,9 +1119,9 @@ export default function RestaurantDetail() {
                           {/* Show "+X meer" only if 3 or more users */}
                           {restaurantUsers[id].length >= 3 && (
                             <div className={`rounded-lg p-3 ${
-                              darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                              false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
                             }`}>
-                              <p className={`text-sm text-center ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                              <p className={`text-sm text-center ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
                                 +{restaurantUsers[id].length - 1} meer personeelsleden
                               </p>
                             </div>
@@ -1131,7 +1129,7 @@ export default function RestaurantDetail() {
                           <Link
                             href={`/restaurants/${id}/users`}
                             className={`block w-full text-center py-2.5 text-sm font-medium rounded-lg transition ${
-                              darkMode 
+                              false 
                                 ? 'bg-[#0A0B0F] border border-[#2a2d3a] text-[#2BE89A] hover:text-[#4FFFB0] hover:bg-[#1c1e27]'
                                 : 'bg-gray-50 border border-gray-200 text-green-600 hover:text-green-700 hover:bg-gray-100'
                             }`}>
@@ -1143,20 +1141,20 @@ export default function RestaurantDetail() {
 
                     {/* Payment Settings (Stripe) */}
                     <div className={`p-5 rounded-xl h-fit ${
-                      darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+                      false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
                     }`}>
                       <div className="flex items-center justify-between mb-4">
                         <h3 className={`text-lg font-semibold flex items-center ${
-                          darkMode ? 'text-white' : 'text-[#111827]'
+                          false ? 'text-white' : 'text-[#111827]'
                         }`}>
-                          <CreditCardIcon className={`h-5 w-5 mr-2 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+                          <CreditCardIcon className={`h-5 w-5 mr-2 ${false ? 'text-[#2BE89A]' : 'text-green-500'}`} />
                           Payment Settings
                         </h3>
                         {!isNotFullyOnboarded && (
                           <Link
                             href={`/restaurants/${id}/stripe-transactions`}
                             className={`p-1.5 rounded-lg transition ${
-                              darkMode ? 'text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F]' : 'text-gray-600 hover:text-green-600 hover:bg-gray-100'
+                              false ? 'text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F]' : 'text-gray-600 hover:text-green-600 hover:bg-gray-100'
                             }`}>
                             <ArrowTopRightOnSquareIcon className="h-4 w-4" />
                           </Link>
@@ -1165,38 +1163,38 @@ export default function RestaurantDetail() {
                       
                       <div className="space-y-3">
                         <div className={`rounded-lg p-3 ${
-                          darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                          false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
                         }`}>
-                          <p className={`text-xs mb-1 ${darkMode ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>Service Fee</p>
-                          <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                          <p className={`text-xs mb-1 ${false ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>Service Fee</p>
+                          <p className={`text-lg font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>
                             {restaurant.serviceFee.type === 'flat' ? '€' : ''}
                             {restaurant.serviceFee.amount}
                             {restaurant.serviceFee.type === 'percentage' ? '%' : ''}
                           </p>
-                          <p className={`text-xs ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{restaurant.serviceFee.type === 'flat' ? 'Per order' : 'Percentage'}</p>
+                          <p className={`text-xs ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{restaurant.serviceFee.type === 'flat' ? 'Per order' : 'Percentage'}</p>
                         </div>
                         
                         {isNotFullyOnboarded ? (
                           <div className={`rounded-lg p-3 ${
-                            darkMode ? 'bg-yellow-500/20 border border-yellow-500/30' : 'bg-yellow-50 border border-yellow-200'
+                            false ? 'bg-yellow-500/20 border border-yellow-500/30' : 'bg-yellow-50 border border-yellow-200'
                           }`}>
                             <div className="flex items-center mb-2">
-                              <CreditCardIcon className={`h-4 w-4 mr-2 ${darkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
-                              <span className={`text-sm font-medium ${darkMode ? 'text-yellow-400' : 'text-yellow-700'}`}>Stripe Required</span>
+                              <CreditCardIcon className={`h-4 w-4 mr-2 ${false ? 'text-yellow-400' : 'text-yellow-600'}`} />
+                              <span className={`text-sm font-medium ${false ? 'text-yellow-400' : 'text-yellow-700'}`}>Stripe Required</span>
                             </div>
-                            <p className={`text-xs ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Setup Stripe in onboarding</p>
+                            <p className={`text-xs ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Setup Stripe in onboarding</p>
                           </div>
                         ) : (
                           <div className={`flex items-center justify-between rounded-lg p-3 ${
-                            darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                            false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
                           }`}>
                             <div className="flex items-center">
                               <div className="p-1.5 bg-blue-500/20 rounded-lg mr-2">
                                 <StripeIcon className="h-4 w-4" />
                               </div>
                               <div>
-                                <p className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Stripe Connected</p>
-                                <p className={`text-xs ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Active account</p>
+                                <p className={`text-sm font-medium ${false ? 'text-white' : 'text-[#111827]'}`}>Stripe Connected</p>
+                                <p className={`text-xs ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Active account</p>
                               </div>
                             </div>
                             <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-600">
@@ -1213,19 +1211,19 @@ export default function RestaurantDetail() {
                     
                     {/* POS Integration */}
                     <div className={`p-5 rounded-xl h-fit ${
-                      darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+                      false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
                     }`}>
                       <div className="flex items-center justify-between mb-4">
                         <h3 className={`text-lg font-semibold flex items-center ${
-                          darkMode ? 'text-white' : 'text-[#111827]'
+                          false ? 'text-white' : 'text-[#111827]'
                         }`}>
-                          <WifiIcon className={`h-5 w-5 mr-2 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+                          <WifiIcon className={`h-5 w-5 mr-2 ${false ? 'text-[#2BE89A]' : 'text-green-500'}`} />
                           POS Integration
                         </h3>
                         <button
                           onClick={() => router.push(`/restaurants/${id}/onboarding?step=3`)}
                           className={`p-1.5 rounded-lg transition ${
-                            darkMode ? 'text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F]' : 'text-gray-600 hover:text-green-600 hover:bg-gray-100'
+                            false ? 'text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F]' : 'text-gray-600 hover:text-green-600 hover:bg-gray-100'
                           }`}>
                           <Cog6ToothIcon className="h-4 w-4" />
                         </button>
@@ -1234,15 +1232,15 @@ export default function RestaurantDetail() {
                       {!restaurant.posData || restaurant.posIntegration === 'Niet gekoppeld' ? (
                         <div className="text-center py-6">
                           <div className={`mx-auto h-12 w-12 rounded-full flex items-center justify-center mb-3 ${
-                            darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-100'
+                            false ? 'bg-[#0A0B0F]' : 'bg-gray-100'
                           }`}>
-                            <WifiIcon className={`h-6 w-6 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
+                            <WifiIcon className={`h-6 w-6 ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
                           </div>
-                          <p className={`text-sm mb-3 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>No POS connected</p>
+                          <p className={`text-sm mb-3 ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>No POS connected</p>
                           <button
                             onClick={() => router.push(`/restaurants/${id}/onboarding?step=3`)}
                             className={`inline-flex items-center text-sm font-medium ${
-                              darkMode ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
+                              false ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
                             }`}>
                             <PlusIcon className="h-4 w-4 mr-1" />
                             Setup POS
@@ -1251,19 +1249,19 @@ export default function RestaurantDetail() {
                       ) : (
                         <div className="space-y-3">
                           <div className={`rounded-lg p-3 ${
-                            darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                            false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
                           }`}>
                             <div className="flex items-center justify-between mb-2">
-                              <p className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Connected System</p>
+                              <p className={`text-sm font-medium ${false ? 'text-white' : 'text-[#111827]'}`}>Connected System</p>
                               <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-600">Active</span>
                             </div>
-                            <p className={`text-sm ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{restaurant.posIntegration}</p>
+                            <p className={`text-sm ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{restaurant.posIntegration}</p>
                           </div>
                           <div className={`rounded-lg p-3 ${
-                            darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                            false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
                           }`}>
-                            <p className={`text-xs mb-1 ${darkMode ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>Today's Orders</p>
-                            <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>342</p>
+                            <p className={`text-xs mb-1 ${false ? 'text-[#9CA3B5]' : 'text-[#9CA3AF]'}`}>Today's Orders</p>
+                            <p className={`text-lg font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>342</p>
                           </div>
                         </div>
                       )}
@@ -1271,19 +1269,19 @@ export default function RestaurantDetail() {
 
                     {/* Google Reviews */}
                     <div className={`p-5 rounded-xl h-fit ${
-                      darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+                      false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
                     }`}>
                       <div className="flex items-center justify-between mb-4">
                         <h3 className={`text-lg font-semibold flex items-center ${
-                          darkMode ? 'text-white' : 'text-[#111827]'
+                          false ? 'text-white' : 'text-[#111827]'
                         }`}>
-                          <StarIcon className={`h-5 w-5 mr-2 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+                          <StarIcon className={`h-5 w-5 mr-2 ${false ? 'text-[#2BE89A]' : 'text-green-500'}`} />
                           Google Reviews
                         </h3>
                         <button
                           onClick={() => setEditingGoogleReview(true)}
                           className={`p-1.5 rounded-lg transition ${
-                            darkMode ? 'text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F]' : 'text-gray-600 hover:text-green-600 hover:bg-gray-100'
+                            false ? 'text-[#BBBECC] hover:text-[#2BE89A] hover:bg-[#0A0B0F]' : 'text-gray-600 hover:text-green-600 hover:bg-gray-100'
                           }`}>
                           {googleReviewLink || contextRestaurant?.googleReviewLink ? (
                             <PencilIcon className="h-4 w-4" />
@@ -1315,11 +1313,11 @@ export default function RestaurantDetail() {
                           ) : (
                             <div className="text-center py-6">
                               <div className={`mx-auto h-12 w-12 rounded-full flex items-center justify-center mb-3 ${
-                                darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-100'
+                                false ? 'bg-[#0A0B0F]' : 'bg-gray-100'
                               }`}>
-                                <StarIcon className={`h-6 w-6 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
+                                <StarIcon className={`h-6 w-6 ${false ? 'text-[#BBBECC]' : 'text-gray-400'}`} />
                               </div>
-                              <p className={`text-sm mb-3 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-500'}`}>No review link set</p>
+                              <p className={`text-sm mb-3 ${false ? 'text-[#BBBECC]' : 'text-gray-500'}`}>No review link set</p>
                               <button
                                 onClick={() => setEditingGoogleReview(true)}
                                 className="inline-flex items-center text-sm text-[#2BE89A] hover:text-[#4FFFB0] font-medium"
@@ -1367,25 +1365,25 @@ export default function RestaurantDetail() {
                 {/* Operations & Analytics Section */}
                 <div>
                   <div className="mb-6">
-                    <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-[#111827]'} mb-2`}>Operations & Analytics</h2>
-                    <p className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Real-time operational data and performance metrics</p>
+                    <h2 className={`text-2xl font-bold ${false ? 'text-white' : 'text-[#111827]'} mb-2`}>Operations & Analytics</h2>
+                    <p className={false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Real-time operational data and performance metrics</p>
                   </div>
                   
                     {/* Active Tables - Full Width */}
                     <div className={`rounded-xl p-6 ${
-                      darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+                      false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
                     }`}>
                       <div className="flex items-center justify-between mb-6">
                         <h3 className={`text-xl font-semibold flex items-center ${
-                          darkMode ? 'text-white' : 'text-[#111827]'
+                          false ? 'text-white' : 'text-[#111827]'
                         }`}>
-                          <TableCellsIcon className={`h-6 w-6 mr-3 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+                          <TableCellsIcon className={`h-6 w-6 mr-3 ${false ? 'text-[#2BE89A]' : 'text-green-500'}`} />
                           Actieve Tafels
                         </h3>
                         <Link
                           href="/tables"
                           className={`inline-flex items-center text-sm font-medium transition ${
-                            darkMode ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
+                            false ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
                           }`}>
                           <span>Alle Tafels</span>
                           <ArrowRightIcon className="ml-1.5 h-4 w-4" />
@@ -1394,15 +1392,15 @@ export default function RestaurantDetail() {
                       
                       {restaurantTables.length === 0 ? (
                         <div className={`text-center py-16 rounded-xl ${
-                          darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-50'
+                          false ? 'bg-[#0A0B0F]' : 'bg-gray-50'
                         }`}>
                           <div className={`mx-auto h-16 w-16 rounded-full flex items-center justify-center mb-4 ${
-                            darkMode ? 'bg-[#1c1e27]' : 'bg-white border border-gray-200'
+                            false ? 'bg-[#1c1e27]' : 'bg-white border border-gray-200'
                           }`}>
-                            <TableCellsIcon className={`h-8 w-8 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
+                            <TableCellsIcon className={`h-8 w-8 ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
                           </div>
-                          <h4 className={`text-lg font-medium mb-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Geen Actieve Tafels</h4>
-                          <p className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Er zijn momenteel geen actieve tafels in dit restaurant.</p>
+                          <h4 className={`text-lg font-medium mb-2 ${false ? 'text-white' : 'text-[#111827]'}`}>Geen Actieve Tafels</h4>
+                          <p className={false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Er zijn momenteel geen actieve tafels in dit restaurant.</p>
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -1410,15 +1408,15 @@ export default function RestaurantDetail() {
                             <div
                               key={table.id}
                               className={`rounded-lg p-4 transition-all duration-200 ${
-                                darkMode 
+                                false 
                                   ? 'bg-[#0A0B0F] border border-[#2a2d3a] hover:border-[#2BE89A]/30'
                                   : 'bg-white border border-gray-200 hover:border-green-500/50 hover:shadow-md'
                               }`}
                             >
                               <div className="flex justify-between items-start mb-3">
                                 <div>
-                                  <h4 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Tafel {table.tableNumber}</h4>
-                                  <p className={`text-xs ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{table.guests} gasten</p>
+                                  <h4 className={`text-lg font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>Tafel {table.tableNumber}</h4>
+                                  <p className={`text-xs ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>{table.guests} gasten</p>
                                 </div>
                                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                                   table.remaining === table.amount 
@@ -1433,20 +1431,20 @@ export default function RestaurantDetail() {
                               
                               <div className="space-y-2 mb-3">
                                 <div className="flex justify-between text-sm">
-                                  <span className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Order #</span>
-                                  <span className={`font-medium ${darkMode ? 'text-white' : 'text-[#111827]'}`}>{table.orderId}</span>
+                                  <span className={false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Order #</span>
+                                  <span className={`font-medium ${false ? 'text-white' : 'text-[#111827]'}`}>{table.orderId}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                  <span className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Bedrag</span>
-                                  <span className={`font-medium ${darkMode ? 'text-white' : 'text-[#111827]'}`}>€{table.amount.toFixed(2)}</span>
+                                  <span className={false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Bedrag</span>
+                                  <span className={`font-medium ${false ? 'text-white' : 'text-[#111827]'}`}>€{table.amount.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                  <span className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Resterend</span>
+                                  <span className={false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Resterend</span>
                                   <span className="text-yellow-500 font-medium">€{table.remaining.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                  <span className={darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Duur</span>
-                                  <span className={`flex items-center ${darkMode ? 'text-white' : 'text-[#111827]'}`}>
+                                  <span className={false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}>Duur</span>
+                                  <span className={`flex items-center ${false ? 'text-white' : 'text-[#111827]'}`}>
                                     <ClockIcon className="h-3 w-3 mr-1" />
                                     {table.duration}
                                   </span>
@@ -1456,7 +1454,7 @@ export default function RestaurantDetail() {
                               <Link
                                 href={`/orders/${table.orderId}`}
                                 className={`w-full inline-flex justify-center items-center px-3 py-2 text-sm font-medium rounded-lg transition ${
-                                  darkMode
+                                  false
                                     ? 'bg-[#1c1e27] text-[#2BE89A] hover:bg-[#252833] border border-[#2a2d3a]'
                                     : 'bg-gray-50 text-green-600 hover:bg-gray-100 border border-gray-200'
                                 }`}
@@ -1473,7 +1471,7 @@ export default function RestaurantDetail() {
                           <Link
                             href="/tables"
                             className={`inline-flex items-center text-sm transition font-medium ${
-                              darkMode ? 'text-[#BBBECC] hover:text-[#2BE89A]' : 'text-[#6B7280] hover:text-green-600'
+                              false ? 'text-[#BBBECC] hover:text-[#2BE89A]' : 'text-[#6B7280] hover:text-green-600'
                             }`}>
                             +{restaurantTables.length - 8} meer actieve tafels
                             <ArrowRightIcon className="ml-2 h-4 w-4" />
@@ -1484,20 +1482,20 @@ export default function RestaurantDetail() {
 
                     {/* Transaction Analytics - Full Width */}
                     <div className={`rounded-xl p-6 mt-6 ${
-                      darkMode ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
+                      false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
                     }`}>
                       <div className="flex items-center justify-between mb-6">
                         <h3 className={`text-xl font-semibold flex items-center ${
-                          darkMode ? 'text-white' : 'text-[#111827]'
+                          false ? 'text-white' : 'text-[#111827]'
                         }`}>
-                          <ChartBarIcon className={`h-6 w-6 mr-3 ${darkMode ? 'text-[#2BE89A]' : 'text-green-500'}`} />
+                          <ChartBarIcon className={`h-6 w-6 mr-3 ${false ? 'text-[#2BE89A]' : 'text-green-500'}`} />
                           Transactie Analytics
                         </h3>
                         {!isNotFullyOnboarded && (
                           <Link
                             href={`/restaurants/${id}/stripe-transactions`}
                             className={`inline-flex items-center text-sm font-medium transition ${
-                              darkMode ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
+                              false ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
                             }`}>
                             <span>Bekijk Alle Transacties</span>
                             <ArrowTopRightOnSquareIcon className="ml-1.5 h-4 w-4" />
@@ -1507,56 +1505,56 @@ export default function RestaurantDetail() {
                       
                       {restaurant.transactions.total === 0 || isNotFullyOnboarded ? (
                         <div className={`text-center py-20 rounded-xl ${
-                          darkMode ? 'bg-[#0A0B0F]' : 'bg-gray-50'
+                          false ? 'bg-[#0A0B0F]' : 'bg-gray-50'
                         }`}>
                           <div className={`mx-auto h-20 w-20 rounded-full flex items-center justify-center mb-6 ${
-                            darkMode ? 'bg-[#1c1e27]' : 'bg-white border border-gray-200'
+                            false ? 'bg-[#1c1e27]' : 'bg-white border border-gray-200'
                           }`}>
-                            <CurrencyDollarIcon className={`h-10 w-10 ${darkMode ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
+                            <CurrencyDollarIcon className={`h-10 w-10 ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
                           </div>
-                          <h4 className={`text-lg font-medium mb-2 ${darkMode ? 'text-white' : 'text-[#111827]'}`}>Nog Geen Transacties</h4>
-                          <p className={`max-w-sm mx-auto ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Transactie analytics verschijnen hier zodra betalingen binnenkomen.</p>
+                          <h4 className={`text-lg font-medium mb-2 ${false ? 'text-white' : 'text-[#111827]'}`}>Nog Geen Transacties</h4>
+                          <p className={`max-w-sm mx-auto ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Transactie analytics verschijnen hier zodra betalingen binnenkomen.</p>
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className={`rounded-xl p-6 ${
-                            darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                            false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
                           }`}>
                             <div className="flex items-center justify-between mb-4">
-                              <p className={`text-sm font-medium ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Totaal Transacties</p>
+                              <p className={`text-sm font-medium ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Totaal Transacties</p>
                               <div className="p-2 bg-gradient-to-r from-green-400 to-green-500 rounded-lg">
                                 <ShoppingBagIcon className="h-5 w-5 text-white" />
                               </div>
                             </div>
-                            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>{restaurant.transactions.total.toLocaleString()}</p>
-                            <p className={`text-xs mt-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Alle tijd</p>
+                            <p className={`text-3xl font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>{restaurant.transactions.total.toLocaleString()}</p>
+                            <p className={`text-xs mt-2 ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Alle tijd</p>
                           </div>
                           <div className={`rounded-xl p-6 ${
-                            darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                            false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
                           }`}>
                             <div className="flex items-center justify-between mb-4">
-                              <p className={`text-sm font-medium ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Deze Maand</p>
+                              <p className={`text-sm font-medium ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Deze Maand</p>
                               <div className="p-2 bg-gradient-to-r from-[#4ECDC4] to-[#44A08D] rounded-lg">
                                 <ArrowTrendingUpIcon className="h-5 w-5 text-white" />
                               </div>
                             </div>
-                            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>{restaurant.transactions.thisMonth}</p>
+                            <p className={`text-3xl font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>{restaurant.transactions.thisMonth}</p>
                             <p className="text-xs text-green-500 mt-2 flex items-center">
                               <ArrowTrendingUpIcon className="h-3 w-3 mr-1" />
                               +12.5% vs vorige maand
                             </p>
                           </div>
                           <div className={`rounded-xl p-6 ${
-                            darkMode ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                            false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
                           }`}>
                             <div className="flex items-center justify-between mb-4">
-                              <p className={`text-sm font-medium ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Vorige Maand</p>
+                              <p className={`text-sm font-medium ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Vorige Maand</p>
                               <div className="p-2 bg-gradient-to-r from-[#667EEA] to-[#764BA2] rounded-lg">
                                 <ChartBarIcon className="h-5 w-5 text-white" />
                               </div>
                             </div>
-                            <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-[#111827]'}`}>{restaurant.transactions.lastMonth}</p>
-                            <p className={`text-xs mt-2 ${darkMode ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Voltooid</p>
+                            <p className={`text-3xl font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>{restaurant.transactions.lastMonth}</p>
+                            <p className={`text-xs mt-2 ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Voltooid</p>
                           </div>
                         </div>
                       )}
