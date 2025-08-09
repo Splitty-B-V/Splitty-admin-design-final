@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Layout from '../components/Layout'
 import { useRestaurants } from '../contexts/RestaurantsContext'
 import {
@@ -26,7 +26,17 @@ export default function Dashboard() {
   const [selectedStore, setSelectedStore] = useState('all')
   const [dateRange, setDateRange] = useState('today')
   const [userName, setUserName] = useState('User')
+  const [selectedMetric, setSelectedMetric] = useState('splitty-omzet') // Track which metric is selected
+  const [analyticsView, setAnalyticsView] = useState('totaal') // totaal, restaurant, regio
+  const [customDateRange, setCustomDateRange] = useState({ start: null, end: null })
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [compareWithPrevious, setCompareWithPrevious] = useState(false)
+  const [selectedMonth, setSelectedMonth] = useState(new Date())
+  const [calendarView, setCalendarView] = useState(new Date())
+  const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null })
+  const [tempDateFilter, setTempDateFilter] = useState(null) // Track which preset is temporarily selected
   const { restaurants } = useRestaurants()
+  const datePickerRef = useRef(null)
 
   useEffect(() => {
     const hour = new Date().getHours()
@@ -41,138 +51,252 @@ export default function Dashboard() {
     }
   }, [])
 
+  // Handle click outside to close date picker
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
+        setShowDatePicker(false)
+        setTempDateFilter(null)
+      }
+    }
+
+    if (showDatePicker) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showDatePicker])
+
   // Calculate real data from restaurants
   const activeRestaurants = restaurants?.filter(r => !r.deleted) || []
   
-  // Generate simple daily data for the last 7 days (less data for performance)
+  // Generate data based on selected date range
   const generateDailyData = () => {
     const data = []
     const today = new Date()
+    let days = 7
+    let startDate = new Date(today)
     
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today)
-      date.setDate(date.getDate() - i)
+    // Determine number of days based on date range
+    switch(dateRange) {
+      case 'today':
+        days = 1
+        break
+      case 'yesterday':
+        days = 1
+        startDate.setDate(startDate.getDate() - 1)
+        break
+      case 'last7days':
+        days = 7
+        startDate.setDate(startDate.getDate() - 6)
+        break
+      case 'last30days':
+        days = 30
+        startDate.setDate(startDate.getDate() - 29)
+        break
+      case 'last90days':
+        days = 90
+        startDate.setDate(startDate.getDate() - 89)
+        break
+      case 'last365days':
+        days = 365
+        startDate.setDate(startDate.getDate() - 364)
+        break
+      case 'lastWeek':
+        startDate.setDate(startDate.getDate() - startDate.getDay() - 7)
+        days = 7
+        break
+      case 'lastMonth':
+        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 0)
+        days = lastDayOfMonth.getDate()
+        break
+      case 'lastQuarter':
+        const quarter = Math.floor(today.getMonth() / 3)
+        startDate = new Date(today.getFullYear(), (quarter - 1) * 3, 1)
+        const endQuarter = new Date(today.getFullYear(), quarter * 3, 0)
+        days = Math.ceil((endQuarter - startDate) / (1000 * 60 * 60 * 24)) + 1
+        break
+      case 'lastYear':
+        startDate = new Date(today.getFullYear() - 1, 0, 1)
+        days = 365
+        break
+      case 'weekToDate':
+        startDate.setDate(startDate.getDate() - startDate.getDay())
+        days = startDate.getDay() + 1
+        break
+      case 'monthToDate':
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1)
+        days = today.getDate()
+        break
+      case 'quarterToDate':
+        const currentQuarter = Math.floor(today.getMonth() / 3)
+        startDate = new Date(today.getFullYear(), currentQuarter * 3, 1)
+        days = Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)) + 1
+        break
+      case 'yearToDate':
+        startDate = new Date(today.getFullYear(), 0, 1)
+        days = Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)) + 1
+        break
+      case 'custom':
+        if (customDateRange.start && customDateRange.end) {
+          const start = new Date(customDateRange.start)
+          const end = new Date(customDateRange.end)
+          days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1
+          startDate = new Date(start)
+        }
+        break
+    }
+    
+    // Generate data for the period
+    for (let i = 0; i < days; i++) {
+      const date = new Date(startDate)
+      date.setDate(date.getDate() + i)
       
-      // Generate realistic daily data
-      const baseOrders = Math.floor(Math.random() * 50) + 150 // 150-200 orders per day
-      const avgOrderValue = Math.random() * 10 + 40 // €40-50 per order
+      // Generate consistent data with some variation
+      const dayOfWeek = date.getDay()
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
+      const baseOrders = isWeekend ? 200 + (i % 50) : 150 + (i % 70)
+      const avgOrderValue = 42 + (i % 8)
       const dailyTurnover = baseOrders * avgOrderValue
       
+      // Format date based on range
+      let dateFormat = { month: 'short', day: 'numeric' }
+      if (days > 30) {
+        dateFormat = { month: 'short', day: 'numeric' }
+      } else if (days > 90) {
+        dateFormat = { month: 'short' }
+      }
+      
       data.push({
-        date: date.toLocaleDateString('nl-NL', { month: 'short', day: 'numeric' }),
+        date: date.toLocaleDateString('nl-NL', dateFormat),
+        fullDate: date,
         orders: baseOrders,
         turnover: dailyTurnover,
       })
     }
     
-    return data
+    // Limit data points for better visualization
+    if (days > 30) {
+      // Group by week for monthly view
+      const weeklyData = []
+      for (let i = 0; i < data.length; i += 7) {
+        const weekData = data.slice(i, i + 7)
+        const weekOrders = weekData.reduce((sum, d) => sum + d.orders, 0)
+        const weekTurnover = weekData.reduce((sum, d) => sum + d.turnover, 0)
+        weeklyData.push({
+          date: `Week ${Math.floor(i / 7) + 1}`,
+          orders: Math.round(weekOrders / weekData.length),
+          turnover: weekTurnover / weekData.length,
+        })
+      }
+      return weeklyData.slice(0, 12) // Max 12 data points
+    }
+    
+    return data.slice(-7) // Return last 7 days for daily view
   }
 
-  const dailyData = generateDailyData()
+  const [dailyData, setDailyData] = useState([])
   
-  // Calculate totals
-  const totalTurnover = dailyData.reduce((sum, day) => sum + day.turnover, 0)
-  const totalOrders = dailyData.reduce((sum, day) => sum + day.orders, 0)
-  const avgOrderValue = totalTurnover / totalOrders
+  // Initialize data on client side to avoid hydration issues
+  useEffect(() => {
+    setDailyData(generateDailyData())
+  }, [])
+  
+  // Calculate totals - Splitty payments processing
+  const totalProcessedPayments = dailyData.reduce((sum, day) => sum + day.turnover, 0) // Total amount processed through Splitty
+  const totalSplittyTransactions = dailyData.reduce((sum, day) => sum + day.orders, 0) // Number of Splitty payments
+  const avgTransactionAmount = totalSplittyTransactions > 0 ? totalProcessedPayments / totalSplittyTransactions : 0 // Average payment amount
+  const splittRevenue = totalSplittyTransactions * 0.70 // €0.70 per transaction
   const activeRestaurantsCount = activeRestaurants.length
 
   // Calculate additional metrics
   const totalUsers = 17 // Based on your example
   const currentUsers = 17 // All users active
-  const targetOrders = 155 // Target order count
-  const currentOrders = 14 // Current orders
-  const targetPayments = 10 // Target payment count  
-  const currentPayments = 8 // Current payments
-  const serviceFees = totalTurnover * 0.027 // 2.7% service fee
+  const avgTableSize = 4.2 // Average number of people per table (based on split payments)
+  const totalTablesServed = Math.floor(totalSplittyTransactions / avgTableSize) // Estimate of tables served
+  const serviceFees = splittRevenue // Revenue from €0.70 per transaction
   const totalRestaurantsTarget = 11 // Target restaurant count
 
-  // Splitty admin panel styled cards
+  // Splitty admin panel styled cards - Organized by category
   const stats = [
+    // PRIMARY METRICS - Most important
     {
-      title: 'Totale Omzet',
-      value: formatCurrency(totalTurnover),
-      change: '+12.5%',
-      trend: 'up',
-      icon: CreditCardIcon,
-      bgColor: 'bg-emerald-50',
-      iconColor: 'text-emerald-600',
-      changeColor: 'text-green-600',
-      description: 'Deze maand'
-    },
-    {
-      title: 'Actieve Restaurants',
-      value: activeRestaurantsCount,
-      subValue: `van ${totalRestaurantsTarget} totaal`,
-      change: `${Math.round((activeRestaurantsCount / totalRestaurantsTarget) * 100)}%`,
-      trend: 'progress',
-      icon: BuildingStorefrontIcon,
-      bgColor: 'bg-emerald-50',
-      iconColor: 'text-emerald-600',
-      changeColor: 'text-emerald-600',
-      progressValue: (activeRestaurantsCount / totalRestaurantsTarget) * 100,
-      progressColor: 'bg-emerald-500',
-      description: 'Onboarding voortgang'
-    },
-    {
-      title: 'Team Leden',
-      value: currentUsers,
-      subValue: `van ${totalUsers} actief`,
-      change: '100%',
-      trend: 'progress',
-      icon: UsersIcon,
-      bgColor: 'bg-teal-50',
-      iconColor: 'text-teal-600',
-      changeColor: 'text-green-600',
-      progressValue: (currentUsers / totalUsers) * 100,
-      progressColor: 'bg-teal-500',
-      description: 'Alle teamleden actief'
-    },
-    {
-      title: 'Bestellingen',
-      value: totalOrders.toLocaleString(),
-      change: '+18.7%',
-      trend: 'up',
-      icon: ShoppingBagIcon,
-      bgColor: 'bg-emerald-50',
-      iconColor: 'text-emerald-600',
-      changeColor: 'text-green-600',
-      description: 'Deze week'
-    },
-    {
-      title: 'Betalingen Verwerkt',
-      value: currentPayments,
-      subValue: `van ${targetPayments} lopend`,
-      change: `${Math.round((currentPayments / targetPayments) * 100)}%`,
-      trend: 'progress',
-      icon: CreditCardIcon,
-      bgColor: 'bg-orange-50',
-      iconColor: 'text-orange-600',
-      changeColor: 'text-orange-600',
-      progressValue: (currentPayments / targetPayments) * 100,
-      progressColor: 'bg-orange-500',
-      description: 'Betalings status'
-    },
-    {
-      title: 'Splitty Revenue',
-      value: formatCurrency(serviceFees),
+      id: 'splitty-omzet',
+      title: 'Splitty Omzet',
+      value: formatCurrency(splittRevenue),
       change: '+15.3%',
       trend: 'up',
       icon: BanknotesIcon,
       bgColor: 'bg-emerald-50',
       iconColor: 'text-emerald-600',
-      changeColor: 'text-green-600',
-      description: 'Service fees'
+      changeColor: 'text-emerald-600',
+      description: '€0,70 per transactie',
+      priority: 'primary'
     },
     {
-      title: 'Gemiddelde Bestelling',
-      value: formatCurrency(avgOrderValue),
+      id: 'verwerkte-betalingen',
+      title: 'Verwerkte Betalingen',
+      value: formatCurrency(totalProcessedPayments),
+      change: '+12.5%',
+      trend: 'up',
+      icon: CreditCardIcon,
+      bgColor: 'bg-blue-50',
+      iconColor: 'text-blue-600',
+      changeColor: 'text-blue-600',
+      description: 'Totaal transactievolume'
+    },
+    {
+      id: 'aantal-transacties',
+      title: 'Aantal Transacties',
+      value: totalSplittyTransactions.toLocaleString(),
+      change: '+18.7%',
+      trend: 'up',
+      icon: ShoppingBagIcon,
+      bgColor: 'bg-purple-50',
+      iconColor: 'text-purple-600',
+      changeColor: 'text-purple-600',
+      description: 'Via Splitty'
+    },
+    {
+      id: 'gemiddeld-bedrag',
+      title: 'Gemiddeld Bedrag',
+      value: formatCurrency(avgTransactionAmount),
       change: '-2.1%',
       trend: 'down',
       icon: ChartBarIcon,
       bgColor: 'bg-gray-50',
       iconColor: 'text-gray-600',
       changeColor: 'text-red-600',
-      description: 'Per transactie'
+      description: 'Per betaling'
+    },
+    // SECONDARY METRICS
+    {
+      id: 'actieve-restaurants',
+      title: 'Actieve Restaurants',
+      value: activeRestaurantsCount,
+      change: '+2',
+      trend: 'up',
+      icon: BuildingStorefrontIcon,
+      bgColor: 'bg-orange-50',
+      iconColor: 'text-orange-600',
+      changeColor: 'text-green-600',
+      description: 'Live op Splitty'
+    },
+    {
+      id: 'tafelgrootte',
+      title: 'Tafelgrootte',
+      value: avgTableSize.toFixed(1),
+      subValue: 'personen',
+      change: '+5.2%',
+      trend: 'up',
+      icon: UserGroupIcon,
+      bgColor: 'bg-teal-50',
+      iconColor: 'text-teal-600',
+      changeColor: 'text-teal-600',
+      description: 'Gemiddeld per tafel'
     },
   ]
 
@@ -185,9 +309,9 @@ export default function Dashboard() {
   const bestPerformingRestaurants = activeRestaurants.slice(0, 5).map((restaurant, index) => ({
     id: restaurant.id,
     name: restaurant.name,
-    revenue: formatCurrency((index + 1) * 2450 + Math.random() * 1000),
-    transactions: Math.floor(Math.random() * 100) + 150,
-    rating: (4.5 + Math.random() * 0.4).toFixed(1)
+    revenue: formatCurrency((index + 1) * 2450 + (index * 250)), // Fixed calculation instead of random
+    transactions: 150 + (index * 20), // Fixed calculation instead of random
+    rating: (4.5 + (index * 0.1)).toFixed(1) // Fixed calculation instead of random
   }))
 
   const partners = [
@@ -201,6 +325,156 @@ export default function Dashboard() {
   const maxOrders = Math.max(...dailyData.map(d => d.orders))
   const maxTurnover = Math.max(...dailyData.map(d => d.turnover))
 
+  // Generate analytics data based on selected metric and view
+  const getAnalyticsData = () => {
+    if (selectedMetric === 'splitty-omzet') {
+      if (analyticsView === 'totaal') {
+        return {
+          title: 'Splitty Omzet',
+          subtitle: 'Totale inkomsten',
+          cards: [
+            { label: 'Week Omzet', value: formatCurrency(splittRevenue), change: '+15.3%', positive: true },
+            { label: 'Aantal Transacties', value: totalSplittyTransactions.toLocaleString(), change: '+18.7%', positive: true },
+            { label: 'Gem. per Dag', value: formatCurrency(splittRevenue / 7), change: '+8.2%', positive: true }
+          ]
+        }
+      } else if (analyticsView === 'restaurant') {
+        return {
+          title: 'Splitty Omzet per Restaurant',
+          subtitle: 'Top presterende locaties',
+          cards: activeRestaurants.slice(0, 3).map((r, i) => ({
+            label: r.name,
+            value: formatCurrency((150 + i * 50) * 0.70),
+            change: `+${10 + i * 2}%`,
+            positive: true
+          }))
+        }
+      } else if (analyticsView === 'regio') {
+        return {
+          title: 'Splitty Omzet per Regio',
+          subtitle: 'Geografische verdeling',
+          cards: [
+            { label: 'Noord-Holland', value: formatCurrency(splittRevenue * 0.4), change: '+22%', positive: true },
+            { label: 'Zuid-Holland', value: formatCurrency(splittRevenue * 0.3), change: '+15%', positive: true },
+            { label: 'Utrecht', value: formatCurrency(splittRevenue * 0.2), change: '+8%', positive: true }
+          ]
+        }
+      }
+    } else if (selectedMetric === 'verwerkte-betalingen') {
+      if (analyticsView === 'totaal') {
+        return {
+          title: 'Verwerkte Betalingen',
+          subtitle: 'Totaal transactievolume',
+          cards: [
+            { label: 'Week Volume', value: formatCurrency(totalProcessedPayments), change: '+12.5%', positive: true },
+            { label: 'Aantal Betalingen', value: totalSplittyTransactions.toLocaleString(), change: '+18.7%', positive: true },
+            { label: 'Gem. Bedrag', value: formatCurrency(avgTransactionAmount), change: '-2.1%', positive: false }
+          ]
+        }
+      } else if (analyticsView === 'restaurant') {
+        return {
+          title: 'Betalingen per Restaurant',
+          subtitle: 'Volume per locatie',
+          cards: activeRestaurants.slice(0, 3).map((r, i) => ({
+            label: r.name,
+            value: formatCurrency((2000 + i * 500)),
+            change: `+${8 + i * 3}%`,
+            positive: true
+          }))
+        }
+      } else if (analyticsView === 'regio') {
+        return {
+          title: 'Betalingen per Regio',
+          subtitle: 'Regionale verdeling',
+          cards: [
+            { label: 'Noord-Holland', value: formatCurrency(totalProcessedPayments * 0.45), change: '+18%', positive: true },
+            { label: 'Zuid-Holland', value: formatCurrency(totalProcessedPayments * 0.35), change: '+14%', positive: true },
+            { label: 'Utrecht', value: formatCurrency(totalProcessedPayments * 0.2), change: '+10%', positive: true }
+          ]
+        }
+      }
+    }
+    // Default fallback
+    return {
+      title: 'Analytics',
+      subtitle: 'Selecteer een metric',
+      cards: []
+    }
+  }
+
+  const analyticsData = getAnalyticsData()
+
+  // Calendar helper functions
+  const generateCalendarDays = (date) => {
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+    const startDate = new Date(firstDay)
+    // Adjust to start on Monday (1) instead of Sunday (0)
+    const dayOfWeek = firstDay.getDay()
+    const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+    startDate.setDate(startDate.getDate() - daysToSubtract)
+    
+    const days = []
+    const current = new Date(startDate)
+    
+    for (let i = 0; i < 42; i++) {
+      days.push(new Date(current))
+      current.setDate(current.getDate() + 1)
+    }
+    
+    return days
+  }
+
+  const isInCurrentMonth = (date, monthDate) => {
+    return date.getMonth() === monthDate.getMonth() && date.getFullYear() === monthDate.getFullYear()
+  }
+
+  const isToday = (date) => {
+    const today = new Date()
+    return date.getDate() === today.getDate() && 
+           date.getMonth() === today.getMonth() && 
+           date.getFullYear() === today.getFullYear()
+  }
+
+  const isSelected = (date) => {
+    if (!selectedDateRange.start) return false
+    
+    // If only start date is selected
+    if (!selectedDateRange.end) {
+      return date.toDateString() === selectedDateRange.start.toDateString()
+    }
+    
+    // If both dates are selected, check if date is in range
+    return date >= selectedDateRange.start && date <= selectedDateRange.end
+  }
+
+  const formatDateForInput = (date) => {
+    if (!date) return ''
+    // Create a new date and adjust for timezone to avoid off-by-one errors
+    const d = new Date(date)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  const handleDateSelect = (date) => {
+    if (!selectedDateRange.start || (selectedDateRange.start && selectedDateRange.end)) {
+      // Start a new selection
+      setSelectedDateRange({ start: date, end: null })
+    } else {
+      // Complete the selection
+      if (date < selectedDateRange.start) {
+        setSelectedDateRange({ start: date, end: selectedDateRange.start })
+      } else {
+        setSelectedDateRange({ start: selectedDateRange.start, end: date })
+      }
+      // Don't update customDateRange here - wait for Toepassen button
+    }
+  }
+
   return (
     <Layout>
       <div className="min-h-screen bg-[#F9FAFB]">
@@ -213,82 +487,858 @@ export default function Dashboard() {
             <p className="text-[#6B7280] mb-6">
               Hier zijn de inzichten van vandaag
             </p>
-            <div className="flex flex-wrap gap-3 items-center">
+            <div className="flex flex-wrap gap-2 items-center">
+              {/* Professional Date Range Dropdown */}
+              <div className="relative" ref={datePickerRef}>
+                <button
+                  onClick={() => {
+                    if (!showDatePicker) {
+                      // Set temp filter to current dateRange when opening
+                      setTempDateFilter(dateRange);
+                      
+                      // Initialize selection based on current filter
+                      if (dateRange === 'today') {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start: today, end: today });
+                      } else if (dateRange === 'yesterday') {
+                        const yesterday = new Date();
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        yesterday.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start: yesterday, end: yesterday });
+                      } else if (dateRange === 'last7days') {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setDate(start.getDate() - 6);
+                        start.setHours(0, 0, 0, 0);
+                        end.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end });
+                      } else if (dateRange === 'last30days') {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setDate(start.getDate() - 29);
+                        start.setHours(0, 0, 0, 0);
+                        end.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end });
+                      } else if (dateRange === 'last90days') {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setDate(start.getDate() - 89);
+                        start.setHours(0, 0, 0, 0);
+                        end.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end });
+                      } else if (dateRange === 'last365days') {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setDate(start.getDate() - 364);
+                        start.setHours(0, 0, 0, 0);
+                        end.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end });
+                      } else if (dateRange === 'lastWeek') {
+                        const today = new Date();
+                        const start = new Date();
+                        start.setDate(today.getDate() - today.getDay() - 7);
+                        const end = new Date(start);
+                        end.setDate(end.getDate() + 6);
+                        start.setHours(0, 0, 0, 0);
+                        end.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end });
+                      } else if (dateRange === 'lastMonth') {
+                        const today = new Date();
+                        const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                        const end = new Date(today.getFullYear(), today.getMonth(), 0);
+                        start.setHours(0, 0, 0, 0);
+                        end.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end });
+                      } else if (dateRange === 'lastQuarter') {
+                        const today = new Date();
+                        const quarter = Math.floor(today.getMonth() / 3);
+                        const start = new Date(today.getFullYear(), (quarter - 1) * 3, 1);
+                        const end = new Date(today.getFullYear(), quarter * 3, 0);
+                        start.setHours(0, 0, 0, 0);
+                        end.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end });
+                      } else if (dateRange === 'lastYear') {
+                        const today = new Date();
+                        const start = new Date(today.getFullYear() - 1, 0, 1);
+                        const end = new Date(today.getFullYear() - 1, 11, 31);
+                        start.setHours(0, 0, 0, 0);
+                        end.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end });
+                      } else if (dateRange === 'weekToDate') {
+                        const today = new Date();
+                        const start = new Date();
+                        // Start from Monday instead of Sunday
+                        const dayOfWeek = today.getDay();
+                        const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                        start.setDate(today.getDate() - daysToSubtract);
+                        start.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end: today });
+                      } else if (dateRange === 'monthToDate') {
+                        const today = new Date();
+                        const start = new Date(today.getFullYear(), today.getMonth(), 1);
+                        start.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end: today });
+                      } else if (dateRange === 'quarterToDate') {
+                        const today = new Date();
+                        const quarter = Math.floor(today.getMonth() / 3);
+                        const start = new Date(today.getFullYear(), quarter * 3, 1);
+                        start.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end: today });
+                      } else if (dateRange === 'yearToDate') {
+                        const today = new Date();
+                        const start = new Date(today.getFullYear(), 0, 1);
+                        start.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+                        setSelectedDateRange({ start, end: today });
+                      } else if (dateRange === 'custom' && customDateRange.start) {
+                        // For custom ranges, load from customDateRange
+                        let startDate, endDate = null
+                        
+                        if (typeof customDateRange.start === 'string') {
+                          const [year1, month1, day1] = customDateRange.start.split('-').map(Number)
+                          startDate = new Date(year1, month1 - 1, day1)
+                        } else {
+                          startDate = new Date(customDateRange.start)
+                        }
+                        
+                        if (customDateRange.end) {
+                          if (typeof customDateRange.end === 'string') {
+                            const [year2, month2, day2] = customDateRange.end.split('-').map(Number)
+                            endDate = new Date(year2, month2 - 1, day2)
+                          } else {
+                            endDate = new Date(customDateRange.end)
+                          }
+                        }
+                        
+                        setSelectedDateRange({ start: startDate, end: endDate })
+                      } else {
+                        setSelectedDateRange({ start: null, end: null })
+                      }
+                    }
+                    setShowDatePicker(!showDatePicker)
+                  }}
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all flex items-center gap-2 text-sm"
+                >
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-gray-700 font-medium">
+                    {dateRange === 'today' && 'Vandaag'}
+                    {dateRange === 'yesterday' && 'Gisteren'}
+                    {dateRange === 'last7days' && 'Afgelopen 7 dagen'}
+                    {dateRange === 'last30days' && 'Afgelopen 30 dagen'}
+                    {dateRange === 'last90days' && 'Afgelopen 90 dagen'}
+                    {dateRange === 'last365days' && 'Afgelopen 365 dagen'}
+                    {dateRange === 'lastWeek' && 'Afgelopen week'}
+                    {dateRange === 'lastMonth' && 'Afgelopen maand'}
+                    {dateRange === 'lastQuarter' && 'Afgelopen kwartaal'}
+                    {dateRange === 'lastYear' && 'Afgelopen jaar'}
+                    {dateRange === 'weekToDate' && 'Week tot nu'}
+                    {dateRange === 'monthToDate' && 'Maand tot nu'}
+                    {dateRange === 'quarterToDate' && 'Kwartaal tot nu'}
+                    {dateRange === 'yearToDate' && 'Jaar tot nu'}
+                    {dateRange === 'custom' && customDateRange.start && (() => {
+                      // Parse dates properly to avoid timezone issues
+                      let startDate, endDate = null
+                      
+                      // Check if customDateRange.start is a string or Date object
+                      if (typeof customDateRange.start === 'string') {
+                        const [year1, month1, day1] = customDateRange.start.split('-').map(Number)
+                        startDate = new Date(year1, month1 - 1, day1)
+                      } else {
+                        startDate = new Date(customDateRange.start)
+                      }
+                      
+                      if (customDateRange.end) {
+                        if (typeof customDateRange.end === 'string') {
+                          const [year2, month2, day2] = customDateRange.end.split('-').map(Number)
+                          endDate = new Date(year2, month2 - 1, day2)
+                        } else {
+                          endDate = new Date(customDateRange.end)
+                        }
+                      }
+                      
+                      const today = new Date()
+                      today.setHours(0, 0, 0, 0)
+                      startDate.setHours(0, 0, 0, 0)
+                      
+                      if (!endDate || customDateRange.start === customDateRange.end) {
+                        // Single date
+                        return startDate.getTime() === today.getTime() ? 'Vandaag' : startDate.toLocaleDateString('nl-NL')
+                      } else {
+                        // Date range
+                        return `${startDate.toLocaleDateString('nl-NL')} - ${endDate.toLocaleDateString('nl-NL')}`
+                      }
+                    })()}
+                  </span>
+                </button>
+                
+                {/* Professional Dropdown Menu */}
+                {showDatePicker && (
+                  <div className="absolute top-full mt-2 left-0 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50" style={{width: '600px', maxHeight: '400px'}}>
+                    <div className="flex h-full" style={{maxHeight: '400px'}}>
+                      {/* Left Sidebar with Options */}
+                      <div className="w-40 border-r border-gray-200 bg-gray-50 flex flex-col" style={{maxHeight: '400px'}}>
+                        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                          {/* Quick Picks */}
+                          <div className="p-2">
+                            <button
+                              onClick={() => { 
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start: today, end: today });
+                                setTempDateFilter('today');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors flex items-center justify-between ${
+                                (tempDateFilter ? tempDateFilter === 'today' : dateRange === 'today') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Vandaag
+                              {dateRange === 'today' && (
+                                <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => { 
+                                const yesterday = new Date();
+                                yesterday.setDate(yesterday.getDate() - 1);
+                                yesterday.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start: yesterday, end: yesterday });
+                                setTempDateFilter('yesterday');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'yesterday' : dateRange === 'yesterday') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Gisteren
+                            </button>
+                          </div>
+                          
+                          <div className="border-t border-gray-200 mx-2"></div>
+                          
+                          {/* Relative Periods */}
+                          <div className="p-2">
+                            <button
+                              onClick={() => { 
+                                const end = new Date();
+                                const start = new Date();
+                                start.setDate(start.getDate() - 6);
+                                start.setHours(0, 0, 0, 0);
+                                end.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end });
+                                setTempDateFilter('last7days');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'last7days' : dateRange === 'last7days') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Afgelopen 7 dagen
+                            </button>
+                            <button
+                              onClick={() => { 
+                                const end = new Date();
+                                const start = new Date();
+                                start.setDate(start.getDate() - 29);
+                                start.setHours(0, 0, 0, 0);
+                                end.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end });
+                                setTempDateFilter('last30days');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'last30days' : dateRange === 'last30days') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Afgelopen 30 dagen
+                            </button>
+                            <button
+                              onClick={() => { 
+                                const end = new Date();
+                                const start = new Date();
+                                start.setDate(start.getDate() - 89);
+                                start.setHours(0, 0, 0, 0);
+                                end.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end });
+                                setTempDateFilter('last90days');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'last90days' : dateRange === 'last90days') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Afgelopen 90 dagen
+                            </button>
+                            <button
+                              onClick={() => { 
+                                const end = new Date();
+                                const start = new Date();
+                                start.setDate(start.getDate() - 364);
+                                start.setHours(0, 0, 0, 0);
+                                end.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end });
+                                setTempDateFilter('last365days');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'last365days' : dateRange === 'last365days') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Afgelopen 365 dagen
+                            </button>
+                          </div>
+                          
+                          <div className="border-t border-gray-200 mx-2"></div>
+                          
+                          {/* Calendar Periods */}
+                          <div className="p-2">
+                            <button
+                              onClick={() => { 
+                                const today = new Date();
+                                const start = new Date();
+                                start.setDate(today.getDate() - today.getDay() - 7);
+                                const end = new Date(start);
+                                end.setDate(end.getDate() + 6);
+                                start.setHours(0, 0, 0, 0);
+                                end.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end });
+                                setTempDateFilter('lastWeek');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'lastWeek' : dateRange === 'lastWeek') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Afgelopen week
+                            </button>
+                            <button
+                              onClick={() => { 
+                                const today = new Date();
+                                const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                                const end = new Date(today.getFullYear(), today.getMonth(), 0);
+                                start.setHours(0, 0, 0, 0);
+                                end.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end });
+                                setTempDateFilter('lastMonth');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'lastMonth' : dateRange === 'lastMonth') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Afgelopen maand
+                            </button>
+                            <button
+                              onClick={() => { 
+                                const today = new Date();
+                                const quarter = Math.floor(today.getMonth() / 3);
+                                const start = new Date(today.getFullYear(), (quarter - 1) * 3, 1);
+                                const end = new Date(today.getFullYear(), quarter * 3, 0);
+                                start.setHours(0, 0, 0, 0);
+                                end.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end });
+                                setTempDateFilter('lastQuarter');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'lastQuarter' : dateRange === 'lastQuarter') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Afgelopen kwartaal
+                            </button>
+                            <button
+                              onClick={() => { 
+                                const today = new Date();
+                                const start = new Date(today.getFullYear() - 1, 0, 1);
+                                const end = new Date(today.getFullYear() - 1, 11, 31);
+                                start.setHours(0, 0, 0, 0);
+                                end.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end });
+                                setTempDateFilter('lastYear');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'lastYear' : dateRange === 'lastYear') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Afgelopen jaar
+                            </button>
+                          </div>
+                          
+                          <div className="border-t border-gray-200 mx-2"></div>
+                          
+                          {/* To Date Options */}
+                          <div className="p-2">
+                            <button
+                              onClick={() => { 
+                                const today = new Date();
+                                const start = new Date();
+                                // Start from Monday instead of Sunday
+                                const dayOfWeek = today.getDay();
+                                const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                                start.setDate(today.getDate() - daysToSubtract);
+                                start.setHours(0, 0, 0, 0);
+                                today.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end: today });
+                                setTempDateFilter('weekToDate');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'weekToDate' : dateRange === 'weekToDate') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Week tot nu
+                            </button>
+                            <button
+                              onClick={() => { 
+                                const today = new Date();
+                                const start = new Date(today.getFullYear(), today.getMonth(), 1);
+                                start.setHours(0, 0, 0, 0);
+                                today.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end: today });
+                                setTempDateFilter('monthToDate');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'monthToDate' : dateRange === 'monthToDate') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Maand tot nu
+                            </button>
+                            <button
+                              onClick={() => { 
+                                const today = new Date();
+                                const quarter = Math.floor(today.getMonth() / 3);
+                                const start = new Date(today.getFullYear(), quarter * 3, 1);
+                                start.setHours(0, 0, 0, 0);
+                                today.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end: today });
+                                setTempDateFilter('quarterToDate');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'quarterToDate' : dateRange === 'quarterToDate') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Kwartaal tot nu
+                            </button>
+                            <button
+                              onClick={() => { 
+                                const today = new Date();
+                                const start = new Date(today.getFullYear(), 0, 1);
+                                start.setHours(0, 0, 0, 0);
+                                today.setHours(0, 0, 0, 0);
+                                setSelectedDateRange({ start, end: today });
+                                setTempDateFilter('yearToDate');
+                                // Don't close picker - wait for Toepassen
+                              }}
+                              className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors ${
+                                (tempDateFilter ? tempDateFilter === 'yearToDate' : dateRange === 'yearToDate') ? 'bg-white text-emerald-700 font-medium shadow-sm' : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                              }`}
+                            >
+                              Jaar tot nu
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Right Side - Calendar and Date Inputs */}
+                      <div className="flex-1 overflow-y-auto" style={{maxHeight: '400px'}}>
+                        <div className="p-4 space-y-4">
+                          {/* Date Range Inputs */}
+                          <div className="grid grid-cols-5 gap-2 items-end">
+                            <div className="col-span-2">
+                              <label className="block text-[10px] font-medium text-gray-600 mb-1">Van</label>
+                              <input
+                                type="text"
+                                placeholder="DD-MM-JJJJ"
+                                value={selectedDateRange.start ? selectedDateRange.start.toLocaleDateString('nl-NL') : ''}
+                                onChange={(e) => {
+                                  // Parse Dutch date format
+                                  const parts = e.target.value.split('-')
+                                  if (parts.length === 3) {
+                                    const date = new Date(parts[2], parts[1] - 1, parts[0])
+                                    if (!isNaN(date)) {
+                                      setCustomDateRange({...customDateRange, start: formatDateForInput(date)})
+                                      setDateRange('custom')
+                                    }
+                                  }
+                                }}
+                                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                              />
+                            </div>
+                            <div className="flex justify-center pb-1.5">
+                              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                              </svg>
+                            </div>
+                            <div className="col-span-2">
+                              <label className="block text-[10px] font-medium text-gray-600 mb-1">Tot</label>
+                              <input
+                                type="text"
+                                placeholder="DD-MM-JJJJ"
+                                value={selectedDateRange.end ? selectedDateRange.end.toLocaleDateString('nl-NL') : (selectedDateRange.start && !selectedDateRange.end ? selectedDateRange.start.toLocaleDateString('nl-NL') : '')}
+                                onChange={(e) => {
+                                  // Parse Dutch date format
+                                  const parts = e.target.value.split('-')
+                                  if (parts.length === 3) {
+                                    const date = new Date(parts[2], parts[1] - 1, parts[0])
+                                    if (!isNaN(date)) {
+                                      setCustomDateRange({...customDateRange, end: formatDateForInput(date)})
+                                      setDateRange('custom')
+                                    }
+                                  }
+                                }}
+                                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* Full Calendar */}
+                          <div>
+                            {/* Calendar Header with Navigation */}
+                            <div className="flex items-center justify-between mb-3">
+                              <button
+                                onClick={() => {
+                                  const newDate = new Date(calendarView)
+                                  newDate.setMonth(newDate.getMonth() - 1)
+                                  setCalendarView(newDate)
+                                }}
+                                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                              >
+                                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                              </button>
+                              
+                              <div className="flex-1 flex justify-between px-8">
+                                <div className="text-left">
+                                  <h3 className="text-xs font-semibold text-gray-700 capitalize">
+                                    {new Date(calendarView.getFullYear(), calendarView.getMonth() - 1, 1).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' })}
+                                  </h3>
+                                </div>
+                                <div className="text-right">
+                                  <h3 className="text-xs font-bold text-gray-900 capitalize">
+                                    {calendarView.toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' })}
+                                  </h3>
+                                </div>
+                              </div>
+                              
+                              <button
+                                onClick={() => {
+                                  const newDate = new Date(calendarView)
+                                  newDate.setMonth(newDate.getMonth() + 1)
+                                  setCalendarView(newDate)
+                                }}
+                                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                              >
+                                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </button>
+                            </div>
+                            
+                            {/* Two Month Calendar Grid */}
+                            <div className="flex gap-3">
+                              {/* Previous Month */}
+                              <div className="flex-1">
+                                <table className="w-full">
+                                  <thead>
+                                    <tr className="text-[10px] text-gray-500">
+                                      <th className="pb-1 font-normal">ma</th>
+                                      <th className="pb-1 font-normal">di</th>
+                                      <th className="pb-1 font-normal">wo</th>
+                                      <th className="pb-1 font-normal">do</th>
+                                      <th className="pb-1 font-normal">vr</th>
+                                      <th className="pb-1 font-normal">za</th>
+                                      <th className="pb-1 font-normal">zo</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {[0, 1, 2, 3, 4, 5].map((weekIndex) => {
+                                      const prevMonth = new Date(calendarView.getFullYear(), calendarView.getMonth() - 1, 1)
+                                      const days = generateCalendarDays(prevMonth)
+                                      const weekDays = days.slice(weekIndex * 7, (weekIndex + 1) * 7)
+                                      
+                                      return (
+                                        <tr key={weekIndex}>
+                                          {weekDays.map((day, dayIndex) => {
+                                            const inMonth = isInCurrentMonth(day, prevMonth)
+                                            const today = isToday(day)
+                                            const selected = isSelected(day)
+                                            
+                                            return (
+                                              <td key={dayIndex} className="p-0.5">
+                                                {inMonth ? (
+                                                  <button
+                                                    onClick={() => handleDateSelect(day)}
+                                                    className={`w-6 h-6 text-[10px] rounded transition-all ${
+                                                      selected ? 'bg-emerald-100 text-emerald-700 font-medium' :
+                                                      'text-gray-700 hover:bg-gray-100'
+                                                    }`}
+                                                  >
+                                                    {day.getDate()}
+                                                  </button>
+                                                ) : (
+                                                  <div className="w-6 h-6"></div>
+                                                )}
+                                              </td>
+                                            )
+                                          })}
+                                        </tr>
+                                      )
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                              
+                              {/* Current Month */}
+                              <div className="flex-1">
+                                <table className="w-full">
+                                  <thead>
+                                    <tr className="text-[10px] text-gray-500">
+                                      <th className="pb-1 font-normal">ma</th>
+                                      <th className="pb-1 font-normal">di</th>
+                                      <th className="pb-1 font-normal">wo</th>
+                                      <th className="pb-1 font-normal">do</th>
+                                      <th className="pb-1 font-normal">vr</th>
+                                      <th className="pb-1 font-bold text-gray-700">za</th>
+                                      <th className="pb-1 font-bold text-gray-700">zo</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {[0, 1, 2, 3, 4, 5].map((weekIndex) => {
+                                      const days = generateCalendarDays(calendarView)
+                                      const weekDays = days.slice(weekIndex * 7, (weekIndex + 1) * 7)
+                                      
+                                      return (
+                                        <tr key={weekIndex}>
+                                          {weekDays.map((day, dayIndex) => {
+                                            const inMonth = isInCurrentMonth(day, calendarView)
+                                            const today = isToday(day)
+                                            const selected = isSelected(day)
+                                            const futureDate = day > new Date()
+                                            
+                                            return (
+                                              <td key={dayIndex} className="p-0.5">
+                                                {inMonth ? (
+                                                  <button
+                                                    onClick={() => handleDateSelect(day)}
+                                                    className={`w-6 h-6 text-[10px] rounded transition-all ${
+                                                      futureDate ? 'text-gray-300 cursor-not-allowed' :
+                                                      selected ? 'bg-emerald-100 text-emerald-700 font-medium' :
+                                                      'text-gray-700 hover:bg-gray-100'
+                                                    }`}
+                                                    disabled={futureDate}
+                                                  >
+                                                    {day.getDate()}
+                                                  </button>
+                                                ) : (
+                                                  <div className="w-6 h-6"></div>
+                                                )}
+                                              </td>
+                                            )
+                                          })}
+                                        </tr>
+                                      )
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Apply/Cancel Buttons - Fixed at bottom */}
+                        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-3">
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => {
+                                setSelectedDateRange({ start: null, end: null })
+                                setShowDatePicker(false)
+                                setTempDateFilter(null)
+                              }}
+                              className="px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 rounded transition-colors"
+                            >
+                              Annuleren
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (selectedDateRange.start) {
+                                  const today = new Date()
+                                  today.setHours(0, 0, 0, 0)
+                                  const startDate = new Date(selectedDateRange.start)
+                                  startDate.setHours(0, 0, 0, 0)
+                                  
+                                  // Check for specific preset ranges
+                                  if (!selectedDateRange.end || selectedDateRange.start.getTime() === selectedDateRange.end.getTime()) {
+                                    // Single date selected
+                                    if (startDate.getTime() === today.getTime()) {
+                                      setDateRange('today')
+                                      setCustomDateRange({ start: null, end: null })
+                                    } else {
+                                      // Check if it's yesterday
+                                      const yesterday = new Date()
+                                      yesterday.setDate(yesterday.getDate() - 1)
+                                      yesterday.setHours(0, 0, 0, 0)
+                                      
+                                      if (startDate.getTime() === yesterday.getTime()) {
+                                        setDateRange('yesterday')
+                                        setCustomDateRange({ start: null, end: null })
+                                      } else {
+                                        // Custom single date
+                                        setCustomDateRange({ 
+                                          start: formatDateForInput(selectedDateRange.start), 
+                                          end: formatDateForInput(selectedDateRange.start)
+                                        })
+                                        setDateRange('custom')
+                                      }
+                                    }
+                                  } else {
+                                    // Date range selected - check for preset ranges
+                                    const endDate = new Date(selectedDateRange.end)
+                                    endDate.setHours(0, 0, 0, 0)
+                                    
+                                    // Calculate days difference
+                                    const daysDiff = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24))
+                                    
+                                    // Check for common ranges
+                                    if (endDate.getTime() === today.getTime()) {
+                                      // First check if a specific filter was selected
+                                      if (tempDateFilter && ['lastWeek', 'lastMonth', 'lastQuarter', 'lastYear', 
+                                                             'weekToDate', 'monthToDate', 'quarterToDate', 'yearToDate'].includes(tempDateFilter)) {
+                                        // If a specific filter was selected, use it
+                                        setDateRange(tempDateFilter)
+                                        setCustomDateRange({ start: null, end: null })
+                                      } else if (daysDiff === 6) {
+                                        setDateRange('last7days')
+                                        setCustomDateRange({ start: null, end: null })
+                                      } else if (daysDiff === 29) {
+                                        setDateRange('last30days')
+                                        setCustomDateRange({ start: null, end: null })
+                                      } else if (daysDiff === 89) {
+                                        setDateRange('last90days')
+                                        setCustomDateRange({ start: null, end: null })
+                                      } else if (daysDiff === 364) {
+                                        setDateRange('last365days')
+                                        setCustomDateRange({ start: null, end: null })
+                                      } else {
+                                        // Custom range
+                                        setCustomDateRange({ 
+                                          start: formatDateForInput(selectedDateRange.start), 
+                                          end: formatDateForInput(selectedDateRange.end)
+                                        })
+                                        setDateRange('custom')
+                                      }
+                                    } else {
+                                      // Custom range
+                                      setCustomDateRange({ 
+                                        start: formatDateForInput(selectedDateRange.start), 
+                                        end: formatDateForInput(selectedDateRange.end)
+                                      })
+                                      setDateRange('custom')
+                                    }
+                                  }
+                                  setShowDatePicker(false)
+                                  setTempDateFilter(null)
+                                }
+                              }}
+                              className="px-3 py-1.5 text-xs bg-emerald-500 text-white rounded hover:bg-emerald-600 transition-colors"
+                            >
+                              Toepassen
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Location Filter */}
               <select
                 value={selectedStore}
                 onChange={(e) => setSelectedStore(e.target.value)}
-                className="px-4 py-2.5 rounded-lg border bg-white border-gray-200 text-gray-700 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg bg-white border border-gray-200 text-gray-600 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
               >
-                <option value="all">Alle Restaurants</option>
+                <option value="all">Alle Locaties</option>
                 <option value="amsterdam">Amsterdam</option>
                 <option value="rotterdam">Rotterdam</option>
                 <option value="utrecht">Utrecht</option>
+                <option value="denhaag">Den Haag</option>
+                <option value="eindhoven">Eindhoven</option>
               </select>
-              <select
-                value={dateRange}
-                onChange={(e) => setDateRange(e.target.value)}
-                className="px-4 py-2.5 rounded-lg border bg-white border-gray-200 text-gray-700 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-20 transition-colors"
+              
+              {/* Compare Toggle */}
+              <button
+                onClick={() => setCompareWithPrevious(!compareWithPrevious)}
+                className={`px-3 py-2 text-sm rounded-lg border transition-all flex items-center gap-2 ${
+                  compareWithPrevious
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                }`}
               >
-                <option value="today">Vandaag</option>
-                <option value="week">Deze Week</option>
-                <option value="month">Deze Maand</option>
-                <option value="year">Dit Jaar</option>
-              </select>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Vergelijk
+              </button>
             </div>
+            
           </div>
 
-          {/* Splitty Admin Stats Cards */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-            {stats.map((stat, index) => (
+          {/* Splitty Admin Stats Cards - Clean Design */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 mb-8">
+            {stats.map((stat) => (
               <div 
-                key={index} 
-                className="rounded-xl p-6 transition-all duration-200 hover:shadow-md bg-white shadow-sm border border-gray-100"
+                key={stat.id} 
+                onClick={() => setSelectedMetric(stat.id)}
+                className={`rounded-xl p-5 transition-all duration-200 hover:shadow-lg bg-white border cursor-pointer ${
+                  selectedMetric === stat.id
+                    ? 'border-emerald-400 shadow-lg ring-2 ring-emerald-200'
+                    : stat.priority === 'primary' 
+                      ? 'border-emerald-200 shadow-md' 
+                      : 'border-gray-100 shadow-sm'
+                }`}
               >
-                {/* Card Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-2.5 rounded-lg ${stat.bgColor}`}>
-                    <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
+                {/* Simplified Card Content */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+                    <stat.icon className={`h-4 w-4 ${stat.iconColor}`} />
                   </div>
-                  {stat.change && (
-                    <div className={`flex items-center text-sm font-medium ${stat.changeColor}`}>
-                      {stat.trend === 'up' && <ArrowTrendingUpIcon className="h-4 w-4 mr-1" />}
-                      {stat.trend === 'down' && <ArrowTrendingDownIcon className="h-4 w-4 mr-1" />}
+                  {stat.trend !== 'neutral' && (
+                    <span className={`text-xs font-semibold ${stat.changeColor}`}>
                       {stat.change}
-                    </div>
+                    </span>
                   )}
                 </div>
 
-                {/* Card Content */}
                 <div>
-                  <h3 className="text-sm font-medium text-[#6B7280] mb-1">
+                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                     {stat.title}
                   </h3>
-                  <div className="flex items-baseline space-x-2">
-                    <p className="text-2xl font-bold text-[#111827]">
+                  <div className="flex items-baseline gap-1">
+                    <p className={`font-bold text-gray-900 ${
+                      stat.priority === 'primary' ? 'text-2xl' : 'text-xl'
+                    }`}>
                       {stat.value}
                     </p>
                     {stat.subValue && (
-                      <span className="text-sm text-[#6B7280] font-normal">
+                      <span className="text-xs text-gray-500">
                         {stat.subValue}
                       </span>
                     )}
                   </div>
-                  
-                  {/* Progress Bar */}
-                  {stat.trend === 'progress' && (
-                    <div className="mt-3">
-                      <div className="w-full rounded-full h-2 bg-gray-100">
-                        <div 
-                          className={`h-2 rounded-full transition-all duration-500 ${stat.progressColor}`}
-                          style={{ width: `${stat.progressValue}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Description */}
                   {stat.description && (
-                    <p className="text-xs text-[#6B7280] mt-2">
+                    <p className="text-xs text-gray-400 mt-1">
                       {stat.description}
                     </p>
                   )}
@@ -300,69 +1350,119 @@ export default function Dashboard() {
           {/* Analytics Dashboard */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-[#111827]">Analytics Dashboard</h2>
-              <span className="text-sm text-[#6B7280] bg-gray-50 px-3 py-1 rounded-full">
-                Afgelopen 7 dagen
-              </span>
+              <div>
+                <h2 className="text-xl font-semibold text-[#111827]">{analyticsData.title}</h2>
+                <p className="text-sm text-[#6B7280] mt-1">{analyticsData.subtitle}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {/* View Toggle Buttons */}
+                <div className="bg-white rounded-lg border border-gray-200 p-1 flex">
+                  <button
+                    onClick={() => setAnalyticsView('totaal')}
+                    className={`px-3 py-1.5 text-xs font-medium rounded transition-all ${
+                      analyticsView === 'totaal'
+                        ? 'bg-emerald-500 text-white'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Totaal
+                  </button>
+                  <button
+                    onClick={() => setAnalyticsView('restaurant')}
+                    className={`px-3 py-1.5 text-xs font-medium rounded transition-all ${
+                      analyticsView === 'restaurant'
+                        ? 'bg-emerald-500 text-white'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Per Restaurant
+                  </button>
+                  <button
+                    onClick={() => setAnalyticsView('regio')}
+                    className={`px-3 py-1.5 text-xs font-medium rounded transition-all ${
+                      analyticsView === 'regio'
+                        ? 'bg-emerald-500 text-white'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Per Regio
+                  </button>
+                </div>
+                <span className="text-sm text-[#6B7280] bg-gray-50 px-3 py-1 rounded-full">
+                  {dateRange === 'today' && 'Vandaag'}
+                  {dateRange === 'yesterday' && 'Gisteren'}
+                  {dateRange === 'last7days' && 'Afgelopen 7 dagen'}
+                  {dateRange === 'last30days' && 'Afgelopen 30 dagen'}
+                  {dateRange === 'last90days' && 'Afgelopen 90 dagen'}
+                  {dateRange === 'last365days' && 'Afgelopen 365 dagen'}
+                  {dateRange === 'lastWeek' && 'Afgelopen week'}
+                  {dateRange === 'lastMonth' && 'Afgelopen maand'}
+                  {dateRange === 'lastQuarter' && 'Afgelopen kwartaal'}
+                  {dateRange === 'lastYear' && 'Afgelopen jaar'}
+                  {dateRange === 'weekToDate' && 'Week tot nu'}
+                  {dateRange === 'monthToDate' && 'Maand tot nu'}
+                  {dateRange === 'quarterToDate' && 'Kwartaal tot nu'}
+                  {dateRange === 'yearToDate' && 'Jaar tot nu'}
+                  {dateRange === 'custom' && customDateRange.start && (() => {
+                    // Parse dates properly to avoid timezone issues
+                    let startDate, endDate = null
+                    
+                    // Check if customDateRange.start is a string or Date object
+                    if (typeof customDateRange.start === 'string') {
+                      const [year1, month1, day1] = customDateRange.start.split('-').map(Number)
+                      startDate = new Date(year1, month1 - 1, day1)
+                    } else {
+                      startDate = new Date(customDateRange.start)
+                    }
+                    
+                    const today = new Date()
+                    const isToday = startDate.toDateString() === today.toDateString()
+                    
+                    if (!customDateRange.end || customDateRange.start === customDateRange.end) {
+                      // Single date selected
+                      return isToday ? 'Vandaag' : startDate.toLocaleDateString('nl-NL')
+                    } else {
+                      // Date range selected
+                      if (typeof customDateRange.end === 'string') {
+                        const [year2, month2, day2] = customDateRange.end.split('-').map(Number)
+                        endDate = new Date(year2, month2 - 1, day2)
+                      } else {
+                        endDate = new Date(customDateRange.end)
+                      }
+                      return `${startDate.toLocaleDateString('nl-NL')} - ${endDate.toLocaleDateString('nl-NL')}`
+                    }
+                  })()}
+                  {compareWithPrevious && ' (vs vorige periode)'}
+                </span>
+              </div>
             </div>
             
             {/* Analytics Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Analytics KPI Cards */}
+              {/* Analytics KPI Cards - Dynamic based on selection */}
               <div className="lg:col-span-1 space-y-4">
-                {/* Weekly Revenue */}
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2 rounded-lg bg-emerald-50">
-                      <CreditCardIcon className="h-4 w-4 text-emerald-600" />
+                {analyticsData.cards.map((card, index) => (
+                  <div key={index} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="p-2 rounded-lg bg-emerald-50">
+                        <ChartBarIcon className="h-4 w-4 text-emerald-600" />
+                      </div>
+                      <div className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        card.positive 
+                          ? 'bg-green-50 text-green-700' 
+                          : 'bg-red-50 text-red-700'
+                      }`}>
+                        {card.change}
+                      </div>
                     </div>
-                    <div className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded-full font-medium">
-                      +8.2%
+                    <div className="text-2xl font-bold mb-1 text-[#111827]">
+                      {card.value}
                     </div>
-                  </div>
-                  <div className="text-2xl font-bold mb-1 text-[#111827]">
-                    {formatCurrency(totalTurnover)}
-                  </div>
-                  <div className="text-sm text-[#6B7280]">
-                    Week omzet
-                  </div>
-                </div>
-
-                {/* Weekly Orders */}
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2 rounded-lg bg-teal-50">
-                      <ShoppingBagIcon className="h-4 w-4 text-teal-600" />
-                    </div>
-                    <div className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded-full font-medium">
-                      +12.5%
+                    <div className="text-sm text-[#6B7280]">
+                      {card.label}
                     </div>
                   </div>
-                  <div className="text-2xl font-bold mb-1 text-[#111827]">
-                    {totalOrders}
-                  </div>
-                  <div className="text-sm text-[#6B7280]">
-                    Week bestellingen
-                  </div>
-                </div>
-
-                {/* Average Order Value */}
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2 rounded-lg bg-orange-50">
-                      <ChartBarIcon className="h-4 w-4 text-orange-600" />
-                    </div>
-                    <div className="text-xs px-2 py-1 bg-orange-50 text-orange-700 rounded-full font-medium">
-                      -2.1%
-                    </div>
-                  </div>
-                  <div className="text-2xl font-bold mb-1 text-[#111827]">
-                    {formatCurrency(avgOrderValue)}
-                  </div>
-                  <div className="text-sm text-[#6B7280]">
-                    Gem. bestelling
-                  </div>
-                </div>
+                ))}
               </div>
 
               {/* Chart Section */}
@@ -389,12 +1489,12 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Enhanced Chart */}
-                  <div className="h-64 relative">
+                  {/* Enhanced Chart - Increased height to match cards */}
+                  <div className="h-80 relative">
                     <div className="h-full flex items-end justify-between space-x-3 px-4">
                       {dailyData.map((day, index) => {
-                        const orderHeight = Math.max((day.orders / maxOrders) * 200, 8)
-                        const turnoverHeight = Math.max((day.turnover / maxTurnover) * 200, 8)
+                        const orderHeight = Math.max((day.orders / maxOrders) * 250, 8)
+                        const turnoverHeight = Math.max((day.turnover / maxTurnover) * 250, 8)
                         
                         return (
                           <div key={index} className="flex-1 flex flex-col items-center group">
