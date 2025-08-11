@@ -97,9 +97,7 @@ const allNavigation = [
     ]
   },
   { name: "Alle Splitty's", href: '/orders', icon: ArrowsRightLeftIcon, roles: ['ceo', 'admin', 'account_manager', 'support'] },
-  { name: 'Actieve Tafels', href: '/tables', icon: TableCellsIcon, roles: ['ceo', 'admin', 'account_manager', 'support'] },
   { name: 'Test Bestelling', href: '/test-order', icon: BeakerIcon, roles: ['ceo', 'admin', 'developer'] },
-  { name: 'Betalingen', href: '/payments', icon: CreditCardIcon, roles: ['ceo', 'admin'] },
   { name: 'Splitty Team', href: '/users', icon: UsersIcon, roles: ['ceo', 'admin'] },
   { name: 'Support', href: '/support', icon: ChatBubbleLeftRightIcon, roles: ['ceo', 'admin', 'support'] },
   { name: 'Knowledge Base', href: '/knowledge-base', icon: BookOpenIcon, roles: ['ceo', 'admin', 'account_manager', 'support', 'developer'] },

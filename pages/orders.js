@@ -387,15 +387,21 @@ export default function Orders() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                          <Link
-                            href={`/orders/${order.id}`}
-                            className="inline-flex items-center px-3 py-1.5 rounded-lg transition bg-green-50 text-green-600 border border-green-200 hover:bg-green-100"
-                          >
-                            Bekijk
-                            <svg className="ml-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </Link>
+                          <div className="flex gap-2 justify-end">
+                            <Link
+                              href={`/restaurants/${order.restaurantId}/orders/${order.id.slice(2)}`}
+                              className="text-green-600 hover:text-green-700 text-xs font-medium"
+                            >
+                              Order
+                            </Link>
+                            <span className="text-gray-300 text-xs">|</span>
+                            <Link
+                              href={`/restaurants/${order.restaurantId}/payments/${order.id.slice(2)}`}
+                              className="text-green-600 hover:text-green-700 text-xs font-medium"
+                            >
+                              Betaling
+                            </Link>
+                          </div>
                         </td>
                       </tr>
                     ))}

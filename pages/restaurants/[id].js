@@ -50,11 +50,29 @@ export default function RestaurantDetail() {
   const [showPassword, setShowPassword] = useState(false)
   const [editingGoogleReview, setEditingGoogleReview] = useState(false)
   const [googleReviewLink, setGoogleReviewLink] = useState('')
+  const [recentOrders, setRecentOrders] = useState([])
   
   // Get current user from localStorage
   const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null
   const currentUserEmail = typeof window !== 'undefined' ? localStorage.getItem('userEmail') : null
   const currentUser = currentUserId ? getCompanyUser(currentUserId) : null
+
+  // Static recent orders - most recent at top
+  useEffect(() => {
+    if (id) {
+      // Fixed orders that never change, already sorted by most recent first
+      const staticOrders = [
+        { id: 1005, table: 12, amount: 45.80, status: 'in_progress', time: '2 min', items: 'Latte, Croissant', timestamp: 1 },
+        { id: 1004, table: 7, amount: 23.50, status: 'completed', time: '5 min', items: 'Cappuccino x2', timestamp: 2 },
+        { id: 1003, table: 3, amount: 67.90, status: 'partial', time: '8 min', items: 'Pizza, Wijn, Dessert', timestamp: 3 },
+        { id: 1002, table: 15, amount: 12.40, status: 'completed', time: '12 min', items: 'Sandwich', timestamp: 4 },
+        { id: 1001, table: 9, amount: 34.20, status: 'completed', time: '15 min', items: 'Pasta, Bier', timestamp: 5 }
+      ]
+      
+      // Orders are already in the correct order (most recent first)
+      setRecentOrders(staticOrders)
+    }
+  }, [id])
 
   // Mock data - in a real app, this would be fetched based on the ID
   const restaurants = {
@@ -1381,7 +1399,7 @@ export default function RestaurantDetail() {
                           Actieve Tafels
                         </h3>
                         <Link
-                          href="/tables"
+                          href={`/restaurants/${id}/tables`}
                           className={`inline-flex items-center text-sm font-medium transition ${
                             false ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
                           }`}>
@@ -1469,7 +1487,7 @@ export default function RestaurantDetail() {
                       {restaurantTables.length > 8 && (
                         <div className="mt-6 text-center">
                           <Link
-                            href="/tables"
+                            href={`/restaurants/${id}/tables`}
                             className={`inline-flex items-center text-sm transition font-medium ${
                               false ? 'text-[#BBBECC] hover:text-[#2BE89A]' : 'text-[#6B7280] hover:text-green-600'
                             }`}>
@@ -1480,7 +1498,7 @@ export default function RestaurantDetail() {
                       )}
                     </div>
 
-                    {/* Transaction Analytics - Full Width */}
+                    {/* Splitty Orders & Transaction Analytics - Full Width */}
                     <div className={`rounded-xl p-6 mt-6 ${
                       false ? 'bg-[#1c1e27] border border-[#2a2d3a]' : 'bg-white shadow-sm'
                     }`}>
@@ -1489,21 +1507,19 @@ export default function RestaurantDetail() {
                           false ? 'text-white' : 'text-[#111827]'
                         }`}>
                           <ChartBarIcon className={`h-6 w-6 mr-3 ${false ? 'text-[#2BE89A]' : 'text-green-500'}`} />
-                          Transactie Analytics
+                          Splitty Orders & Transacties
                         </h3>
-                        {!isNotFullyOnboarded && (
-                          <Link
-                            href={`/restaurants/${id}/stripe-transactions`}
-                            className={`inline-flex items-center text-sm font-medium transition ${
-                              false ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
-                            }`}>
-                            <span>Bekijk Alle Transacties</span>
-                            <ArrowTopRightOnSquareIcon className="ml-1.5 h-4 w-4" />
-                          </Link>
-                        )}
+                        <Link
+                          href={`/restaurants/${id}/tables`}
+                          className={`inline-flex items-center text-sm font-medium transition ${
+                            false ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
+                          }`}>
+                          <span>Bekijk Alle Orders</span>
+                          <ArrowTopRightOnSquareIcon className="ml-1.5 h-4 w-4" />
+                        </Link>
                       </div>
                       
-                      {restaurant.transactions.total === 0 || isNotFullyOnboarded ? (
+                      {isNotFullyOnboarded ? (
                         <div className={`text-center py-20 rounded-xl ${
                           false ? 'bg-[#0A0B0F]' : 'bg-gray-50'
                         }`}>
@@ -1512,51 +1528,178 @@ export default function RestaurantDetail() {
                           }`}>
                             <CurrencyDollarIcon className={`h-10 w-10 ${false ? 'text-[#BBBECC]' : 'text-gray-600'}`} />
                           </div>
-                          <h4 className={`text-lg font-medium mb-2 ${false ? 'text-white' : 'text-[#111827]'}`}>Nog Geen Transacties</h4>
-                          <p className={`max-w-sm mx-auto ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Transactie analytics verschijnen hier zodra betalingen binnenkomen.</p>
+                          <h4 className={`text-lg font-medium mb-2 ${false ? 'text-white' : 'text-[#111827]'}`}>Nog Geen Splitty Orders</h4>
+                          <p className={`max-w-sm mx-auto ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                            Splitty orders verschijnen hier in realtime zodra klanten beginnen met betalen.
+                          </p>
                         </div>
                       ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          <div className={`rounded-xl p-6 ${
-                            false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
-                          }`}>
-                            <div className="flex items-center justify-between mb-4">
-                              <p className={`text-sm font-medium ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Totaal Transacties</p>
-                              <div className="p-2 bg-gradient-to-r from-green-400 to-green-500 rounded-lg">
-                                <ShoppingBagIcon className="h-5 w-5 text-white" />
+                        <>
+                          {/* Summary Cards */}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div className={`rounded-xl p-4 ${
+                              false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                            }`}>
+                              <div className="flex items-center justify-between mb-2">
+                                <p className={`text-sm font-medium ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Deze Maand</p>
+                                <div className="p-2 bg-gradient-to-r from-green-400 to-green-500 rounded-lg">
+                                  <ShoppingBagIcon className="h-4 w-4 text-white" />
+                                </div>
                               </div>
+                              <p className={`text-2xl font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>
+                                {restaurant.transactions.thisMonth}
+                              </p>
+                              <p className={`text-xs mt-1 ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>
+                                {new Date().toLocaleDateString('nl-NL', { month: 'long' })}
+                              </p>
                             </div>
-                            <p className={`text-3xl font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>{restaurant.transactions.total.toLocaleString()}</p>
-                            <p className={`text-xs mt-2 ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Alle tijd</p>
-                          </div>
-                          <div className={`rounded-xl p-6 ${
-                            false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
-                          }`}>
-                            <div className="flex items-center justify-between mb-4">
-                              <p className={`text-sm font-medium ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Deze Maand</p>
-                              <div className="p-2 bg-gradient-to-r from-[#4ECDC4] to-[#44A08D] rounded-lg">
-                                <ArrowTrendingUpIcon className="h-5 w-5 text-white" />
+                            <div className={`rounded-xl p-4 ${
+                              false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                            }`}>
+                              <div className="flex items-center justify-between mb-2">
+                                <p className={`text-sm font-medium ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Vandaag</p>
+                                <div className="p-2 bg-gradient-to-r from-[#4ECDC4] to-[#44A08D] rounded-lg">
+                                  <ArrowTrendingUpIcon className="h-4 w-4 text-white" />
+                                </div>
                               </div>
+                              <p className={`text-2xl font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>
+                                {Math.floor(restaurant.transactions.thisMonth / 30)}
+                              </p>
+                              <p className="text-xs text-green-500 mt-1 flex items-center">
+                                <ArrowTrendingUpIcon className="h-3 w-3 mr-1" />
+                                +15% vs gisteren
+                              </p>
                             </div>
-                            <p className={`text-3xl font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>{restaurant.transactions.thisMonth}</p>
-                            <p className="text-xs text-green-500 mt-2 flex items-center">
-                              <ArrowTrendingUpIcon className="h-3 w-3 mr-1" />
-                              +12.5% vs vorige maand
-                            </p>
-                          </div>
-                          <div className={`rounded-xl p-6 ${
-                            false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
-                          }`}>
-                            <div className="flex items-center justify-between mb-4">
-                              <p className={`text-sm font-medium ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Vorige Maand</p>
-                              <div className="p-2 bg-gradient-to-r from-[#667EEA] to-[#764BA2] rounded-lg">
-                                <ChartBarIcon className="h-5 w-5 text-white" />
+                            <div className={`rounded-xl p-4 ${
+                              false ? 'bg-[#0A0B0F] border border-[#2a2d3a]' : 'bg-gray-50 border border-gray-200'
+                            }`}>
+                              <div className="flex items-center justify-between mb-2">
+                                <p className={`text-sm font-medium ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Actieve Orders</p>
+                                <div className="p-2 bg-gradient-to-r from-[#667EEA] to-[#764BA2] rounded-lg">
+                                  <ClockIcon className="h-4 w-4 text-white" />
+                                </div>
                               </div>
+                              <p className={`text-2xl font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>3</p>
+                              <p className={`text-xs mt-1 ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>In behandeling</p>
                             </div>
-                            <p className={`text-3xl font-bold ${false ? 'text-white' : 'text-[#111827]'}`}>{restaurant.transactions.lastMonth}</p>
-                            <p className={`text-xs mt-2 ${false ? 'text-[#BBBECC]' : 'text-[#6B7280]'}`}>Voltooid</p>
                           </div>
-                        </div>
+
+                          {/* Recent Orders Table - Compact */}
+                          <div className={`rounded-lg overflow-hidden border ${
+                            false ? 'border-[#2a2d3a]' : 'border-gray-200'
+                          }`}>
+                            <div className={`px-4 py-2.5 ${
+                              false ? 'bg-[#0A0B0F] border-b border-[#2a2d3a]' : 'bg-gray-50 border-b border-gray-200'
+                            }`}>
+                              <h4 className={`text-sm font-medium ${false ? 'text-white' : 'text-gray-900'}`}>
+                                Live Splitty Orders - Laatste 5
+                              </h4>
+                            </div>
+                            <div className="overflow-x-auto">
+                              <table className="min-w-full">
+                                <thead className={false ? 'bg-[#0A0B0F]' : 'bg-white'}>
+                                  <tr className="border-b border-gray-200">
+                                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                                      false ? 'text-[#BBBECC]' : 'text-gray-500'
+                                    }`}>Order</th>
+                                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                                      false ? 'text-[#BBBECC]' : 'text-gray-500'
+                                    }`}>Tafel</th>
+                                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                                      false ? 'text-[#BBBECC]' : 'text-gray-500'
+                                    }`}>Bedrag</th>
+                                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                                      false ? 'text-[#BBBECC]' : 'text-gray-500'
+                                    }`}>Status</th>
+                                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                                      false ? 'text-[#BBBECC]' : 'text-gray-500'
+                                    }`}>Tijd</th>
+                                    <th className={`px-4 py-2 text-left text-xs font-medium uppercase tracking-wider ${
+                                      false ? 'text-[#BBBECC]' : 'text-gray-500'
+                                    }`}>Acties</th>
+                                  </tr>
+                                </thead>
+                                <tbody className={false ? 'bg-[#1c1e27]' : 'bg-white'}>
+                                  {recentOrders.map((order, i) => (
+                                    <tr key={order.id} className={`${i !== 4 ? 'border-b border-gray-100' : ''} ${false ? 'hover:bg-[#0A0B0F]' : 'hover:bg-gray-50'}`}>
+                                      <td className={`px-4 py-2.5 whitespace-nowrap text-sm font-medium ${
+                                        false ? 'text-white' : 'text-gray-900'
+                                      }`}>
+                                        #{order.id}
+                                      </td>
+                                      <td className={`px-4 py-2.5 whitespace-nowrap text-sm ${
+                                        false ? 'text-[#BBBECC]' : 'text-gray-500'
+                                      }`}>
+                                        {order.table}
+                                      </td>
+                                      <td className={`px-4 py-2.5 whitespace-nowrap text-sm font-medium ${
+                                        false ? 'text-white' : 'text-gray-900'
+                                      }`}>
+                                        €{order.amount.toFixed(2)}
+                                      </td>
+                                      <td className="px-4 py-2.5 whitespace-nowrap">
+                                        {order.status === 'completed' ? (
+                                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></div>
+                                            Voltooid
+                                          </span>
+                                        ) : order.status === 'in_progress' ? (
+                                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1.5 animate-pulse"></div>
+                                            Bezig
+                                          </span>
+                                        ) : (
+                                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1.5"></div>
+                                            Deels
+                                          </span>
+                                        )}
+                                      </td>
+                                      <td className={`px-4 py-2.5 whitespace-nowrap text-xs ${
+                                        false ? 'text-[#BBBECC]' : 'text-gray-500'
+                                      }`}>
+                                        {order.time}
+                                      </td>
+                                      <td className="px-4 py-2.5 whitespace-nowrap text-sm">
+                                        <div className="flex gap-1.5 items-center">
+                                          <Link 
+                                            href={`/restaurants/${id}/orders/${order.id}`}
+                                            className={`font-medium text-xs ${
+                                              false ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
+                                            }`}
+                                          >
+                                            Order
+                                          </Link>
+                                          <span className="text-gray-300 text-xs">|</span>
+                                          <Link 
+                                            href={`/restaurants/${id}/payments/${order.id}`}
+                                            className={`font-medium text-xs ${
+                                              false ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
+                                            }`}
+                                          >
+                                            Betaling
+                                          </Link>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                            <div className={`px-4 py-2.5 ${
+                              false ? 'bg-[#0A0B0F] border-t border-[#2a2d3a]' : 'bg-gray-50 border-t border-gray-200'
+                            }`}>
+                              <Link
+                                href={`/restaurants/${id}/tables`}
+                                className={`text-xs font-medium ${
+                                  false ? 'text-[#2BE89A] hover:text-[#4FFFB0]' : 'text-green-600 hover:text-green-700'
+                                }`}
+                              >
+                                Bekijk alle orders & betalingen →
+                              </Link>
+                            </div>
+                          </div>
+                        </>
                       )}
                     </div>
                   </div>
